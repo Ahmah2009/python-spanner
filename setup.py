@@ -93,7 +93,7 @@ setuptools.setup(
     namespace_packages=namespaces,
     install_requires=dependencies,
     extras_require=extras,
-    python_requires=">=3.6",
+    python_requires=">=2.7",
     include_package_data=True,
     zip_safe=False,
 )
