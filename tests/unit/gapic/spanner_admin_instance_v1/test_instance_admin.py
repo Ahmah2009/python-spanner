@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import zip
+from future import standard_library
+standard_library.install_aliases()
 # -*- coding: utf-8 -*-
 
 # Copyright 2020 Google LLC
@@ -452,7 +459,7 @@ def test_instance_admin_client_client_options_from_dict():
 
 
 def test_list_instance_configs(
-    transport: str = "grpc",
+    transport = "grpc",
     request_type=spanner_instance_admin.ListInstanceConfigsRequest,
 ):
     client = InstanceAdminClient(
@@ -493,7 +500,7 @@ def test_list_instance_configs_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_instance_configs_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_instance_admin.ListInstanceConfigsRequest,
 ):
     client = InstanceAdminAsyncClient(
@@ -835,7 +842,7 @@ async def test_list_instance_configs_async_pages():
 
 
 def test_get_instance_config(
-    transport: str = "grpc",
+    transport = "grpc",
     request_type=spanner_instance_admin.GetInstanceConfigRequest,
 ):
     client = InstanceAdminClient(
@@ -878,7 +885,7 @@ def test_get_instance_config_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_instance_config_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_instance_admin.GetInstanceConfigRequest,
 ):
     client = InstanceAdminAsyncClient(
@@ -1048,7 +1055,7 @@ async def test_get_instance_config_flattened_error_async():
 
 
 def test_list_instances(
-    transport: str = "grpc", request_type=spanner_instance_admin.ListInstancesRequest
+    transport = "grpc", request_type=spanner_instance_admin.ListInstancesRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1086,7 +1093,7 @@ def test_list_instances_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_instances_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_instance_admin.ListInstancesRequest,
 ):
     client = InstanceAdminAsyncClient(
@@ -1402,7 +1409,7 @@ async def test_list_instances_async_pages():
 
 
 def test_get_instance(
-    transport: str = "grpc", request_type=spanner_instance_admin.GetInstanceRequest
+    transport = "grpc", request_type=spanner_instance_admin.GetInstanceRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1455,7 +1462,7 @@ def test_get_instance_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_instance_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_instance_admin.GetInstanceRequest,
 ):
     client = InstanceAdminAsyncClient(
@@ -1628,7 +1635,7 @@ async def test_get_instance_flattened_error_async():
 
 
 def test_create_instance(
-    transport: str = "grpc", request_type=spanner_instance_admin.CreateInstanceRequest
+    transport = "grpc", request_type=spanner_instance_admin.CreateInstanceRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1661,7 +1668,7 @@ def test_create_instance_from_dict():
 
 @pytest.mark.asyncio
 async def test_create_instance_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_instance_admin.CreateInstanceRequest,
 ):
     client = InstanceAdminAsyncClient(
@@ -1837,7 +1844,7 @@ async def test_create_instance_flattened_error_async():
 
 
 def test_update_instance(
-    transport: str = "grpc", request_type=spanner_instance_admin.UpdateInstanceRequest
+    transport = "grpc", request_type=spanner_instance_admin.UpdateInstanceRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1870,7 +1877,7 @@ def test_update_instance_from_dict():
 
 @pytest.mark.asyncio
 async def test_update_instance_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_instance_admin.UpdateInstanceRequest,
 ):
     client = InstanceAdminAsyncClient(
@@ -2042,7 +2049,7 @@ async def test_update_instance_flattened_error_async():
 
 
 def test_delete_instance(
-    transport: str = "grpc", request_type=spanner_instance_admin.DeleteInstanceRequest
+    transport = "grpc", request_type=spanner_instance_admin.DeleteInstanceRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2075,7 +2082,7 @@ def test_delete_instance_from_dict():
 
 @pytest.mark.asyncio
 async def test_delete_instance_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_instance_admin.DeleteInstanceRequest,
 ):
     client = InstanceAdminAsyncClient(
@@ -2223,7 +2230,7 @@ async def test_delete_instance_flattened_error_async():
 
 
 def test_set_iam_policy(
-    transport: str = "grpc", request_type=iam_policy.SetIamPolicyRequest
+    transport = "grpc", request_type=iam_policy.SetIamPolicyRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2261,7 +2268,7 @@ def test_set_iam_policy_from_dict():
 
 @pytest.mark.asyncio
 async def test_set_iam_policy_async(
-    transport: str = "grpc_asyncio", request_type=iam_policy.SetIamPolicyRequest
+    transport = "grpc_asyncio", request_type=iam_policy.SetIamPolicyRequest
 ):
     client = InstanceAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2430,7 +2437,7 @@ async def test_set_iam_policy_flattened_error_async():
 
 
 def test_get_iam_policy(
-    transport: str = "grpc", request_type=iam_policy.GetIamPolicyRequest
+    transport = "grpc", request_type=iam_policy.GetIamPolicyRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2468,7 +2475,7 @@ def test_get_iam_policy_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_iam_policy_async(
-    transport: str = "grpc_asyncio", request_type=iam_policy.GetIamPolicyRequest
+    transport = "grpc_asyncio", request_type=iam_policy.GetIamPolicyRequest
 ):
     client = InstanceAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2637,7 +2644,7 @@ async def test_get_iam_policy_flattened_error_async():
 
 
 def test_test_iam_permissions(
-    transport: str = "grpc", request_type=iam_policy.TestIamPermissionsRequest
+    transport = "grpc", request_type=iam_policy.TestIamPermissionsRequest
 ):
     client = InstanceAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2677,7 +2684,7 @@ def test_test_iam_permissions_from_dict():
 
 @pytest.mark.asyncio
 async def test_test_iam_permissions_async(
-    transport: str = "grpc_asyncio", request_type=iam_policy.TestIamPermissionsRequest
+    transport = "grpc_asyncio", request_type=iam_policy.TestIamPermissionsRequest
 ):
     client = InstanceAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,

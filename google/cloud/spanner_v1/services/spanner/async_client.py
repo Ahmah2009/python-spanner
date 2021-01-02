@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 # -*- coding: utf-8 -*-
 
 # Copyright 2020 Google LLC
@@ -42,7 +49,7 @@ from .transports.grpc_asyncio import SpannerGrpcAsyncIOTransport
 from .client import SpannerClient
 
 
-class SpannerAsyncClient:
+class SpannerAsyncClient(object):
     """Cloud Spanner API
     The Cloud Spanner API can be used to manage sessions and execute
     transactions on data stored in Cloud Spanner databases.
@@ -83,7 +90,7 @@ class SpannerAsyncClient:
     from_service_account_json = from_service_account_file
 
     @property
-    def transport(self) -> SpannerTransport:
+    def transport(self):
         """Return the transport used by the client instance.
 
         Returns:
@@ -96,13 +103,16 @@ class SpannerAsyncClient:
     )
 
     def __init__(
-        self,
-        *,
-        credentials: credentials.Credentials = None,
-        transport: Union[str, SpannerTransport] = "grpc_asyncio",
-        client_options: ClientOptions = None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
-    ) -> None:
+        self, **_3to2kwargs
+    ):
+        if 'client_info' in _3to2kwargs: client_info = _3to2kwargs['client_info']; del _3to2kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'client_options' in _3to2kwargs: client_options = _3to2kwargs['client_options']; del _3to2kwargs['client_options']
+        else: client_options =  None
+        if 'transport' in _3to2kwargs: transport = _3to2kwargs['transport']; del _3to2kwargs['transport']
+        else: transport =  "grpc_asyncio"
+        if 'credentials' in _3to2kwargs: credentials = _3to2kwargs['credentials']; del _3to2kwargs['credentials']
+        else: credentials =  None
         """Instantiate the spanner client.
 
         Args:
@@ -145,13 +155,16 @@ class SpannerAsyncClient:
 
     async def create_session(
         self,
-        request: spanner.CreateSessionRequest = None,
-        *,
-        database: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner.Session:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'database' in _3to2kwargs: database = _3to2kwargs['database']; del _3to2kwargs['database']
+        else: database =  None
         r"""Creates a new session. A session can be used to perform
         transactions that read and/or modify data in a Cloud Spanner
         database. Sessions are meant to be reused for many consecutive
@@ -239,14 +252,18 @@ class SpannerAsyncClient:
 
     async def batch_create_sessions(
         self,
-        request: spanner.BatchCreateSessionsRequest = None,
-        *,
-        database: str = None,
-        session_count: int = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner.BatchCreateSessionsResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'session_count' in _3to2kwargs: session_count = _3to2kwargs['session_count']; del _3to2kwargs['session_count']
+        else: session_count =  None
+        if 'database' in _3to2kwargs: database = _3to2kwargs['database']; del _3to2kwargs['database']
+        else: database =  None
         r"""Creates multiple new sessions.
         This API can be used to initialize a session cache on
         the clients. See https://goo.gl/TgSFN2 for best
@@ -334,13 +351,16 @@ class SpannerAsyncClient:
 
     async def get_session(
         self,
-        request: spanner.GetSessionRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner.Session:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Gets a session. Returns ``NOT_FOUND`` if the session does not
         exist. This is mainly useful for determining whether a session
         is still alive.
@@ -412,13 +432,16 @@ class SpannerAsyncClient:
 
     async def list_sessions(
         self,
-        request: spanner.ListSessionsRequest = None,
-        *,
-        database: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListSessionsAsyncPager:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'database' in _3to2kwargs: database = _3to2kwargs['database']; del _3to2kwargs['database']
+        else: database =  None
         r"""Lists all sessions in a given database.
 
         Args:
@@ -499,13 +522,16 @@ class SpannerAsyncClient:
 
     async def delete_session(
         self,
-        request: spanner.DeleteSessionRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> None:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Ends a session, releasing server resources associated
         with it. This will asynchronously trigger cancellation
         of any operations that are running with this session.
@@ -572,12 +598,14 @@ class SpannerAsyncClient:
 
     async def execute_sql(
         self,
-        request: spanner.ExecuteSqlRequest = None,
-        *,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> result_set.ResultSet:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
         r"""Executes an SQL statement, returning all results in a single
         reply. This method cannot be used to return a result set larger
         than 10 MiB; if the query yields more data than that, the query
@@ -643,12 +671,14 @@ class SpannerAsyncClient:
 
     def execute_streaming_sql(
         self,
-        request: spanner.ExecuteSqlRequest = None,
-        *,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> Awaitable[AsyncIterable[result_set.PartialResultSet]]:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
         r"""Like [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql], except
         returns the result set as a stream. Unlike
         [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql], there is no
@@ -703,12 +733,14 @@ class SpannerAsyncClient:
 
     async def execute_batch_dml(
         self,
-        request: spanner.ExecuteBatchDmlRequest = None,
-        *,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner.ExecuteBatchDmlResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
         r"""Executes a batch of SQL DML statements. This method allows many
         statements to be run with lower latency than submitting them
         sequentially with
@@ -809,12 +841,14 @@ class SpannerAsyncClient:
 
     async def read(
         self,
-        request: spanner.ReadRequest = None,
-        *,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> result_set.ResultSet:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
         r"""Reads rows from the database using key lookups and scans, as a
         simple key/value style alternative to
         [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql]. This method
@@ -881,12 +915,14 @@ class SpannerAsyncClient:
 
     def streaming_read(
         self,
-        request: spanner.ReadRequest = None,
-        *,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> Awaitable[AsyncIterable[result_set.PartialResultSet]]:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
         r"""Like [Read][google.spanner.v1.Spanner.Read], except returns the
         result set as a stream. Unlike
         [Read][google.spanner.v1.Spanner.Read], there is no limit on the
@@ -941,14 +977,18 @@ class SpannerAsyncClient:
 
     async def begin_transaction(
         self,
-        request: spanner.BeginTransactionRequest = None,
-        *,
-        session: str = None,
-        options: transaction.TransactionOptions = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> transaction.Transaction:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'options' in _3to2kwargs: options = _3to2kwargs['options']; del _3to2kwargs['options']
+        else: options =  None
+        if 'session' in _3to2kwargs: session = _3to2kwargs['session']; del _3to2kwargs['session']
+        else: session =  None
         r"""Begins a new transaction. This step can often be skipped:
         [Read][google.spanner.v1.Spanner.Read],
         [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] and
@@ -1030,16 +1070,22 @@ class SpannerAsyncClient:
 
     async def commit(
         self,
-        request: spanner.CommitRequest = None,
-        *,
-        session: str = None,
-        transaction_id: bytes = None,
-        mutations: Sequence[mutation.Mutation] = None,
-        single_use_transaction: transaction.TransactionOptions = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner.CommitResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'single_use_transaction' in _3to2kwargs: single_use_transaction = _3to2kwargs['single_use_transaction']; del _3to2kwargs['single_use_transaction']
+        else: single_use_transaction =  None
+        if 'mutations' in _3to2kwargs: mutations = _3to2kwargs['mutations']; del _3to2kwargs['mutations']
+        else: mutations =  None
+        if 'transaction_id' in _3to2kwargs: transaction_id = _3to2kwargs['transaction_id']; del _3to2kwargs['transaction_id']
+        else: transaction_id =  None
+        if 'session' in _3to2kwargs: session = _3to2kwargs['session']; del _3to2kwargs['session']
+        else: session =  None
         r"""Commits a transaction. The request includes the mutations to be
         applied to rows in the database.
 
@@ -1156,14 +1202,18 @@ class SpannerAsyncClient:
 
     async def rollback(
         self,
-        request: spanner.RollbackRequest = None,
-        *,
-        session: str = None,
-        transaction_id: bytes = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> None:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'transaction_id' in _3to2kwargs: transaction_id = _3to2kwargs['transaction_id']; del _3to2kwargs['transaction_id']
+        else: transaction_id =  None
+        if 'session' in _3to2kwargs: session = _3to2kwargs['session']; del _3to2kwargs['session']
+        else: session =  None
         r"""Rolls back a transaction, releasing any locks it holds. It is a
         good idea to call this for any transaction that includes one or
         more [Read][google.spanner.v1.Spanner.Read] or
@@ -1245,12 +1295,14 @@ class SpannerAsyncClient:
 
     async def partition_query(
         self,
-        request: spanner.PartitionQueryRequest = None,
-        *,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner.PartitionResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
         r"""Creates a set of partition tokens that can be used to execute a
         query operation in parallel. Each of the returned partition
         tokens can be used by
@@ -1317,12 +1369,14 @@ class SpannerAsyncClient:
 
     async def partition_read(
         self,
-        request: spanner.PartitionReadRequest = None,
-        *,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner.PartitionResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
         r"""Creates a set of partition tokens that can be used to execute a
         read operation in parallel. Each of the returned partition
         tokens can be used by

@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import zip
+from future import standard_library
+standard_library.install_aliases()
 # -*- coding: utf-8 -*-
 
 # Copyright 2020 Google LLC
@@ -455,7 +462,7 @@ def test_database_admin_client_client_options_from_dict():
 
 
 def test_list_databases(
-    transport: str = "grpc", request_type=spanner_database_admin.ListDatabasesRequest
+    transport = "grpc", request_type=spanner_database_admin.ListDatabasesRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -493,7 +500,7 @@ def test_list_databases_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_databases_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.ListDatabasesRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -809,7 +816,7 @@ async def test_list_databases_async_pages():
 
 
 def test_create_database(
-    transport: str = "grpc", request_type=spanner_database_admin.CreateDatabaseRequest
+    transport = "grpc", request_type=spanner_database_admin.CreateDatabaseRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -842,7 +849,7 @@ def test_create_database_from_dict():
 
 @pytest.mark.asyncio
 async def test_create_database_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.CreateDatabaseRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -1008,7 +1015,7 @@ async def test_create_database_flattened_error_async():
 
 
 def test_get_database(
-    transport: str = "grpc", request_type=spanner_database_admin.GetDatabaseRequest
+    transport = "grpc", request_type=spanner_database_admin.GetDatabaseRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1048,7 +1055,7 @@ def test_get_database_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_database_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.GetDatabaseRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -1208,7 +1215,7 @@ async def test_get_database_flattened_error_async():
 
 
 def test_update_database_ddl(
-    transport: str = "grpc",
+    transport = "grpc",
     request_type=spanner_database_admin.UpdateDatabaseDdlRequest,
 ):
     client = DatabaseAdminClient(
@@ -1244,7 +1251,7 @@ def test_update_database_ddl_from_dict():
 
 @pytest.mark.asyncio
 async def test_update_database_ddl_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.UpdateDatabaseDdlRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -1420,7 +1427,7 @@ async def test_update_database_ddl_flattened_error_async():
 
 
 def test_drop_database(
-    transport: str = "grpc", request_type=spanner_database_admin.DropDatabaseRequest
+    transport = "grpc", request_type=spanner_database_admin.DropDatabaseRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1453,7 +1460,7 @@ def test_drop_database_from_dict():
 
 @pytest.mark.asyncio
 async def test_drop_database_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.DropDatabaseRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -1601,7 +1608,7 @@ async def test_drop_database_flattened_error_async():
 
 
 def test_get_database_ddl(
-    transport: str = "grpc", request_type=spanner_database_admin.GetDatabaseDdlRequest
+    transport = "grpc", request_type=spanner_database_admin.GetDatabaseDdlRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1639,7 +1646,7 @@ def test_get_database_ddl_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_database_ddl_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.GetDatabaseDdlRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -1797,7 +1804,7 @@ async def test_get_database_ddl_flattened_error_async():
 
 
 def test_set_iam_policy(
-    transport: str = "grpc", request_type=iam_policy.SetIamPolicyRequest
+    transport = "grpc", request_type=iam_policy.SetIamPolicyRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1835,7 +1842,7 @@ def test_set_iam_policy_from_dict():
 
 @pytest.mark.asyncio
 async def test_set_iam_policy_async(
-    transport: str = "grpc_asyncio", request_type=iam_policy.SetIamPolicyRequest
+    transport = "grpc_asyncio", request_type=iam_policy.SetIamPolicyRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2004,7 +2011,7 @@ async def test_set_iam_policy_flattened_error_async():
 
 
 def test_get_iam_policy(
-    transport: str = "grpc", request_type=iam_policy.GetIamPolicyRequest
+    transport = "grpc", request_type=iam_policy.GetIamPolicyRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2042,7 +2049,7 @@ def test_get_iam_policy_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_iam_policy_async(
-    transport: str = "grpc_asyncio", request_type=iam_policy.GetIamPolicyRequest
+    transport = "grpc_asyncio", request_type=iam_policy.GetIamPolicyRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2211,7 +2218,7 @@ async def test_get_iam_policy_flattened_error_async():
 
 
 def test_test_iam_permissions(
-    transport: str = "grpc", request_type=iam_policy.TestIamPermissionsRequest
+    transport = "grpc", request_type=iam_policy.TestIamPermissionsRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2251,7 +2258,7 @@ def test_test_iam_permissions_from_dict():
 
 @pytest.mark.asyncio
 async def test_test_iam_permissions_async(
-    transport: str = "grpc_asyncio", request_type=iam_policy.TestIamPermissionsRequest
+    transport = "grpc_asyncio", request_type=iam_policy.TestIamPermissionsRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2446,7 +2453,7 @@ async def test_test_iam_permissions_flattened_error_async():
 
 
 def test_create_backup(
-    transport: str = "grpc", request_type=gsad_backup.CreateBackupRequest
+    transport = "grpc", request_type=gsad_backup.CreateBackupRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2479,7 +2486,7 @@ def test_create_backup_from_dict():
 
 @pytest.mark.asyncio
 async def test_create_backup_async(
-    transport: str = "grpc_asyncio", request_type=gsad_backup.CreateBackupRequest
+    transport = "grpc_asyncio", request_type=gsad_backup.CreateBackupRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2653,7 +2660,7 @@ async def test_create_backup_flattened_error_async():
         )
 
 
-def test_get_backup(transport: str = "grpc", request_type=backup.GetBackupRequest):
+def test_get_backup(transport = "grpc", request_type=backup.GetBackupRequest):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -2702,7 +2709,7 @@ def test_get_backup_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_backup_async(
-    transport: str = "grpc_asyncio", request_type=backup.GetBackupRequest
+    transport = "grpc_asyncio", request_type=backup.GetBackupRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2867,7 +2874,7 @@ async def test_get_backup_flattened_error_async():
 
 
 def test_update_backup(
-    transport: str = "grpc", request_type=gsad_backup.UpdateBackupRequest
+    transport = "grpc", request_type=gsad_backup.UpdateBackupRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2917,7 +2924,7 @@ def test_update_backup_from_dict():
 
 @pytest.mark.asyncio
 async def test_update_backup_async(
-    transport: str = "grpc_asyncio", request_type=gsad_backup.UpdateBackupRequest
+    transport = "grpc_asyncio", request_type=gsad_backup.UpdateBackupRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -3096,7 +3103,7 @@ async def test_update_backup_flattened_error_async():
 
 
 def test_delete_backup(
-    transport: str = "grpc", request_type=backup.DeleteBackupRequest
+    transport = "grpc", request_type=backup.DeleteBackupRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -3129,7 +3136,7 @@ def test_delete_backup_from_dict():
 
 @pytest.mark.asyncio
 async def test_delete_backup_async(
-    transport: str = "grpc_asyncio", request_type=backup.DeleteBackupRequest
+    transport = "grpc_asyncio", request_type=backup.DeleteBackupRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -3275,7 +3282,7 @@ async def test_delete_backup_flattened_error_async():
         )
 
 
-def test_list_backups(transport: str = "grpc", request_type=backup.ListBackupsRequest):
+def test_list_backups(transport = "grpc", request_type=backup.ListBackupsRequest):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -3312,7 +3319,7 @@ def test_list_backups_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_backups_async(
-    transport: str = "grpc_asyncio", request_type=backup.ListBackupsRequest
+    transport = "grpc_asyncio", request_type=backup.ListBackupsRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -3581,7 +3588,7 @@ async def test_list_backups_async_pages():
 
 
 def test_restore_database(
-    transport: str = "grpc", request_type=spanner_database_admin.RestoreDatabaseRequest
+    transport = "grpc", request_type=spanner_database_admin.RestoreDatabaseRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -3614,7 +3621,7 @@ def test_restore_database_from_dict():
 
 @pytest.mark.asyncio
 async def test_restore_database_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.RestoreDatabaseRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -3790,7 +3797,7 @@ async def test_restore_database_flattened_error_async():
 
 
 def test_list_database_operations(
-    transport: str = "grpc",
+    transport = "grpc",
     request_type=spanner_database_admin.ListDatabaseOperationsRequest,
 ):
     client = DatabaseAdminClient(
@@ -3831,7 +3838,7 @@ def test_list_database_operations_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_database_operations_async(
-    transport: str = "grpc_asyncio",
+    transport = "grpc_asyncio",
     request_type=spanner_database_admin.ListDatabaseOperationsRequest,
 ):
     client = DatabaseAdminAsyncClient(
@@ -4155,7 +4162,7 @@ async def test_list_database_operations_async_pages():
 
 
 def test_list_backup_operations(
-    transport: str = "grpc", request_type=backup.ListBackupOperationsRequest
+    transport = "grpc", request_type=backup.ListBackupOperationsRequest
 ):
     client = DatabaseAdminClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -4195,7 +4202,7 @@ def test_list_backup_operations_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_backup_operations_async(
-    transport: str = "grpc_asyncio", request_type=backup.ListBackupOperationsRequest
+    transport = "grpc_asyncio", request_type=backup.ListBackupOperationsRequest
 ):
     client = DatabaseAdminAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,

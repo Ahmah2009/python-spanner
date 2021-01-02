@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import filter
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 # Copyright 2020 Google LLC All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,7 +107,7 @@ def handle_insert(connection, sql, params):
         )
 
 
-class ColumnInfo:
+class ColumnInfo(object):
     """Row column description object."""
 
     def __init__(

@@ -15,6 +15,13 @@
 # limitations under the License.
 #
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import next
+from future import standard_library
+standard_library.install_aliases()
 from collections import OrderedDict
 from distutils import util
 import os
@@ -57,7 +64,7 @@ class InstanceAdminClientMeta(type):
     _transport_registry["grpc"] = InstanceAdminGrpcTransport
     _transport_registry["grpc_asyncio"] = InstanceAdminGrpcAsyncIOTransport
 
-    def get_transport_class(cls, label: str = None,) -> Type[InstanceAdminTransport]:
+    def get_transport_class(cls, label = None,):
         """Return an appropriate transport class.
 
         Args:
@@ -135,7 +142,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
     )
 
     @classmethod
-    def from_service_account_file(cls, filename: str, *args, **kwargs):
+    def from_service_account_file(cls, filename, *args, **kwargs):
         """Creates an instance of this client using the provided credentials
         file.
 
@@ -155,7 +162,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
     from_service_account_json = from_service_account_file
 
     @property
-    def transport(self) -> InstanceAdminTransport:
+    def transport(self):
         """Return the transport used by the client instance.
 
         Returns:
@@ -164,27 +171,27 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         return self._transport
 
     @staticmethod
-    def instance_path(project: str, instance: str,) -> str:
+    def instance_path(project, instance,):
         """Return a fully-qualified instance string."""
         return "projects/{project}/instances/{instance}".format(
             project=project, instance=instance,
         )
 
     @staticmethod
-    def parse_instance_path(path: str) -> Dict[str, str]:
+    def parse_instance_path(path):
         """Parse a instance path into its component segments."""
         m = re.match(r"^projects/(?P<project>.+?)/instances/(?P<instance>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def instance_config_path(project: str, instance_config: str,) -> str:
+    def instance_config_path(project, instance_config,):
         """Return a fully-qualified instance_config string."""
         return "projects/{project}/instanceConfigs/{instance_config}".format(
             project=project, instance_config=instance_config,
         )
 
     @staticmethod
-    def parse_instance_config_path(path: str) -> Dict[str, str]:
+    def parse_instance_config_path(path):
         """Parse a instance_config path into its component segments."""
         m = re.match(
             r"^projects/(?P<project>.+?)/instanceConfigs/(?P<instance_config>.+?)$",
@@ -193,72 +200,75 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_billing_account_path(billing_account: str,) -> str:
+    def common_billing_account_path(billing_account,):
         """Return a fully-qualified billing_account string."""
         return "billingAccounts/{billing_account}".format(
             billing_account=billing_account,
         )
 
     @staticmethod
-    def parse_common_billing_account_path(path: str) -> Dict[str, str]:
+    def parse_common_billing_account_path(path):
         """Parse a billing_account path into its component segments."""
         m = re.match(r"^billingAccounts/(?P<billing_account>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_folder_path(folder: str,) -> str:
+    def common_folder_path(folder,):
         """Return a fully-qualified folder string."""
         return "folders/{folder}".format(folder=folder,)
 
     @staticmethod
-    def parse_common_folder_path(path: str) -> Dict[str, str]:
+    def parse_common_folder_path(path):
         """Parse a folder path into its component segments."""
         m = re.match(r"^folders/(?P<folder>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_organization_path(organization: str,) -> str:
+    def common_organization_path(organization,):
         """Return a fully-qualified organization string."""
         return "organizations/{organization}".format(organization=organization,)
 
     @staticmethod
-    def parse_common_organization_path(path: str) -> Dict[str, str]:
+    def parse_common_organization_path(path):
         """Parse a organization path into its component segments."""
         m = re.match(r"^organizations/(?P<organization>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_project_path(project: str,) -> str:
+    def common_project_path(project,):
         """Return a fully-qualified project string."""
         return "projects/{project}".format(project=project,)
 
     @staticmethod
-    def parse_common_project_path(path: str) -> Dict[str, str]:
+    def parse_common_project_path(path):
         """Parse a project path into its component segments."""
         m = re.match(r"^projects/(?P<project>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_location_path(project: str, location: str,) -> str:
+    def common_location_path(project, location,):
         """Return a fully-qualified location string."""
         return "projects/{project}/locations/{location}".format(
             project=project, location=location,
         )
 
     @staticmethod
-    def parse_common_location_path(path: str) -> Dict[str, str]:
+    def parse_common_location_path(path):
         """Parse a location path into its component segments."""
         m = re.match(r"^projects/(?P<project>.+?)/locations/(?P<location>.+?)$", path)
         return m.groupdict() if m else {}
 
     def __init__(
-        self,
-        *,
-        credentials: Optional[credentials.Credentials] = None,
-        transport: Union[str, InstanceAdminTransport, None] = None,
-        client_options: Optional[client_options_lib.ClientOptions] = None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
-    ) -> None:
+        self, **_3to2kwargs
+    ):
+        if 'client_info' in _3to2kwargs: client_info = _3to2kwargs['client_info']; del _3to2kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'client_options' in _3to2kwargs: client_options = _3to2kwargs['client_options']; del _3to2kwargs['client_options']
+        else: client_options =  None
+        if 'transport' in _3to2kwargs: transport = _3to2kwargs['transport']; del _3to2kwargs['transport']
+        else: transport =  None
+        if 'credentials' in _3to2kwargs: credentials = _3to2kwargs['credentials']; del _3to2kwargs['credentials']
+        else: credentials =  None
         """Instantiate the instance admin client.
 
         Args:
@@ -370,13 +380,16 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def list_instance_configs(
         self,
-        request: spanner_instance_admin.ListInstanceConfigsRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListInstanceConfigsPager:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Lists the supported instance configurations for a
         given project.
 
@@ -454,13 +467,16 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def get_instance_config(
         self,
-        request: spanner_instance_admin.GetInstanceConfigRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner_instance_admin.InstanceConfig:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Gets information about a particular instance
         configuration.
 
@@ -531,13 +547,16 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def list_instances(
         self,
-        request: spanner_instance_admin.ListInstancesRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListInstancesPager:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Lists all instances in the given project.
 
         Args:
@@ -614,13 +633,16 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def get_instance(
         self,
-        request: spanner_instance_admin.GetInstanceRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner_instance_admin.Instance:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Gets information about a particular instance.
 
         Args:
@@ -688,15 +710,20 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def create_instance(
         self,
-        request: spanner_instance_admin.CreateInstanceRequest = None,
-        *,
-        parent: str = None,
-        instance_id: str = None,
-        instance: spanner_instance_admin.Instance = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'instance' in _3to2kwargs: instance = _3to2kwargs['instance']; del _3to2kwargs['instance']
+        else: instance =  None
+        if 'instance_id' in _3to2kwargs: instance_id = _3to2kwargs['instance_id']; del _3to2kwargs['instance_id']
+        else: instance_id =  None
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Creates an instance and begins preparing it to begin serving.
         The returned [long-running
         operation][google.longrunning.Operation] can be used to track
@@ -830,14 +857,18 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def update_instance(
         self,
-        request: spanner_instance_admin.UpdateInstanceRequest = None,
-        *,
-        instance: spanner_instance_admin.Instance = None,
-        field_mask: gp_field_mask.FieldMask = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'field_mask' in _3to2kwargs: field_mask = _3to2kwargs['field_mask']; del _3to2kwargs['field_mask']
+        else: field_mask =  None
+        if 'instance' in _3to2kwargs: instance = _3to2kwargs['instance']; del _3to2kwargs['instance']
+        else: instance =  None
         r"""Updates an instance, and begins allocating or releasing
         resources as requested. The returned [long-running
         operation][google.longrunning.Operation] can be used to track
@@ -978,13 +1009,16 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def delete_instance(
         self,
-        request: spanner_instance_admin.DeleteInstanceRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> None:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Deletes an instance.
 
         Immediately upon completion of the request:
@@ -1055,13 +1089,16 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def set_iam_policy(
         self,
-        request: iam_policy.SetIamPolicyRequest = None,
-        *,
-        resource: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> policy.Policy:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
         r"""Sets the access control policy on an instance resource. Replaces
         any existing policy.
 
@@ -1192,13 +1229,16 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def get_iam_policy(
         self,
-        request: iam_policy.GetIamPolicyRequest = None,
-        *,
-        resource: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> policy.Policy:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
         r"""Gets the access control policy for an instance resource. Returns
         an empty policy if an instance exists but does not have a policy
         set.
@@ -1330,14 +1370,18 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def test_iam_permissions(
         self,
-        request: iam_policy.TestIamPermissionsRequest = None,
-        *,
-        resource: str = None,
-        permissions: Sequence[str] = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> iam_policy.TestIamPermissionsResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'permissions' in _3to2kwargs: permissions = _3to2kwargs['permissions']; del _3to2kwargs['permissions']
+        else: permissions =  None
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
         r"""Returns permissions that the caller has on the specified
         instance resource.
 

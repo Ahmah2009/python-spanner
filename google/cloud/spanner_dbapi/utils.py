@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import next
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 # Copyright 2020 Google LLC All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +25,7 @@ import re
 re_UNICODE_POINTS = re.compile(r"([^\s]*[\u0080-\uFFFF]+[^\s]*)")
 
 
-class PeekIterator:
+class PeekIterator(object):
     """
     PeekIterator peeks at the first element out of an iterator
     for the sake of operations like auto-population of fields on reading
@@ -57,7 +65,7 @@ class PeekIterator:
         return self
 
 
-class StreamedManyResultSets:
+class StreamedManyResultSets(object):
     """Iterator to walk through several `StreamedResultsSet` iterators.
     This type of iterator is used by `Cursor.executemany()`
     method to iterate through several `StreamedResultsSet`

@@ -13,6 +13,13 @@
 # limitations under the License.
 
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from builtins import range
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 
 import os
 from pathlib import Path
@@ -195,7 +202,7 @@ def py(session):
 def _get_repo_root():
     """ Returns the root folder of the project. """
     # Get root of this repository. Assume we don't have directories nested deeper than 10 items.
-    p = Path(os.getcwd())
+    p = Path(os.getcwdu())
     for i in range(10):
         if p is None:
             break

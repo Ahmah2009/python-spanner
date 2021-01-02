@@ -13,6 +13,12 @@
 # limitations under the License.
 
 """Connection-based DB API for Cloud Spanner."""
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
 
 from google.cloud.spanner_dbapi.connection import Connection
 from google.cloud.spanner_dbapi.connection import connect

@@ -15,6 +15,13 @@
 # limitations under the License.
 #
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import super
+from future import standard_library
+standard_library.install_aliases()
 import warnings
 from typing import Awaitable, Callable, Dict, Optional, Sequence, Tuple
 
@@ -57,13 +64,13 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @classmethod
     def create_channel(
         cls,
-        host: str = "spanner.googleapis.com",
-        credentials: credentials.Credentials = None,
-        credentials_file: Optional[str] = None,
-        scopes: Optional[Sequence[str]] = None,
-        quota_project_id: Optional[str] = None,
+        host = "spanner.googleapis.com",
+        credentials = None,
+        credentials_file = None,
+        scopes = None,
+        quota_project_id = None,
         **kwargs,
-    ) -> aio.Channel:
+    ):
         """Create and return a gRPC AsyncIO channel object.
         Args:
             address (Optional[str]): The host for the channel to use.
@@ -96,19 +103,28 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
         )
 
     def __init__(
-        self,
-        *,
-        host: str = "spanner.googleapis.com",
-        credentials: credentials.Credentials = None,
-        credentials_file: Optional[str] = None,
-        scopes: Optional[Sequence[str]] = None,
-        channel: aio.Channel = None,
-        api_mtls_endpoint: str = None,
-        client_cert_source: Callable[[], Tuple[bytes, bytes]] = None,
-        ssl_channel_credentials: grpc.ChannelCredentials = None,
-        quota_project_id=None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
-    ) -> None:
+        self, **_3to2kwargs
+    ):
+        if 'client_info' in _3to2kwargs: client_info = _3to2kwargs['client_info']; del _3to2kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'quota_project_id' in _3to2kwargs: quota_project_id = _3to2kwargs['quota_project_id']; del _3to2kwargs['quota_project_id']
+        else: quota_project_id = None
+        if 'ssl_channel_credentials' in _3to2kwargs: ssl_channel_credentials = _3to2kwargs['ssl_channel_credentials']; del _3to2kwargs['ssl_channel_credentials']
+        else: ssl_channel_credentials =  None
+        if 'client_cert_source' in _3to2kwargs: client_cert_source = _3to2kwargs['client_cert_source']; del _3to2kwargs['client_cert_source']
+        else: client_cert_source =  None
+        if 'api_mtls_endpoint' in _3to2kwargs: api_mtls_endpoint = _3to2kwargs['api_mtls_endpoint']; del _3to2kwargs['api_mtls_endpoint']
+        else: api_mtls_endpoint =  None
+        if 'channel' in _3to2kwargs: channel = _3to2kwargs['channel']; del _3to2kwargs['channel']
+        else: channel =  None
+        if 'scopes' in _3to2kwargs: scopes = _3to2kwargs['scopes']; del _3to2kwargs['scopes']
+        else: scopes =  None
+        if 'credentials_file' in _3to2kwargs: credentials_file = _3to2kwargs['credentials_file']; del _3to2kwargs['credentials_file']
+        else: credentials_file =  None
+        if 'credentials' in _3to2kwargs: credentials = _3to2kwargs['credentials']; del _3to2kwargs['credentials']
+        else: credentials =  None
+        if 'host' in _3to2kwargs: host = _3to2kwargs['host']; del _3to2kwargs['host']
+        else: host =  "spanner.googleapis.com"
         """Instantiate the transport.
 
         Args:
@@ -237,7 +253,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
         self._stubs = {}
 
     @property
-    def grpc_channel(self) -> aio.Channel:
+    def grpc_channel(self):
         """Create the channel designed to connect to this service.
 
         This property caches on the instance; repeated calls return
@@ -249,7 +265,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def create_session(
         self,
-    ) -> Callable[[spanner.CreateSessionRequest], Awaitable[spanner.Session]]:
+    ):
         r"""Return a callable for the create session method over gRPC.
 
         Creates a new session. A session can be used to perform
@@ -293,10 +309,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def batch_create_sessions(
         self,
-    ) -> Callable[
-        [spanner.BatchCreateSessionsRequest],
-        Awaitable[spanner.BatchCreateSessionsResponse],
-    ]:
+    ):
         r"""Return a callable for the batch create sessions method over gRPC.
 
         Creates multiple new sessions.
@@ -325,7 +338,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def get_session(
         self,
-    ) -> Callable[[spanner.GetSessionRequest], Awaitable[spanner.Session]]:
+    ):
         r"""Return a callable for the get session method over gRPC.
 
         Gets a session. Returns ``NOT_FOUND`` if the session does not
@@ -353,9 +366,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def list_sessions(
         self,
-    ) -> Callable[
-        [spanner.ListSessionsRequest], Awaitable[spanner.ListSessionsResponse]
-    ]:
+    ):
         r"""Return a callable for the list sessions method over gRPC.
 
         Lists all sessions in a given database.
@@ -381,7 +392,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def delete_session(
         self,
-    ) -> Callable[[spanner.DeleteSessionRequest], Awaitable[empty.Empty]]:
+    ):
         r"""Return a callable for the delete session method over gRPC.
 
         Ends a session, releasing server resources associated
@@ -409,7 +420,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def execute_sql(
         self,
-    ) -> Callable[[spanner.ExecuteSqlRequest], Awaitable[result_set.ResultSet]]:
+    ):
         r"""Return a callable for the execute sql method over gRPC.
 
         Executes an SQL statement, returning all results in a single
@@ -448,7 +459,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def execute_streaming_sql(
         self,
-    ) -> Callable[[spanner.ExecuteSqlRequest], Awaitable[result_set.PartialResultSet]]:
+    ):
         r"""Return a callable for the execute streaming sql method over gRPC.
 
         Like [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql], except
@@ -479,9 +490,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def execute_batch_dml(
         self,
-    ) -> Callable[
-        [spanner.ExecuteBatchDmlRequest], Awaitable[spanner.ExecuteBatchDmlResponse]
-    ]:
+    ):
         r"""Return a callable for the execute batch dml method over gRPC.
 
         Executes a batch of SQL DML statements. This method allows many
@@ -518,7 +527,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
         return self._stubs["execute_batch_dml"]
 
     @property
-    def read(self) -> Callable[[spanner.ReadRequest], Awaitable[result_set.ResultSet]]:
+    def read(self):
         r"""Return a callable for the read method over gRPC.
 
         Reads rows from the database using key lookups and scans, as a
@@ -558,7 +567,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def streaming_read(
         self,
-    ) -> Callable[[spanner.ReadRequest], Awaitable[result_set.PartialResultSet]]:
+    ):
         r"""Return a callable for the streaming read method over gRPC.
 
         Like [Read][google.spanner.v1.Spanner.Read], except returns the
@@ -589,9 +598,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def begin_transaction(
         self,
-    ) -> Callable[
-        [spanner.BeginTransactionRequest], Awaitable[transaction.Transaction]
-    ]:
+    ):
         r"""Return a callable for the begin transaction method over gRPC.
 
         Begins a new transaction. This step can often be skipped:
@@ -621,7 +628,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def commit(
         self,
-    ) -> Callable[[spanner.CommitRequest], Awaitable[spanner.CommitResponse]]:
+    ):
         r"""Return a callable for the commit method over gRPC.
 
         Commits a transaction. The request includes the mutations to be
@@ -653,7 +660,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
         return self._stubs["commit"]
 
     @property
-    def rollback(self) -> Callable[[spanner.RollbackRequest], Awaitable[empty.Empty]]:
+    def rollback(self):
         r"""Return a callable for the rollback method over gRPC.
 
         Rolls back a transaction, releasing any locks it holds. It is a
@@ -688,9 +695,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def partition_query(
         self,
-    ) -> Callable[
-        [spanner.PartitionQueryRequest], Awaitable[spanner.PartitionResponse]
-    ]:
+    ):
         r"""Return a callable for the partition query method over gRPC.
 
         Creates a set of partition tokens that can be used to execute a
@@ -729,7 +734,7 @@ class SpannerGrpcAsyncIOTransport(SpannerTransport):
     @property
     def partition_read(
         self,
-    ) -> Callable[[spanner.PartitionReadRequest], Awaitable[spanner.PartitionResponse]]:
+    ):
         r"""Return a callable for the partition read method over gRPC.
 
         Creates a set of partition tokens that can be used to execute a

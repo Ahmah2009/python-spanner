@@ -15,6 +15,13 @@
 # limitations under the License.
 #
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import next
+from future import standard_library
+standard_library.install_aliases()
 from collections import OrderedDict
 from distutils import util
 import os
@@ -62,7 +69,7 @@ class DatabaseAdminClientMeta(type):
     _transport_registry["grpc"] = DatabaseAdminGrpcTransport
     _transport_registry["grpc_asyncio"] = DatabaseAdminGrpcAsyncIOTransport
 
-    def get_transport_class(cls, label: str = None,) -> Type[DatabaseAdminTransport]:
+    def get_transport_class(cls, label = None,):
         """Return an appropriate transport class.
 
         Args:
@@ -125,7 +132,7 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
     )
 
     @classmethod
-    def from_service_account_file(cls, filename: str, *args, **kwargs):
+    def from_service_account_file(cls, filename, *args, **kwargs):
         """Creates an instance of this client using the provided credentials
         file.
 
@@ -145,7 +152,7 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
     from_service_account_json = from_service_account_file
 
     @property
-    def transport(self) -> DatabaseAdminTransport:
+    def transport(self):
         """Return the transport used by the client instance.
 
         Returns:
@@ -154,14 +161,14 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
         return self._transport
 
     @staticmethod
-    def backup_path(project: str, instance: str, backup: str,) -> str:
+    def backup_path(project, instance, backup,):
         """Return a fully-qualified backup string."""
         return "projects/{project}/instances/{instance}/backups/{backup}".format(
             project=project, instance=instance, backup=backup,
         )
 
     @staticmethod
-    def parse_backup_path(path: str) -> Dict[str, str]:
+    def parse_backup_path(path):
         """Parse a backup path into its component segments."""
         m = re.match(
             r"^projects/(?P<project>.+?)/instances/(?P<instance>.+?)/backups/(?P<backup>.+?)$",
@@ -170,14 +177,14 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
         return m.groupdict() if m else {}
 
     @staticmethod
-    def database_path(project: str, instance: str, database: str,) -> str:
+    def database_path(project, instance, database,):
         """Return a fully-qualified database string."""
         return "projects/{project}/instances/{instance}/databases/{database}".format(
             project=project, instance=instance, database=database,
         )
 
     @staticmethod
-    def parse_database_path(path: str) -> Dict[str, str]:
+    def parse_database_path(path):
         """Parse a database path into its component segments."""
         m = re.match(
             r"^projects/(?P<project>.+?)/instances/(?P<instance>.+?)/databases/(?P<database>.+?)$",
@@ -186,85 +193,88 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
         return m.groupdict() if m else {}
 
     @staticmethod
-    def instance_path(project: str, instance: str,) -> str:
+    def instance_path(project, instance,):
         """Return a fully-qualified instance string."""
         return "projects/{project}/instances/{instance}".format(
             project=project, instance=instance,
         )
 
     @staticmethod
-    def parse_instance_path(path: str) -> Dict[str, str]:
+    def parse_instance_path(path):
         """Parse a instance path into its component segments."""
         m = re.match(r"^projects/(?P<project>.+?)/instances/(?P<instance>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_billing_account_path(billing_account: str,) -> str:
+    def common_billing_account_path(billing_account,):
         """Return a fully-qualified billing_account string."""
         return "billingAccounts/{billing_account}".format(
             billing_account=billing_account,
         )
 
     @staticmethod
-    def parse_common_billing_account_path(path: str) -> Dict[str, str]:
+    def parse_common_billing_account_path(path):
         """Parse a billing_account path into its component segments."""
         m = re.match(r"^billingAccounts/(?P<billing_account>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_folder_path(folder: str,) -> str:
+    def common_folder_path(folder,):
         """Return a fully-qualified folder string."""
         return "folders/{folder}".format(folder=folder,)
 
     @staticmethod
-    def parse_common_folder_path(path: str) -> Dict[str, str]:
+    def parse_common_folder_path(path):
         """Parse a folder path into its component segments."""
         m = re.match(r"^folders/(?P<folder>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_organization_path(organization: str,) -> str:
+    def common_organization_path(organization,):
         """Return a fully-qualified organization string."""
         return "organizations/{organization}".format(organization=organization,)
 
     @staticmethod
-    def parse_common_organization_path(path: str) -> Dict[str, str]:
+    def parse_common_organization_path(path):
         """Parse a organization path into its component segments."""
         m = re.match(r"^organizations/(?P<organization>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_project_path(project: str,) -> str:
+    def common_project_path(project,):
         """Return a fully-qualified project string."""
         return "projects/{project}".format(project=project,)
 
     @staticmethod
-    def parse_common_project_path(path: str) -> Dict[str, str]:
+    def parse_common_project_path(path):
         """Parse a project path into its component segments."""
         m = re.match(r"^projects/(?P<project>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_location_path(project: str, location: str,) -> str:
+    def common_location_path(project, location,):
         """Return a fully-qualified location string."""
         return "projects/{project}/locations/{location}".format(
             project=project, location=location,
         )
 
     @staticmethod
-    def parse_common_location_path(path: str) -> Dict[str, str]:
+    def parse_common_location_path(path):
         """Parse a location path into its component segments."""
         m = re.match(r"^projects/(?P<project>.+?)/locations/(?P<location>.+?)$", path)
         return m.groupdict() if m else {}
 
     def __init__(
-        self,
-        *,
-        credentials: Optional[credentials.Credentials] = None,
-        transport: Union[str, DatabaseAdminTransport, None] = None,
-        client_options: Optional[client_options_lib.ClientOptions] = None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
-    ) -> None:
+        self, **_3to2kwargs
+    ):
+        if 'client_info' in _3to2kwargs: client_info = _3to2kwargs['client_info']; del _3to2kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'client_options' in _3to2kwargs: client_options = _3to2kwargs['client_options']; del _3to2kwargs['client_options']
+        else: client_options =  None
+        if 'transport' in _3to2kwargs: transport = _3to2kwargs['transport']; del _3to2kwargs['transport']
+        else: transport =  None
+        if 'credentials' in _3to2kwargs: credentials = _3to2kwargs['credentials']; del _3to2kwargs['credentials']
+        else: credentials =  None
         """Instantiate the database admin client.
 
         Args:
@@ -376,13 +386,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def list_databases(
         self,
-        request: spanner_database_admin.ListDatabasesRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListDatabasesPager:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Lists Cloud Spanner databases.
 
         Args:
@@ -459,14 +472,18 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def create_database(
         self,
-        request: spanner_database_admin.CreateDatabaseRequest = None,
-        *,
-        parent: str = None,
-        create_statement: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'create_statement' in _3to2kwargs: create_statement = _3to2kwargs['create_statement']; del _3to2kwargs['create_statement']
+        else: create_statement =  None
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Creates a new Cloud Spanner database and starts to prepare it
         for serving. The returned [long-running
         operation][google.longrunning.Operation] will have a name of the
@@ -567,13 +584,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def get_database(
         self,
-        request: spanner_database_admin.GetDatabaseRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner_database_admin.Database:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Gets the state of a Cloud Spanner database.
 
         Args:
@@ -639,14 +659,18 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def update_database_ddl(
         self,
-        request: spanner_database_admin.UpdateDatabaseDdlRequest = None,
-        *,
-        database: str = None,
-        statements: Sequence[str] = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'statements' in _3to2kwargs: statements = _3to2kwargs['statements']; del _3to2kwargs['statements']
+        else: statements =  None
+        if 'database' in _3to2kwargs: database = _3to2kwargs['database']; del _3to2kwargs['database']
+        else: database =  None
         r"""Updates the schema of a Cloud Spanner database by
         creating/altering/dropping tables, columns, indexes, etc. The
         returned [long-running operation][google.longrunning.Operation]
@@ -769,13 +793,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def drop_database(
         self,
-        request: spanner_database_admin.DropDatabaseRequest = None,
-        *,
-        database: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> None:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'database' in _3to2kwargs: database = _3to2kwargs['database']; del _3to2kwargs['database']
+        else: database =  None
         r"""Drops (aka deletes) a Cloud Spanner database. Completed backups
         for the database will be retained according to their
         ``expire_time``.
@@ -836,13 +863,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def get_database_ddl(
         self,
-        request: spanner_database_admin.GetDatabaseDdlRequest = None,
-        *,
-        database: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner_database_admin.GetDatabaseDdlResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'database' in _3to2kwargs: database = _3to2kwargs['database']; del _3to2kwargs['database']
+        else: database =  None
         r"""Returns the schema of a Cloud Spanner database as a list of
         formatted DDL statements. This method does not show pending
         schema updates, those may be queried using the
@@ -912,13 +942,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def set_iam_policy(
         self,
-        request: iam_policy.SetIamPolicyRequest = None,
-        *,
-        resource: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> policy.Policy:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
         r"""Sets the access control policy on a database or backup resource.
         Replaces any existing policy.
 
@@ -1053,13 +1086,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def get_iam_policy(
         self,
-        request: iam_policy.GetIamPolicyRequest = None,
-        *,
-        resource: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> policy.Policy:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
         r"""Gets the access control policy for a database or backup
         resource. Returns an empty policy if a database or backup exists
         but does not have a policy set.
@@ -1195,14 +1231,18 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def test_iam_permissions(
         self,
-        request: iam_policy.TestIamPermissionsRequest = None,
-        *,
-        resource: str = None,
-        permissions: Sequence[str] = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> iam_policy.TestIamPermissionsResponse:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'permissions' in _3to2kwargs: permissions = _3to2kwargs['permissions']; del _3to2kwargs['permissions']
+        else: permissions =  None
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
         r"""Returns permissions that the caller has on the specified
         database or backup resource.
 
@@ -1283,15 +1323,20 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def create_backup(
         self,
-        request: gsad_backup.CreateBackupRequest = None,
-        *,
-        parent: str = None,
-        backup: gsad_backup.Backup = None,
-        backup_id: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'backup_id' in _3to2kwargs: backup_id = _3to2kwargs['backup_id']; del _3to2kwargs['backup_id']
+        else: backup_id =  None
+        if 'backup' in _3to2kwargs: backup = _3to2kwargs['backup']; del _3to2kwargs['backup']
+        else: backup =  None
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Starts creating a new Cloud Spanner Backup. The returned backup
         [long-running operation][google.longrunning.Operation] will have
         a name of the format
@@ -1403,13 +1448,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def get_backup(
         self,
-        request: backup.GetBackupRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> backup.Backup:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Gets metadata on a pending or completed
         [Backup][google.spanner.admin.database.v1.Backup].
 
@@ -1475,14 +1523,18 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def update_backup(
         self,
-        request: gsad_backup.UpdateBackupRequest = None,
-        *,
-        backup: gsad_backup.Backup = None,
-        update_mask: field_mask.FieldMask = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> gsad_backup.Backup:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'update_mask' in _3to2kwargs: update_mask = _3to2kwargs['update_mask']; del _3to2kwargs['update_mask']
+        else: update_mask =  None
+        if 'backup' in _3to2kwargs: backup = _3to2kwargs['backup']; del _3to2kwargs['backup']
+        else: backup =  None
         r"""Updates a pending or completed
         [Backup][google.spanner.admin.database.v1.Backup].
 
@@ -1568,13 +1620,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def delete_backup(
         self,
-        request: backup.DeleteBackupRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> None:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
         r"""Deletes a pending or completed
         [Backup][google.spanner.admin.database.v1.Backup].
 
@@ -1636,13 +1691,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def list_backups(
         self,
-        request: backup.ListBackupsRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListBackupsPager:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Lists completed and pending backups. Backups returned are
         ordered by ``create_time`` in descending order, starting from
         the most recent ``create_time``.
@@ -1720,15 +1778,20 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def restore_database(
         self,
-        request: spanner_database_admin.RestoreDatabaseRequest = None,
-        *,
-        parent: str = None,
-        database_id: str = None,
-        backup: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'backup' in _3to2kwargs: backup = _3to2kwargs['backup']; del _3to2kwargs['backup']
+        else: backup =  None
+        if 'database_id' in _3to2kwargs: database_id = _3to2kwargs['database_id']; del _3to2kwargs['database_id']
+        else: database_id =  None
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Create a new database by restoring from a completed backup. The
         new database must be in the same project and in an instance with
         the same instance configuration as the instance containing the
@@ -1847,13 +1910,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def list_database_operations(
         self,
-        request: spanner_database_admin.ListDatabaseOperationsRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListDatabaseOperationsPager:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Lists database
         [longrunning-operations][google.longrunning.Operation]. A
         database operation has a name of the form
@@ -1941,13 +2007,16 @@ class DatabaseAdminClient(metaclass=DatabaseAdminClientMeta):
 
     def list_backup_operations(
         self,
-        request: backup.ListBackupOperationsRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListBackupOperationsPager:
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
         r"""Lists the backup [long-running
         operations][google.longrunning.Operation] in the given instance.
         A backup operation has a name of the form

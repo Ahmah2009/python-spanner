@@ -1,3 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import zip
+from builtins import dict
+from builtins import int
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 # Copyright 2016 Google LLC All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -328,7 +338,7 @@ class _Database(object):
     name = "testing"
 
 
-class _FauxSpannerAPI:
+class _FauxSpannerAPI(object):
 
     _create_instance_conflict = False
     _instance_not_found = False

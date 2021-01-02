@@ -15,6 +15,13 @@
 # limitations under the License.
 #
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import super
+from future import standard_library
+standard_library.install_aliases()
 import warnings
 from typing import Callable, Dict, Optional, Sequence, Tuple
 
@@ -72,19 +79,28 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     _stubs: Dict[str, Callable]
 
     def __init__(
-        self,
-        *,
-        host: str = "spanner.googleapis.com",
-        credentials: credentials.Credentials = None,
-        credentials_file: str = None,
-        scopes: Sequence[str] = None,
-        channel: grpc.Channel = None,
-        api_mtls_endpoint: str = None,
-        client_cert_source: Callable[[], Tuple[bytes, bytes]] = None,
-        ssl_channel_credentials: grpc.ChannelCredentials = None,
-        quota_project_id: Optional[str] = None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
-    ) -> None:
+        self, **_3to2kwargs
+    ):
+        if 'client_info' in _3to2kwargs: client_info = _3to2kwargs['client_info']; del _3to2kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'quota_project_id' in _3to2kwargs: quota_project_id = _3to2kwargs['quota_project_id']; del _3to2kwargs['quota_project_id']
+        else: quota_project_id =  None
+        if 'ssl_channel_credentials' in _3to2kwargs: ssl_channel_credentials = _3to2kwargs['ssl_channel_credentials']; del _3to2kwargs['ssl_channel_credentials']
+        else: ssl_channel_credentials =  None
+        if 'client_cert_source' in _3to2kwargs: client_cert_source = _3to2kwargs['client_cert_source']; del _3to2kwargs['client_cert_source']
+        else: client_cert_source =  None
+        if 'api_mtls_endpoint' in _3to2kwargs: api_mtls_endpoint = _3to2kwargs['api_mtls_endpoint']; del _3to2kwargs['api_mtls_endpoint']
+        else: api_mtls_endpoint =  None
+        if 'channel' in _3to2kwargs: channel = _3to2kwargs['channel']; del _3to2kwargs['channel']
+        else: channel =  None
+        if 'scopes' in _3to2kwargs: scopes = _3to2kwargs['scopes']; del _3to2kwargs['scopes']
+        else: scopes =  None
+        if 'credentials_file' in _3to2kwargs: credentials_file = _3to2kwargs['credentials_file']; del _3to2kwargs['credentials_file']
+        else: credentials_file =  None
+        if 'credentials' in _3to2kwargs: credentials = _3to2kwargs['credentials']; del _3to2kwargs['credentials']
+        else: credentials =  None
+        if 'host' in _3to2kwargs: host = _3to2kwargs['host']; del _3to2kwargs['host']
+        else: host =  "spanner.googleapis.com"
         """Instantiate the transport.
 
         Args:
@@ -215,13 +231,13 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @classmethod
     def create_channel(
         cls,
-        host: str = "spanner.googleapis.com",
-        credentials: credentials.Credentials = None,
-        credentials_file: str = None,
-        scopes: Optional[Sequence[str]] = None,
-        quota_project_id: Optional[str] = None,
+        host = "spanner.googleapis.com",
+        credentials = None,
+        credentials_file = None,
+        scopes = None,
+        quota_project_id = None,
         **kwargs,
-    ) -> grpc.Channel:
+    ):
         """Create and return a gRPC channel object.
         Args:
             address (Optional[str]): The host for the channel to use.
@@ -258,13 +274,13 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
         )
 
     @property
-    def grpc_channel(self) -> grpc.Channel:
+    def grpc_channel(self):
         """Return the channel designed to connect to this service.
         """
         return self._grpc_channel
 
     @property
-    def operations_client(self) -> operations_v1.OperationsClient:
+    def operations_client(self):
         """Create the client designed to process long-running operations.
 
         This property caches on the instance; repeated calls return the same
@@ -280,10 +296,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def list_instance_configs(
         self,
-    ) -> Callable[
-        [spanner_instance_admin.ListInstanceConfigsRequest],
-        spanner_instance_admin.ListInstanceConfigsResponse,
-    ]:
+    ):
         r"""Return a callable for the list instance configs method over gRPC.
 
         Lists the supported instance configurations for a
@@ -310,10 +323,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def get_instance_config(
         self,
-    ) -> Callable[
-        [spanner_instance_admin.GetInstanceConfigRequest],
-        spanner_instance_admin.InstanceConfig,
-    ]:
+    ):
         r"""Return a callable for the get instance config method over gRPC.
 
         Gets information about a particular instance
@@ -340,10 +350,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def list_instances(
         self,
-    ) -> Callable[
-        [spanner_instance_admin.ListInstancesRequest],
-        spanner_instance_admin.ListInstancesResponse,
-    ]:
+    ):
         r"""Return a callable for the list instances method over gRPC.
 
         Lists all instances in the given project.
@@ -369,9 +376,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def get_instance(
         self,
-    ) -> Callable[
-        [spanner_instance_admin.GetInstanceRequest], spanner_instance_admin.Instance
-    ]:
+    ):
         r"""Return a callable for the get instance method over gRPC.
 
         Gets information about a particular instance.
@@ -397,7 +402,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def create_instance(
         self,
-    ) -> Callable[[spanner_instance_admin.CreateInstanceRequest], operations.Operation]:
+    ):
         r"""Return a callable for the create instance method over gRPC.
 
         Creates an instance and begins preparing it to begin serving.
@@ -460,7 +465,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def update_instance(
         self,
-    ) -> Callable[[spanner_instance_admin.UpdateInstanceRequest], operations.Operation]:
+    ):
         r"""Return a callable for the update instance method over gRPC.
 
         Updates an instance, and begins allocating or releasing
@@ -530,7 +535,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def delete_instance(
         self,
-    ) -> Callable[[spanner_instance_admin.DeleteInstanceRequest], empty.Empty]:
+    ):
         r"""Return a callable for the delete instance method over gRPC.
 
         Deletes an instance.
@@ -566,7 +571,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def set_iam_policy(
         self,
-    ) -> Callable[[iam_policy.SetIamPolicyRequest], policy.Policy]:
+    ):
         r"""Return a callable for the set iam policy method over gRPC.
 
         Sets the access control policy on an instance resource. Replaces
@@ -596,7 +601,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def get_iam_policy(
         self,
-    ) -> Callable[[iam_policy.GetIamPolicyRequest], policy.Policy]:
+    ):
         r"""Return a callable for the get iam policy method over gRPC.
 
         Gets the access control policy for an instance resource. Returns
@@ -627,9 +632,7 @@ class InstanceAdminGrpcTransport(InstanceAdminTransport):
     @property
     def test_iam_permissions(
         self,
-    ) -> Callable[
-        [iam_policy.TestIamPermissionsRequest], iam_policy.TestIamPermissionsResponse
-    ]:
+    ):
         r"""Return a callable for the test iam permissions method over gRPC.
 
         Returns permissions that the caller has on the specified

@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import zip
+from future import standard_library
+standard_library.install_aliases()
 # -*- coding: utf-8 -*-
 
 # Copyright 2020 Google LLC
@@ -415,7 +422,7 @@ def test_spanner_client_client_options_from_dict():
 
 
 def test_create_session(
-    transport: str = "grpc", request_type=spanner.CreateSessionRequest
+    transport = "grpc", request_type=spanner.CreateSessionRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -451,7 +458,7 @@ def test_create_session_from_dict():
 
 @pytest.mark.asyncio
 async def test_create_session_async(
-    transport: str = "grpc_asyncio", request_type=spanner.CreateSessionRequest
+    transport = "grpc_asyncio", request_type=spanner.CreateSessionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -602,7 +609,7 @@ async def test_create_session_flattened_error_async():
 
 
 def test_batch_create_sessions(
-    transport: str = "grpc", request_type=spanner.BatchCreateSessionsRequest
+    transport = "grpc", request_type=spanner.BatchCreateSessionsRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -638,7 +645,7 @@ def test_batch_create_sessions_from_dict():
 
 @pytest.mark.asyncio
 async def test_batch_create_sessions_async(
-    transport: str = "grpc_asyncio", request_type=spanner.BatchCreateSessionsRequest
+    transport = "grpc_asyncio", request_type=spanner.BatchCreateSessionsRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -812,7 +819,7 @@ async def test_batch_create_sessions_flattened_error_async():
         )
 
 
-def test_get_session(transport: str = "grpc", request_type=spanner.GetSessionRequest):
+def test_get_session(transport = "grpc", request_type=spanner.GetSessionRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -847,7 +854,7 @@ def test_get_session_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_session_async(
-    transport: str = "grpc_asyncio", request_type=spanner.GetSessionRequest
+    transport = "grpc_asyncio", request_type=spanner.GetSessionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -998,7 +1005,7 @@ async def test_get_session_flattened_error_async():
 
 
 def test_list_sessions(
-    transport: str = "grpc", request_type=spanner.ListSessionsRequest
+    transport = "grpc", request_type=spanner.ListSessionsRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1036,7 +1043,7 @@ def test_list_sessions_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_sessions_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ListSessionsRequest
+    transport = "grpc_asyncio", request_type=spanner.ListSessionsRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1313,7 +1320,7 @@ async def test_list_sessions_async_pages():
 
 
 def test_delete_session(
-    transport: str = "grpc", request_type=spanner.DeleteSessionRequest
+    transport = "grpc", request_type=spanner.DeleteSessionRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1346,7 +1353,7 @@ def test_delete_session_from_dict():
 
 @pytest.mark.asyncio
 async def test_delete_session_async(
-    transport: str = "grpc_asyncio", request_type=spanner.DeleteSessionRequest
+    transport = "grpc_asyncio", request_type=spanner.DeleteSessionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1492,7 +1499,7 @@ async def test_delete_session_flattened_error_async():
         )
 
 
-def test_execute_sql(transport: str = "grpc", request_type=spanner.ExecuteSqlRequest):
+def test_execute_sql(transport = "grpc", request_type=spanner.ExecuteSqlRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -1525,7 +1532,7 @@ def test_execute_sql_from_dict():
 
 @pytest.mark.asyncio
 async def test_execute_sql_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ExecuteSqlRequest
+    transport = "grpc_asyncio", request_type=spanner.ExecuteSqlRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1611,7 +1618,7 @@ async def test_execute_sql_field_headers_async():
 
 
 def test_execute_streaming_sql(
-    transport: str = "grpc", request_type=spanner.ExecuteSqlRequest
+    transport = "grpc", request_type=spanner.ExecuteSqlRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1647,7 +1654,7 @@ def test_execute_streaming_sql_from_dict():
 
 @pytest.mark.asyncio
 async def test_execute_streaming_sql_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ExecuteSqlRequest
+    transport = "grpc_asyncio", request_type=spanner.ExecuteSqlRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1742,7 +1749,7 @@ async def test_execute_streaming_sql_field_headers_async():
 
 
 def test_execute_batch_dml(
-    transport: str = "grpc", request_type=spanner.ExecuteBatchDmlRequest
+    transport = "grpc", request_type=spanner.ExecuteBatchDmlRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1778,7 +1785,7 @@ def test_execute_batch_dml_from_dict():
 
 @pytest.mark.asyncio
 async def test_execute_batch_dml_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ExecuteBatchDmlRequest
+    transport = "grpc_asyncio", request_type=spanner.ExecuteBatchDmlRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1869,7 +1876,7 @@ async def test_execute_batch_dml_field_headers_async():
     assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
 
 
-def test_read(transport: str = "grpc", request_type=spanner.ReadRequest):
+def test_read(transport = "grpc", request_type=spanner.ReadRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -1902,7 +1909,7 @@ def test_read_from_dict():
 
 @pytest.mark.asyncio
 async def test_read_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ReadRequest
+    transport = "grpc_asyncio", request_type=spanner.ReadRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1987,7 +1994,7 @@ async def test_read_field_headers_async():
     assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
 
 
-def test_streaming_read(transport: str = "grpc", request_type=spanner.ReadRequest):
+def test_streaming_read(transport = "grpc", request_type=spanner.ReadRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -2020,7 +2027,7 @@ def test_streaming_read_from_dict():
 
 @pytest.mark.asyncio
 async def test_streaming_read_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ReadRequest
+    transport = "grpc_asyncio", request_type=spanner.ReadRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2109,7 +2116,7 @@ async def test_streaming_read_field_headers_async():
 
 
 def test_begin_transaction(
-    transport: str = "grpc", request_type=spanner.BeginTransactionRequest
+    transport = "grpc", request_type=spanner.BeginTransactionRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2147,7 +2154,7 @@ def test_begin_transaction_from_dict():
 
 @pytest.mark.asyncio
 async def test_begin_transaction_async(
-    transport: str = "grpc_asyncio", request_type=spanner.BeginTransactionRequest
+    transport = "grpc_asyncio", request_type=spanner.BeginTransactionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2325,7 +2332,7 @@ async def test_begin_transaction_flattened_error_async():
         )
 
 
-def test_commit(transport: str = "grpc", request_type=spanner.CommitRequest):
+def test_commit(transport = "grpc", request_type=spanner.CommitRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -2358,7 +2365,7 @@ def test_commit_from_dict():
 
 @pytest.mark.asyncio
 async def test_commit_async(
-    transport: str = "grpc_asyncio", request_type=spanner.CommitRequest
+    transport = "grpc_asyncio", request_type=spanner.CommitRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2552,7 +2559,7 @@ async def test_commit_flattened_error_async():
         )
 
 
-def test_rollback(transport: str = "grpc", request_type=spanner.RollbackRequest):
+def test_rollback(transport = "grpc", request_type=spanner.RollbackRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -2584,7 +2591,7 @@ def test_rollback_from_dict():
 
 @pytest.mark.asyncio
 async def test_rollback_async(
-    transport: str = "grpc_asyncio", request_type=spanner.RollbackRequest
+    transport = "grpc_asyncio", request_type=spanner.RollbackRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2743,7 +2750,7 @@ async def test_rollback_flattened_error_async():
 
 
 def test_partition_query(
-    transport: str = "grpc", request_type=spanner.PartitionQueryRequest
+    transport = "grpc", request_type=spanner.PartitionQueryRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2777,7 +2784,7 @@ def test_partition_query_from_dict():
 
 @pytest.mark.asyncio
 async def test_partition_query_async(
-    transport: str = "grpc_asyncio", request_type=spanner.PartitionQueryRequest
+    transport = "grpc_asyncio", request_type=spanner.PartitionQueryRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2863,7 +2870,7 @@ async def test_partition_query_field_headers_async():
 
 
 def test_partition_read(
-    transport: str = "grpc", request_type=spanner.PartitionReadRequest
+    transport = "grpc", request_type=spanner.PartitionReadRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2897,7 +2904,7 @@ def test_partition_read_from_dict():
 
 @pytest.mark.asyncio
 async def test_partition_read_async(
-    transport: str = "grpc_asyncio", request_type=spanner.PartitionReadRequest
+    transport = "grpc_asyncio", request_type=spanner.PartitionReadRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,

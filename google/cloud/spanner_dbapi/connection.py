@@ -13,6 +13,14 @@
 # limitations under the License.
 
 """DB-API Connection for the Google Cloud Spanner."""
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import next
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 
 import time
 import warnings
@@ -37,7 +45,7 @@ AUTOCOMMIT_MODE_WARNING = "This method is non-operational in autocommit mode"
 MAX_INTERNAL_RETRIES = 50
 
 
-class Connection:
+class Connection(object):
     """Representation of a DB-API connection to a Cloud Spanner database.
 
     You most likely don't need to instantiate `Connection` objects

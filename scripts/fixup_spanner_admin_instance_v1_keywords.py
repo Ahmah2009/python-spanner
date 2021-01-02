@@ -1,3 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import open
+from builtins import int
+from builtins import zip
+from future import standard_library
+standard_library.install_aliases()
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -25,9 +34,9 @@ from typing import (Any, Callable, Dict, List, Sequence, Tuple)
 
 
 def partition(
-    predicate: Callable[[Any], bool],
-    iterator: Sequence[Any]
-) -> Tuple[List[Any], List[Any]]:
+    predicate,
+    iterator
+):
     """A stable, out-of-place partition."""
     results = ([], [])
 
@@ -54,7 +63,7 @@ class spanner_admin_instanceCallTransformer(cst.CSTTransformer):
 
     }
 
-    def leave_Call(self, original: cst.Call, updated: cst.Call) -> cst.CSTNode:
+    def leave_Call(self, original, updated):
         try:
             key = original.func.attr.value
             kword_params = self.METHOD_TO_PARAMS[key]
@@ -97,11 +106,11 @@ class spanner_admin_instanceCallTransformer(cst.CSTTransformer):
 
 
 def fix_files(
-    in_dir: pathlib.Path,
-    out_dir: pathlib.Path,
-    *,
-    transformer=spanner_admin_instanceCallTransformer(),
+    in_dir,
+    out_dir, **_3to2kwargs
 ):
+    if 'transformer' in _3to2kwargs: transformer = _3to2kwargs['transformer']; del _3to2kwargs['transformer']
+    else: transformer = spanner_admin_instanceCallTransformer()
     """Duplicate the input dir to the output dir, fixing file method calls.
 
     Preconditions:

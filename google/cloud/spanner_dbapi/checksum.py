@@ -13,6 +13,13 @@
 # limitations under the License.
 
 """API to calculate checksums of SQL statements results."""
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 
 import hashlib
 import pickle
@@ -20,7 +27,7 @@ import pickle
 from google.cloud.spanner_dbapi.exceptions import RetryAborted
 
 
-class ResultsChecksum:
+class ResultsChecksum(object):
     """Cumulative checksum.
 
     Used to calculate a total checksum of all the results

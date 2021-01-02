@@ -1,3 +1,12 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import map
+from builtins import dict
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 # Copyright 2016 Google LLC All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +39,7 @@ def _make_rpc_error(error_cls, trailing_metadata=None):
     return error_cls("error", errors=(grpc_error,))
 
 
-class _ConstantTime:
+class _ConstantTime(object):
     def time(self):
         return 1
 

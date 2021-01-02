@@ -13,6 +13,13 @@
 # limitations under the License.
 
 """Populate spanner databases with data for streaming system tests."""
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from future import standard_library
+standard_library.install_aliases()
 
 from google.cloud.spanner_v1 import Client
 from google.cloud.spanner_v1.keyset import KeySet
