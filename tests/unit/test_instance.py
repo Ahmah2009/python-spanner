@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import unittest
 
 import mock
@@ -19,25 +21,25 @@ import mock
 
 class TestInstance(unittest.TestCase):
 
-    PROJECT = "project"
-    PARENT = "projects/" + PROJECT
-    INSTANCE_ID = "instance-id"
-    INSTANCE_NAME = PARENT + "/instances/" + INSTANCE_ID
-    CONFIG_NAME = "configuration-name"
-    LOCATION = "projects/" + PROJECT + "/locations/" + CONFIG_NAME
-    DISPLAY_NAME = "display_name"
+    PROJECT = u"project"
+    PARENT = u"projects/" + PROJECT
+    INSTANCE_ID = u"instance-id"
+    INSTANCE_NAME = PARENT + u"/instances/" + INSTANCE_ID
+    CONFIG_NAME = u"configuration-name"
+    LOCATION = u"projects/" + PROJECT + u"/locations/" + CONFIG_NAME
+    DISPLAY_NAME = u"display_name"
     NODE_COUNT = 5
     OP_ID = 8915
-    OP_NAME = "operations/projects/%s/instances/%soperations/%d" % (
+    OP_NAME = u"operations/projects/%s/instances/%soperations/%d" % (
         PROJECT,
         INSTANCE_ID,
         OP_ID,
     )
-    TABLE_ID = "table_id"
-    TABLE_NAME = INSTANCE_NAME + "/tables/" + TABLE_ID
+    TABLE_ID = u"table_id"
+    TABLE_NAME = INSTANCE_NAME + u"/tables/" + TABLE_ID
     TIMEOUT_SECONDS = 1
-    DATABASE_ID = "database_id"
-    DATABASE_NAME = "%s/databases/%s" % (INSTANCE_NAME, DATABASE_ID)
+    DATABASE_ID = u"database_id"
+    DATABASE_NAME = u"%s/databases/%s" % (INSTANCE_NAME, DATABASE_ID)
 
     def _getTargetClass(self):
         from google.cloud.spanner_v1.instance import Instance
@@ -59,7 +61,7 @@ class TestInstance(unittest.TestCase):
         self.assertEqual(instance.display_name, self.INSTANCE_ID)
 
     def test_constructor_non_default(self):
-        DISPLAY_NAME = "display_name"
+        DISPLAY_NAME = u"display_name"
         client = object()
 
         instance = self._make_one(
@@ -76,7 +78,7 @@ class TestInstance(unittest.TestCase):
         self.assertEqual(instance.display_name, DISPLAY_NAME)
 
     def test_copy(self):
-        DISPLAY_NAME = "display_name"
+        DISPLAY_NAME = u"display_name"
 
         client = _Client(self.PROJECT)
         instance = self._make_one(
@@ -94,7 +96,7 @@ class TestInstance(unittest.TestCase):
     def test__update_from_pb_success(self):
         from google.cloud.spanner_admin_instance_v1 import Instance
 
-        display_name = "display_name"
+        display_name = u"display_name"
         instance_pb = Instance(display_name=display_name)
 
         instance = self._make_one(None, None, None, None)
@@ -115,7 +117,7 @@ class TestInstance(unittest.TestCase):
     def test_from_pb_bad_instance_name(self):
         from google.cloud.spanner_admin_instance_v1 import Instance
 
-        instance_name = "INCORRECT_FORMAT"
+        instance_name = u"INCORRECT_FORMAT"
         instance_pb = Instance(name=instance_name)
 
         klass = self._getTargetClass()
@@ -125,7 +127,7 @@ class TestInstance(unittest.TestCase):
     def test_from_pb_project_mistmatch(self):
         from google.cloud.spanner_admin_instance_v1 import Instance
 
-        ALT_PROJECT = "ALT_PROJECT"
+        ALT_PROJECT = u"ALT_PROJECT"
         client = _Client(project=ALT_PROJECT)
 
         self.assertNotEqual(self.PROJECT, ALT_PROJECT)
@@ -180,8 +182,8 @@ class TestInstance(unittest.TestCase):
         self.assertFalse(comparison_val)
 
     def test___ne__(self):
-        instance1 = self._make_one("instance_id1", "client1", self.CONFIG_NAME)
-        instance2 = self._make_one("instance_id2", "client2", self.CONFIG_NAME)
+        instance1 = self._make_one(u"instance_id1", u"client1", self.CONFIG_NAME)
+        instance2 = self._make_one(u"instance_id2", u"client2", self.CONFIG_NAME)
         self.assertNotEqual(instance1, instance2)
 
     def test_create_grpc_error(self):
@@ -217,7 +219,7 @@ class TestInstance(unittest.TestCase):
         self.assertEqual(instance.config, self.CONFIG_NAME)
         self.assertEqual(instance.display_name, self.INSTANCE_ID)
         self.assertEqual(instance.node_count, 1)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_create_success(self):
         op_future = _FauxOperationFuture()
@@ -244,7 +246,7 @@ class TestInstance(unittest.TestCase):
         self.assertEqual(instance.config, self.CONFIG_NAME)
         self.assertEqual(instance.display_name, self.DISPLAY_NAME)
         self.assertEqual(instance.node_count, self.NODE_COUNT)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_exists_instance_grpc_error(self):
         from google.api_core.exceptions import Unknown
@@ -268,7 +270,7 @@ class TestInstance(unittest.TestCase):
 
         name, metadata = api._got_instance
         self.assertEqual(name, self.INSTANCE_NAME)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_exists_success(self):
         from google.cloud.spanner_admin_instance_v1 import Instance
@@ -289,7 +291,7 @@ class TestInstance(unittest.TestCase):
 
         name, metadata = api._got_instance
         self.assertEqual(name, self.INSTANCE_NAME)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_reload_instance_grpc_error(self):
         from google.api_core.exceptions import Unknown
@@ -316,7 +318,7 @@ class TestInstance(unittest.TestCase):
 
         name, metadata = api._got_instance
         self.assertEqual(name, self.INSTANCE_NAME)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_reload_success(self):
         from google.cloud.spanner_admin_instance_v1 import Instance
@@ -341,7 +343,7 @@ class TestInstance(unittest.TestCase):
 
         name, metadata = api._got_instance
         self.assertEqual(name, self.INSTANCE_NAME)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_update_grpc_error(self):
         from google.api_core.exceptions import Unknown
@@ -371,12 +373,12 @@ class TestInstance(unittest.TestCase):
             instance.update()
 
         instance, field_mask, metadata = api._updated_instance
-        self.assertEqual(field_mask.paths, ["config", "display_name", "node_count"])
+        self.assertEqual(field_mask.paths, [u"config", u"display_name", u"node_count"])
         self.assertEqual(instance.name, self.INSTANCE_NAME)
         self.assertEqual(instance.config, self.CONFIG_NAME)
         self.assertEqual(instance.display_name, self.INSTANCE_ID)
         self.assertEqual(instance.node_count, DEFAULT_NODE_COUNT)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_update_success(self):
         op_future = _FauxOperationFuture()
@@ -397,12 +399,12 @@ class TestInstance(unittest.TestCase):
         self.assertIs(future, op_future)
 
         instance, field_mask, metadata = api._updated_instance
-        self.assertEqual(field_mask.paths, ["config", "display_name", "node_count"])
+        self.assertEqual(field_mask.paths, [u"config", u"display_name", u"node_count"])
         self.assertEqual(instance.name, self.INSTANCE_NAME)
         self.assertEqual(instance.config, self.CONFIG_NAME)
         self.assertEqual(instance.display_name, self.DISPLAY_NAME)
         self.assertEqual(instance.node_count, self.NODE_COUNT)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_delete_grpc_error(self):
         from google.api_core.exceptions import Unknown
@@ -428,7 +430,7 @@ class TestInstance(unittest.TestCase):
 
         name, metadata = api._deleted_instance
         self.assertEqual(name, self.INSTANCE_NAME)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_delete_success(self):
         from google.protobuf.empty_pb2 import Empty
@@ -443,7 +445,7 @@ class TestInstance(unittest.TestCase):
 
         name, metadata = api._deleted_instance
         self.assertEqual(name, self.INSTANCE_NAME)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", instance.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", instance.name)])
 
     def test_database_factory_defaults(self):
         from google.cloud.spanner_v1.database import Database
@@ -451,7 +453,7 @@ class TestInstance(unittest.TestCase):
 
         client = _Client(self.PROJECT)
         instance = self._make_one(self.INSTANCE_ID, client, self.CONFIG_NAME)
-        DATABASE_ID = "database-id"
+        DATABASE_ID = u"database-id"
 
         database = instance.database(DATABASE_ID)
 
@@ -469,7 +471,7 @@ class TestInstance(unittest.TestCase):
 
         client = _Client(self.PROJECT)
         instance = self._make_one(self.INSTANCE_ID, client, self.CONFIG_NAME)
-        DATABASE_ID = "database-id"
+        DATABASE_ID = u"database-id"
         pool = _Pool()
 
         database = instance.database(
@@ -496,8 +498,8 @@ class TestInstance(unittest.TestCase):
 
         databases_pb = ListDatabasesResponse(
             databases=[
-                DatabasePB(name="{}/databases/aa".format(self.INSTANCE_NAME)),
-                DatabasePB(name="{}/databases/bb".format(self.INSTANCE_NAME)),
+                DatabasePB(name=u"{}/databases/aa".format(self.INSTANCE_NAME)),
+                DatabasePB(name=u"{}/databases/bb".format(self.INSTANCE_NAME)),
             ]
         )
 
@@ -509,12 +511,12 @@ class TestInstance(unittest.TestCase):
         databases = list(response)
 
         self.assertIsInstance(databases[0], DatabasePB)
-        self.assertTrue(databases[0].name.endswith("/aa"))
-        self.assertTrue(databases[1].name.endswith("/bb"))
+        self.assertTrue(databases[0].name.endswith(u"/aa"))
+        self.assertTrue(databases[1].name.endswith(u"/bb"))
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         ld_api.assert_called_once_with(
             ListDatabasesRequest(parent=self.INSTANCE_NAME),
@@ -546,8 +548,8 @@ class TestInstance(unittest.TestCase):
         self.assertEqual(databases, [])
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         ld_api.assert_called_once_with(
             ListDatabasesRequest(parent=self.INSTANCE_NAME, page_size=page_size),
@@ -561,14 +563,14 @@ class TestInstance(unittest.TestCase):
 
         client = _Client(self.PROJECT)
         instance = self._make_one(self.INSTANCE_ID, client, self.CONFIG_NAME)
-        BACKUP_ID = "backup-id"
+        BACKUP_ID = u"backup-id"
 
         backup = instance.backup(BACKUP_ID)
 
         self.assertIsInstance(backup, Backup)
         self.assertEqual(backup.backup_id, BACKUP_ID)
         self.assertIs(backup._instance, instance)
-        self.assertEqual(backup._database, "")
+        self.assertEqual(backup._database, u"")
         self.assertIsNone(backup._expire_time)
 
     def test_backup_factory_explicit(self):
@@ -578,8 +580,8 @@ class TestInstance(unittest.TestCase):
 
         client = _Client(self.PROJECT)
         instance = self._make_one(self.INSTANCE_ID, client, self.CONFIG_NAME)
-        BACKUP_ID = "backup-id"
-        DATABASE_NAME = "database-name"
+        BACKUP_ID = u"backup-id"
+        DATABASE_NAME = u"database-name"
         timestamp = datetime.datetime.utcnow().replace(tzinfo=UTC)
 
         backup = instance.backup(
@@ -605,9 +607,9 @@ class TestInstance(unittest.TestCase):
 
         backups_pb = ListBackupsResponse(
             backups=[
-                BackupPB(name=instance.name + "/backups/op1"),
-                BackupPB(name=instance.name + "/backups/op2"),
-                BackupPB(name=instance.name + "/backups/op3"),
+                BackupPB(name=instance.name + u"/backups/op1"),
+                BackupPB(name=instance.name + u"/backups/op2"),
+                BackupPB(name=instance.name + u"/backups/op3"),
             ]
         )
 
@@ -621,8 +623,8 @@ class TestInstance(unittest.TestCase):
             self.assertIsInstance(backup, BackupPB)
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         lbo_api.assert_called_once_with(
             ListBackupsRequest(parent=self.INSTANCE_NAME),
@@ -644,9 +646,9 @@ class TestInstance(unittest.TestCase):
 
         backups_pb = ListBackupsResponse(
             backups=[
-                BackupPB(name=instance.name + "/backups/op1"),
-                BackupPB(name=instance.name + "/backups/op2"),
-                BackupPB(name=instance.name + "/backups/op3"),
+                BackupPB(name=instance.name + u"/backups/op1"),
+                BackupPB(name=instance.name + u"/backups/op2"),
+                BackupPB(name=instance.name + u"/backups/op3"),
             ]
         )
 
@@ -654,18 +656,18 @@ class TestInstance(unittest.TestCase):
             api._transport.list_backups
         ] = mock.Mock(return_value=backups_pb)
 
-        backups = instance.list_backups(filter_="filter", page_size=10)
+        backups = instance.list_backups(filter_=u"filter", page_size=10)
 
         for backup in backups:
             self.assertIsInstance(backup, BackupPB)
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         ldo_api.assert_called_once_with(
             ListBackupsRequest(
-                parent=self.INSTANCE_NAME, filter="filter", page_size=10
+                parent=self.INSTANCE_NAME, filter=u"filter", page_size=10
             ),
             metadata=expected_metadata,
             retry=mock.ANY,
@@ -688,13 +690,13 @@ class TestInstance(unittest.TestCase):
         create_backup_metadata = Any()
         create_backup_metadata.Pack(
             CreateBackupMetadata.pb(
-                CreateBackupMetadata(name="backup", database="database")
+                CreateBackupMetadata(name=u"backup", database=u"database")
             )
         )
 
         operations_pb = ListBackupOperationsResponse(
             operations=[
-                operations_pb2.Operation(name="op1", metadata=create_backup_metadata)
+                operations_pb2.Operation(name=u"op1", metadata=create_backup_metadata)
             ]
         )
 
@@ -705,8 +707,8 @@ class TestInstance(unittest.TestCase):
         instance.list_backup_operations()
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         ldo_api.assert_called_once_with(
             ListBackupOperationsRequest(parent=self.INSTANCE_NAME),
@@ -731,13 +733,13 @@ class TestInstance(unittest.TestCase):
         create_backup_metadata = Any()
         create_backup_metadata.Pack(
             CreateBackupMetadata.pb(
-                CreateBackupMetadata(name="backup", database="database")
+                CreateBackupMetadata(name=u"backup", database=u"database")
             )
         )
 
         operations_pb = ListBackupOperationsResponse(
             operations=[
-                operations_pb2.Operation(name="op1", metadata=create_backup_metadata)
+                operations_pb2.Operation(name=u"op1", metadata=create_backup_metadata)
             ]
         )
 
@@ -745,15 +747,15 @@ class TestInstance(unittest.TestCase):
             api._transport.list_backup_operations
         ] = mock.Mock(return_value=operations_pb)
 
-        instance.list_backup_operations(filter_="filter", page_size=10)
+        instance.list_backup_operations(filter_=u"filter", page_size=10)
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         ldo_api.assert_called_once_with(
             ListBackupOperationsRequest(
-                parent=self.INSTANCE_NAME, filter="filter", page_size=10
+                parent=self.INSTANCE_NAME, filter=u"filter", page_size=10
             ),
             metadata=expected_metadata,
             retry=mock.ANY,
@@ -780,21 +782,21 @@ class TestInstance(unittest.TestCase):
 
         create_database_metadata = Any()
         create_database_metadata.Pack(
-            CreateDatabaseMetadata.pb(CreateDatabaseMetadata(database="database"))
+            CreateDatabaseMetadata.pb(CreateDatabaseMetadata(database=u"database"))
         )
 
         optimize_database_metadata = Any()
         optimize_database_metadata.Pack(
             OptimizeRestoredDatabaseMetadata.pb(
-                OptimizeRestoredDatabaseMetadata(name="database")
+                OptimizeRestoredDatabaseMetadata(name=u"database")
             )
         )
 
         databases_pb = ListDatabaseOperationsResponse(
             operations=[
-                operations_pb2.Operation(name="op1", metadata=create_database_metadata),
+                operations_pb2.Operation(name=u"op1", metadata=create_database_metadata),
                 operations_pb2.Operation(
-                    name="op2", metadata=optimize_database_metadata
+                    name=u"op2", metadata=optimize_database_metadata
                 ),
             ]
         )
@@ -806,8 +808,8 @@ class TestInstance(unittest.TestCase):
         instance.list_database_operations()
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         ldo_api.assert_called_once_with(
             ListDatabaseOperationsRequest(parent=self.INSTANCE_NAME),
@@ -837,7 +839,7 @@ class TestInstance(unittest.TestCase):
         restore_database_metadata.Pack(
             RestoreDatabaseMetadata.pb(
                 RestoreDatabaseMetadata(
-                    name="database", source_type=RestoreSourceType.BACKUP
+                    name=u"database", source_type=RestoreSourceType.BACKUP
                 )
             )
         )
@@ -846,7 +848,7 @@ class TestInstance(unittest.TestCase):
         update_database_metadata.Pack(
             UpdateDatabaseDdlMetadata.pb(
                 UpdateDatabaseDdlMetadata(
-                    database="database", statements=["statements"]
+                    database=u"database", statements=[u"statements"]
                 )
             )
         )
@@ -854,9 +856,9 @@ class TestInstance(unittest.TestCase):
         databases_pb = ListDatabaseOperationsResponse(
             operations=[
                 operations_pb2.Operation(
-                    name="op1", metadata=restore_database_metadata
+                    name=u"op1", metadata=restore_database_metadata
                 ),
-                operations_pb2.Operation(name="op2", metadata=update_database_metadata),
+                operations_pb2.Operation(name=u"op2", metadata=update_database_metadata),
             ]
         )
 
@@ -864,15 +866,15 @@ class TestInstance(unittest.TestCase):
             api._transport.list_database_operations
         ] = mock.Mock(return_value=databases_pb)
 
-        instance.list_database_operations(filter_="filter", page_size=10)
+        instance.list_database_operations(filter_=u"filter", page_size=10)
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", instance.name),
-            ("x-goog-request-params", "parent={}".format(instance.name)),
+            (u"google-cloud-resource-prefix", instance.name),
+            (u"x-goog-request-params", u"parent={}".format(instance.name)),
         )
         ldo_api.assert_called_once_with(
             ListDatabaseOperationsRequest(
-                parent=self.INSTANCE_NAME, filter="filter", page_size=10
+                parent=self.INSTANCE_NAME, filter=u"filter", page_size=10
             ),
             metadata=expected_metadata,
             retry=mock.ANY,
@@ -885,7 +887,7 @@ class TestInstance(unittest.TestCase):
         )
         from google.cloud.spanner_v1 import instance
 
-        type_string = "type.googleapis.com/google.spanner.admin.database.v1.OptimizeRestoredDatabaseMetadata"
+        type_string = u"type.googleapis.com/google.spanner.admin.database.v1.OptimizeRestoredDatabaseMetadata"
         self.assertIn(type_string, instance._OPERATION_METADATA_TYPES)
         self.assertEqual(
             instance._type_string_to_type_pb(type_string),
@@ -896,13 +898,13 @@ class TestInstance(unittest.TestCase):
         from google.cloud.spanner_v1 import instance
         from google.protobuf.empty_pb2 import Empty
 
-        self.assertEqual(instance._type_string_to_type_pb("invalid_string"), Empty)
+        self.assertEqual(instance._type_string_to_type_pb(u"invalid_string"), Empty)
 
 
 class _Client(object):
     def __init__(self, project, timeout_seconds=None):
         self.project = project
-        self.project_name = "projects/" + self.project
+        self.project_name = u"projects/" + self.project
         self.timeout_seconds = timeout_seconds
 
     def copy(self):
@@ -932,9 +934,9 @@ class _FauxInstanceAdminAPI(object):
 
         self._created_instance = (parent, instance_id, instance, metadata)
         if self._rpc_error:
-            raise Unknown("error")
+            raise Unknown(u"error")
         if self._create_instance_conflict:
-            raise AlreadyExists("conflict")
+            raise AlreadyExists(u"conflict")
         return self._create_instance_response
 
     def get_instance(self, name, metadata=None):
@@ -942,9 +944,9 @@ class _FauxInstanceAdminAPI(object):
 
         self._got_instance = (name, metadata)
         if self._rpc_error:
-            raise Unknown("error")
+            raise Unknown(u"error")
         if self._instance_not_found:
-            raise NotFound("error")
+            raise NotFound(u"error")
         return self._get_instance_response
 
     def update_instance(self, instance, field_mask, metadata=None):
@@ -952,9 +954,9 @@ class _FauxInstanceAdminAPI(object):
 
         self._updated_instance = (instance, field_mask, metadata)
         if self._rpc_error:
-            raise Unknown("error")
+            raise Unknown(u"error")
         if self._instance_not_found:
-            raise NotFound("error")
+            raise NotFound(u"error")
         return self._update_instance_response
 
     def delete_instance(self, name, metadata=None):
@@ -962,9 +964,9 @@ class _FauxInstanceAdminAPI(object):
 
         self._deleted_instance = name, metadata
         if self._rpc_error:
-            raise Unknown("error")
+            raise Unknown(u"error")
         if self._instance_not_found:
-            raise NotFound("error")
+            raise NotFound(u"error")
         return self._delete_instance_response
 
 

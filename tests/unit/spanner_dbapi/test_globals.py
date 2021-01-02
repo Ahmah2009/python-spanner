@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import unittest
 
 
@@ -21,8 +22,8 @@ class TestDBAPIGlobals(unittest.TestCase):
         from google.cloud.spanner_dbapi import paramstyle
         from google.cloud.spanner_dbapi import threadsafety
 
-        self.assertEqual(apilevel, "2.0", "We implement PEP-0249 version 2.0")
-        self.assertEqual(paramstyle, "format", "Cloud Spanner uses @param")
+        self.assertEqual(apilevel, u"2.0", u"We implement PEP-0249 version 2.0")
+        self.assertEqual(paramstyle, u"format", u"Cloud Spanner uses @param")
         self.assertEqual(
-            threadsafety, 1, "Threads may share module but not connections"
+            threadsafety, 1, u"Threads may share module but not connections"
         )

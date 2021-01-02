@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Cloud Spanner DB-API Connection class unit tests."""
+u"""Cloud Spanner DB-API Connection class unit tests."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import mock
 import unittest
 
@@ -22,14 +24,14 @@ class TestHelpers(unittest.TestCase):
     def test__execute_insert_heterogenous(self):
         from google.cloud.spanner_dbapi import _helpers
 
-        sql = "sql"
+        sql = u"sql"
         params = (sql, None)
         with mock.patch(
-            "google.cloud.spanner_dbapi._helpers.sql_pyformat_args_to_spanner",
+            u"google.cloud.spanner_dbapi._helpers.sql_pyformat_args_to_spanner",
             return_value=params,
         ) as mock_pyformat:
             with mock.patch(
-                "google.cloud.spanner_dbapi._helpers.get_param_types", return_value=None
+                u"google.cloud.spanner_dbapi._helpers.get_param_types", return_value=None
             ) as mock_param_types:
                 transaction = mock.MagicMock()
                 transaction.execute_update = mock_execute = mock.MagicMock()
@@ -55,10 +57,10 @@ class TestHelpers(unittest.TestCase):
 
         connection = mock.MagicMock()
         connection.database.run_in_transaction = mock_run_in = mock.MagicMock()
-        sql = "sql"
+        sql = u"sql"
         parts = mock.MagicMock()
         with mock.patch(
-            "google.cloud.spanner_dbapi._helpers.parse_insert", return_value=parts
+            u"google.cloud.spanner_dbapi._helpers.parse_insert", return_value=parts
         ):
             parts.get = mock.MagicMock(return_value=True)
             mock_run_in.return_value = 0
@@ -75,7 +77,7 @@ class TestColumnInfo(unittest.TestCase):
     def test_ctor(self):
         from google.cloud.spanner_dbapi.cursor import ColumnInfo
 
-        name = "col-name"
+        name = u"col-name"
         type_code = 8
         display_size = 5
         internal_size = 10
@@ -102,18 +104,18 @@ class TestColumnInfo(unittest.TestCase):
     def test___get_item__(self):
         from google.cloud.spanner_dbapi.cursor import ColumnInfo
 
-        fields = ("col-name", 8, 5, 10, 3, None, False)
+        fields = (u"col-name", 8, 5, 10, 3, None, False)
         cols = ColumnInfo(*fields)
 
-        for i in range(0, 7):
+        for i in xrange(0, 7):
             self.assertEqual(cols[i], fields[i])
 
     def test___str__(self):
         from google.cloud.spanner_dbapi.cursor import ColumnInfo
 
-        cols = ColumnInfo("col-name", 8, None, 10, 3, None, False)
+        cols = ColumnInfo(u"col-name", 8, None, 10, 3, None, False)
 
         self.assertEqual(
-            str(cols),
-            "ColumnInfo(name='col-name', type_code=8, internal_size=10, precision='3')",
+            unicode(cols),
+            u"ColumnInfo(name='col-name', type_code=8, internal_size=10, precision='3')",
         )

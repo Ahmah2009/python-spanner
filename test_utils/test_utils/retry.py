@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import time
 from functools import wraps
 
@@ -23,16 +24,16 @@ BACKOFF = 2
 
 
 def _retry_all(_):
-    """Retry all caught exceptions."""
+    u"""Retry all caught exceptions."""
     return True
 
 
 class BackoffFailed(Exception):
-    """Retry w/ backoffs did not complete successfully."""
+    u"""Retry w/ backoffs did not complete successfully."""
 
 
 class RetryBase(object):
-    """Base for retrying calling a decorated function w/ exponential backoff.
+    u"""Base for retrying calling a decorated function w/ exponential backoff.
 
     :type max_tries: int
     :param max_tries: Number of times to try (not retry) before giving up.
@@ -56,7 +57,7 @@ class RetryBase(object):
 
 
 class RetryErrors(RetryBase):
-    """Decorator for retrying given exceptions in testing.
+    u"""Decorator for retrying given exceptions in testing.
 
     :type exception: Exception or tuple of Exceptions
     :param exception: The exception to check or may be a tuple of
@@ -93,13 +94,13 @@ class RetryErrors(RetryBase):
             while tries < self.max_tries:
                 try:
                     return to_wrap(*args, **kwargs)
-                except self.exception as caught_exception:
+                except self.exception, caught_exception:
 
                     if not self.error_predicate(caught_exception):
                         raise
 
                     delay = self.delay * self.backoff**tries
-                    msg = ("%s, Trying again in %d seconds..." %
+                    msg = (u"%s, Trying again in %d seconds..." %
                            (caught_exception, delay))
                     self.logger(msg)
 
@@ -111,7 +112,7 @@ class RetryErrors(RetryBase):
 
 
 class RetryResult(RetryBase):
-    """Decorator for retrying based on non-error result.
+    u"""Decorator for retrying based on non-error result.
 
     :type result_predicate: function, takes result, returns bool
     :param result_predicate: Predicate evaluating whether to retry after a
@@ -146,7 +147,7 @@ class RetryResult(RetryBase):
                     return result
 
                 delay = self.delay * self.backoff**tries
-                msg = "%s. Trying again in %d seconds..." % (
+                msg = u"%s. Trying again in %d seconds..." % (
                     self.result_predicate.__name__, delay,)
                 self.logger(msg)
 
@@ -158,7 +159,7 @@ class RetryResult(RetryBase):
 
 
 class RetryInstanceState(RetryBase):
-    """Decorator for retrying based on instance state.
+    u"""Decorator for retrying based on instance state.
 
     :type instance_predicate: function, takes instance, returns bool
     :param instance_predicate: Predicate evaluating whether to retry after an
@@ -185,7 +186,7 @@ class RetryInstanceState(RetryBase):
         self.instance_predicate = instance_predicate
 
     def __call__(self, to_wrap):
-        instance = to_wrap.__self__   # only instance methods allowed
+        instance = to_wrap.im_self   # only instance methods allowed
 
         @wraps(to_wrap)
         def wrapped_function(*args, **kwargs):
@@ -196,7 +197,7 @@ class RetryInstanceState(RetryBase):
                     return result
 
                 delay = self.delay * self.backoff**tries
-                msg = "%s. Trying again in %d seconds..." % (
+                msg = u"%s. Trying again in %d seconds..." % (
                     self.instance_predicate.__name__, delay,)
                 self.logger(msg)
 

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script is used to synthesize generated parts of this library."""
+u"""This script is used to synthesize generated parts of this library."""
+from __future__ import absolute_import
 import synthtool as s
 from synthtool import gcp
 from synthtool.languages import python
@@ -24,59 +25,59 @@ common = gcp.CommonTemplates()
 # Generate spanner GAPIC layer
 # ----------------------------------------------------------------------------
 library = gapic.py_library(
-    service="spanner",
-    version="v1",
-    bazel_target="//google/spanner/v1:spanner-v1-py",
+    service=u"spanner",
+    version=u"v1",
+    bazel_target=u"//google/spanner/v1:spanner-v1-py",
     include_protos=True,
 )
 
-s.move(library, excludes=["google/cloud/spanner/**", "*.*", "docs/index.rst", "google/cloud/spanner_v1/__init__.py"])
+s.move(library, excludes=[u"google/cloud/spanner/**", u"*.*", u"docs/index.rst", u"google/cloud/spanner_v1/__init__.py"])
 
 # ----------------------------------------------------------------------------
 # Generate instance admin client
 # ----------------------------------------------------------------------------
 library = gapic.py_library(
-    service="spanner_admin_instance",
-    version="v1",
-    bazel_target="//google/spanner/admin/instance/v1:admin-instance-v1-py",
+    service=u"spanner_admin_instance",
+    version=u"v1",
+    bazel_target=u"//google/spanner/admin/instance/v1:admin-instance-v1-py",
     include_protos=True,
 )
 
-s.move(library, excludes=["google/cloud/spanner_admin_instance/**", "*.*", "docs/index.rst"])
+s.move(library, excludes=[u"google/cloud/spanner_admin_instance/**", u"*.*", u"docs/index.rst"])
 
 # ----------------------------------------------------------------------------
 # Generate database admin client
 # ----------------------------------------------------------------------------
 library = gapic.py_library(
-    service="spanner_admin_database",
-    version="v1",
-    bazel_target="//google/spanner/admin/database/v1:admin-database-v1-py",
+    service=u"spanner_admin_database",
+    version=u"v1",
+    bazel_target=u"//google/spanner/admin/database/v1:admin-database-v1-py",
     include_protos=True,
 )
 
-s.move(library, excludes=["google/cloud/spanner_admin_database/**", "*.*", "docs/index.rst"])
+s.move(library, excludes=[u"google/cloud/spanner_admin_database/**", u"*.*", u"docs/index.rst"])
 
 # Fix formatting for bullet lists.
 # See: https://github.com/googleapis/gapic-generator-python/issues/604
 s.replace(
-    "google/cloud/spanner_admin_database_v1/services/database_admin/*.py",
-    "``backup.expire_time``.",
-    "``backup.expire_time``.\n"
+    u"google/cloud/spanner_admin_database_v1/services/database_admin/*.py",
+    u"``backup.expire_time``.",
+    u"``backup.expire_time``.\n"
 )
 
 # ----------------------------------------------------------------------------
 # Add templated files
 # ----------------------------------------------------------------------------
 templated_files = common.py_library(microgenerator=True, samples=True)
-s.move(templated_files, excludes=[".coveragerc", "noxfile.py"])
+s.move(templated_files, excludes=[u".coveragerc", u"noxfile.py"])
 
 # Ensure CI runs on a new instance each time
 s.replace(
-    ".kokoro/build.sh",
-    "# Remove old nox",
-    "# Set up creating a new instance for each system test run\n"
-    "export GOOGLE_CLOUD_TESTS_CREATE_SPANNER_INSTANCE=true\n"
-    "\n\g<0>",
+    u".kokoro/build.sh",
+    u"# Remove old nox",
+    u"# Set up creating a new instance for each system test run\n"
+    u"export GOOGLE_CLOUD_TESTS_CREATE_SPANNER_INSTANCE=true\n"
+    u"\n\g<0>",
 )
 
 # ----------------------------------------------------------------------------
@@ -85,4 +86,4 @@ s.replace(
 
 python.py_samples()
 
-s.shell.run(["nox", "-s", "blacken"], hide_output=False)
+s.shell.run([u"nox", u"-s", u"blacken"], hide_output=False)

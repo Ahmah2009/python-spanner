@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test fixtures."""
+u"""Test fixtures."""
 
 
-DDL = """\
+DDL = u"""\
 CREATE TABLE contacts (
     contact_id INT64,
     first_name STRING(1024),
@@ -67,7 +67,7 @@ CREATE TABLE users_history (
      PRIMARY KEY(id, commit_ts DESC);
 """
 
-EMULATOR_DDL = """\
+EMULATOR_DDL = u"""\
 CREATE TABLE contacts (
     contact_id INT64,
     first_name STRING(1024),
@@ -117,7 +117,7 @@ CREATE TABLE users_history (
      PRIMARY KEY(id, commit_ts DESC);
 """
 
-DDL_STATEMENTS = [stmt.strip() for stmt in DDL.split(";") if stmt.strip()]
+DDL_STATEMENTS = [stmt.strip() for stmt in DDL.split(u";") if stmt.strip()]
 EMULATOR_DDL_STATEMENTS = [
-    stmt.strip() for stmt in EMULATOR_DDL.split(";") if stmt.strip()
+    stmt.strip() for stmt in EMULATOR_DDL.split(u";") if stmt.strip()
 ]

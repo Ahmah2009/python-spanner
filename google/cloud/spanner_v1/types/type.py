@@ -15,16 +15,17 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.v1", manifest={"TypeCode", "Type", "StructType",},
+    package=u"google.spanner.v1", manifest=set([u"TypeCode", u"Type", u"StructType",]),
 )
 
 
 class TypeCode(proto.Enum):
-    r"""``TypeCode`` is used as part of [Type][google.spanner.v1.Type] to
+    ur"""``TypeCode`` is used as part of [Type][google.spanner.v1.Type] to
     indicate the type of a Cloud Spanner value.
 
     Each legal value of a type can be encoded to or decoded from a JSON
@@ -46,7 +47,7 @@ class TypeCode(proto.Enum):
 
 
 class Type(proto.Message):
-    r"""``Type`` indicates the type of a Cloud Spanner value, as might be
+    ur"""``Type`` indicates the type of a Cloud Spanner value, as might be
     stored in a table cell or returned from an SQL query.
 
     Attributes:
@@ -64,15 +65,15 @@ class Type(proto.Message):
             fields.
     """
 
-    code = proto.Field(proto.ENUM, number=1, enum="TypeCode",)
+    code = proto.Field(proto.ENUM, number=1, enum=u"TypeCode",)
 
-    array_element_type = proto.Field(proto.MESSAGE, number=2, message="Type",)
+    array_element_type = proto.Field(proto.MESSAGE, number=2, message=u"Type",)
 
-    struct_type = proto.Field(proto.MESSAGE, number=3, message="StructType",)
+    struct_type = proto.Field(proto.MESSAGE, number=3, message=u"StructType",)
 
 
 class StructType(proto.Message):
-    r"""``StructType`` defines the fields of a
+    ur"""``StructType`` defines the fields of a
     [STRUCT][google.spanner.v1.TypeCode.STRUCT] type.
 
     Attributes:
@@ -88,7 +89,7 @@ class StructType(proto.Message):
     """
 
     class Field(proto.Message):
-        r"""Message representing a single field of a struct.
+        ur"""Message representing a single field of a struct.
 
         Attributes:
             name (str):
@@ -105,7 +106,7 @@ class StructType(proto.Message):
 
         name = proto.Field(proto.STRING, number=1)
 
-        type_ = proto.Field(proto.MESSAGE, number=2, message="Type",)
+        type_ = proto.Field(proto.MESSAGE, number=2, message=u"Type",)
 
     fields = proto.RepeatedField(proto.MESSAGE, number=1, message=Field,)
 

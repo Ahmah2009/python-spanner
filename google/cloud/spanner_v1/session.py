@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Wrapper for Cloud Spanner Session objects."""
+u"""Wrapper for Cloud Spanner Session objects."""
 
+from __future__ import division
+from __future__ import with_statement
+from __future__ import absolute_import
 from functools import total_ordering
 import random
 import time
@@ -37,12 +40,11 @@ from google.cloud.spanner_v1 import CreateSessionRequest
 
 
 DEFAULT_RETRY_TIMEOUT_SECS = 30
-"""Default timeout used by :meth:`Session.run_in_transaction`."""
+u"""Default timeout used by :meth:`Session.run_in_transaction`."""
 
 
-@total_ordering
 class Session(object):
-    """Representation of a Cloud Spanner Session.
+    u"""Representation of a Cloud Spanner Session.
 
     We can use a :class:`Session` to:
 
@@ -71,12 +73,12 @@ class Session(object):
 
     @property
     def session_id(self):
-        """Read-only ID, set by the back-end during :meth:`create`."""
+        u"""Read-only ID, set by the back-end during :meth:`create`."""
         return self._session_id
 
     @property
     def labels(self):
-        """User-assigned labels for the session.
+        u"""User-assigned labels for the session.
 
         :rtype: dict (str -> str)
         :returns: the labels dict (empty if no labels were assigned.
@@ -85,7 +87,7 @@ class Session(object):
 
     @property
     def name(self):
-        """Session name used in requests.
+        u"""Session name used in requests.
 
         .. note::
 
@@ -101,11 +103,11 @@ class Session(object):
         :raises ValueError: if session is not yet created
         """
         if self._session_id is None:
-            raise ValueError("No session ID set by back-end")
-        return self._database.name + "/sessions/" + self._session_id
+            raise ValueError(u"No session ID set by back-end")
+        return self._database.name + u"/sessions/" + self._session_id
 
     def create(self):
-        """Create this session, bound to its database.
+        u"""Create this session, bound to its database.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.v1#google.spanner.v1.Spanner.CreateSession
@@ -113,7 +115,7 @@ class Session(object):
         :raises: :exc:`ValueError` if :attr:`session_id` is already set.
         """
         if self._session_id is not None:
-            raise ValueError("Session ID already set by back-end")
+            raise ValueError(u"Session ID already set by back-end")
         api = self._database.spanner_api
         metadata = _metadata_with_prefix(self._database.name)
 
@@ -122,12 +124,12 @@ class Session(object):
         if self._labels:
             request.session.labels = self._labels
 
-        with trace_call("CloudSpanner.CreateSession", self, self._labels):
+        with trace_call(u"CloudSpanner.CreateSession", self, self._labels):
             session_pb = api.create_session(request=request, metadata=metadata,)
-        self._session_id = session_pb.name.split("/")[-1]
+        self._session_id = session_pb.name.split(u"/")[-1]
 
     def exists(self):
-        """Test for the existence of this session.
+        u"""Test for the existence of this session.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.v1#google.spanner.v1.Spanner.GetSession
@@ -140,20 +142,20 @@ class Session(object):
         api = self._database.spanner_api
         metadata = _metadata_with_prefix(self._database.name)
 
-        with trace_call("CloudSpanner.GetSession", self) as span:
+        with trace_call(u"CloudSpanner.GetSession", self) as span:
             try:
                 api.get_session(name=self.name, metadata=metadata)
                 if span:
-                    span.set_attribute("session_found", True)
+                    span.set_attribute(u"session_found", True)
             except NotFound:
                 if span:
-                    span.set_attribute("session_found", False)
+                    span.set_attribute(u"session_found", False)
                 return False
 
         return True
 
     def delete(self):
-        """Delete this session.
+        u"""Delete this session.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.v1#google.spanner.v1.Spanner.GetSession
@@ -162,26 +164,26 @@ class Session(object):
         :raises NotFound: if the session does not exist
         """
         if self._session_id is None:
-            raise ValueError("Session ID not set by back-end")
+            raise ValueError(u"Session ID not set by back-end")
         api = self._database.spanner_api
         metadata = _metadata_with_prefix(self._database.name)
-        with trace_call("CloudSpanner.DeleteSession", self):
+        with trace_call(u"CloudSpanner.DeleteSession", self):
             api.delete_session(name=self.name, metadata=metadata)
 
     def ping(self):
-        """Ping the session to keep it alive by executing "SELECT 1".
+        u"""Ping the session to keep it alive by executing "SELECT 1".
 
         :raises: ValueError: if :attr:`session_id` is not already set.
         """
         if self._session_id is None:
-            raise ValueError("Session ID not set by back-end")
+            raise ValueError(u"Session ID not set by back-end")
         api = self._database.spanner_api
         metadata = _metadata_with_prefix(self._database.name)
-        request = ExecuteSqlRequest(session=self.name, sql="SELECT 1")
+        request = ExecuteSqlRequest(session=self.name, sql=u"SELECT 1")
         api.execute_sql(request=request, metadata=metadata)
 
     def snapshot(self, **kw):
-        """Create a snapshot to perform a set of reads with shared staleness.
+        u"""Create a snapshot to perform a set of reads with shared staleness.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.v1#google.spanner.v1.TransactionOptions.ReadOnly
@@ -195,12 +197,12 @@ class Session(object):
         :raises ValueError: if the session has not yet been created.
         """
         if self._session_id is None:
-            raise ValueError("Session has not been created.")
+            raise ValueError(u"Session has not been created.")
 
         return Snapshot(self, **kw)
 
-    def read(self, table, columns, keyset, index="", limit=0):
-        """Perform a ``StreamingRead`` API request for rows in a table.
+    def read(self, table, columns, keyset, index=u"", limit=0):
+        u"""Perform a ``StreamingRead`` API request for rows in a table.
 
         :type table: str
         :param table: name of the table from which to fetch data
@@ -233,7 +235,7 @@ class Session(object):
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
     ):
-        """Perform an ``ExecuteStreamingSql`` API request.
+        u"""Perform an ``ExecuteStreamingSql`` API request.
 
         :type sql: str
         :param sql: SQL query statement
@@ -272,26 +274,26 @@ class Session(object):
         )
 
     def batch(self):
-        """Factory to create a batch for this session.
+        u"""Factory to create a batch for this session.
 
         :rtype: :class:`~google.cloud.spanner_v1.batch.Batch`
         :returns: a batch bound to this session
         :raises ValueError: if the session has not yet been created.
         """
         if self._session_id is None:
-            raise ValueError("Session has not been created.")
+            raise ValueError(u"Session has not been created.")
 
         return Batch(self)
 
     def transaction(self):
-        """Create a transaction to perform a set of reads with shared staleness.
+        u"""Create a transaction to perform a set of reads with shared staleness.
 
         :rtype: :class:`~google.cloud.spanner_v1.transaction.Transaction`
         :returns: a transaction bound to this session
         :raises ValueError: if the session has not yet been created.
         """
         if self._session_id is None:
-            raise ValueError("Session has not been created.")
+            raise ValueError(u"Session has not been created.")
 
         if self._transaction is not None:
             self._transaction.rolled_back = True
@@ -301,7 +303,7 @@ class Session(object):
         return txn
 
     def run_in_transaction(self, func, *args, **kw):
-        """Perform a unit of work in a transaction, retrying on abort.
+        u"""Perform a unit of work in a transaction, retrying on abort.
 
         :type func: callable
         :param func: takes a required positional argument, the transaction,
@@ -323,7 +325,7 @@ class Session(object):
         :raises Exception:
             reraises any non-ABORT execptions raised by ``func``.
         """
-        deadline = time.time() + kw.pop("timeout_secs", DEFAULT_RETRY_TIMEOUT_SECS)
+        deadline = time.time() + kw.pop(u"timeout_secs", DEFAULT_RETRY_TIMEOUT_SECS)
         attempts = 0
 
         while True:
@@ -337,7 +339,7 @@ class Session(object):
             try:
                 attempts += 1
                 return_value = func(txn, *args, **kw)
-            except Aborted as exc:
+            except Aborted, exc:
                 del self._transaction
                 _delay_until_retry(exc, deadline, attempts)
                 continue
@@ -350,7 +352,7 @@ class Session(object):
 
             try:
                 txn.commit()
-            except Aborted as exc:
+            except Aborted, exc:
                 del self._transaction
                 _delay_until_retry(exc, deadline, attempts)
             except GoogleAPICallError:
@@ -364,8 +366,10 @@ class Session(object):
 #
 # Rational:  this function factors out complex shared deadline / retry
 #            handling from two `except:` clauses.
+Session = total_ordering(Session)
+
 def _delay_until_retry(exc, deadline, attempts):
-    """Helper for :meth:`Session.run_in_transaction`.
+    u"""Helper for :meth:`Session.run_in_transaction`.
 
     Detect retryable abort, and impose server-supplied delay.
 
@@ -398,7 +402,7 @@ def _delay_until_retry(exc, deadline, attempts):
 
 
 def _get_retry_delay(cause, attempts):
-    """Helper for :func:`_delay_until_retry`.
+    u"""Helper for :func:`_delay_until_retry`.
 
     :type exc: :class:`grpc.Call`
     :param exc: exception for aborted transaction
@@ -410,7 +414,7 @@ def _get_retry_delay(cause, attempts):
     :param attempts: number of call retries
     """
     metadata = dict(cause.trailing_metadata())
-    retry_info_pb = metadata.get("google.rpc.retryinfo-bin")
+    retry_info_pb = metadata.get(u"google.rpc.retryinfo-bin")
     if retry_info_pb is not None:
         retry_info = RetryInfo()
         retry_info.ParseFromString(retry_info_pb)

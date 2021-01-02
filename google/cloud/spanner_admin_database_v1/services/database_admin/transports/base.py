@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import abc
 import typing
 import pkg_resources
@@ -38,7 +39,7 @@ from google.protobuf import empty_pb2 as empty  # type: ignore
 try:
     DEFAULT_CLIENT_INFO = gapic_v1.client_info.ClientInfo(
         gapic_version=pkg_resources.get_distribution(
-            "google-cloud-spanner-admin-database",
+            u"google-cloud-spanner-admin-database",
         ).version,
     )
 except pkg_resources.DistributionNotFound:
@@ -46,25 +47,30 @@ except pkg_resources.DistributionNotFound:
 
 
 class DatabaseAdminTransport(abc.ABC):
-    """Abstract transport class for DatabaseAdmin."""
+    u"""Abstract transport class for DatabaseAdmin."""
 
     AUTH_SCOPES = (
-        "https://www.googleapis.com/auth/cloud-platform",
-        "https://www.googleapis.com/auth/spanner.admin",
+        u"https://www.googleapis.com/auth/cloud-platform",
+        u"https://www.googleapis.com/auth/spanner.admin",
     )
 
     def __init__(
         self,
-        *,
-        host: str = "spanner.googleapis.com",
-        credentials: credentials.Credentials = None,
-        credentials_file: typing.Optional[str] = None,
-        scopes: typing.Optional[typing.Sequence[str]] = AUTH_SCOPES,
-        quota_project_id: typing.Optional[str] = None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
         **kwargs,
-    ) -> None:
-        """Instantiate the transport.
+    ):
+        if 'client_info' in kwargs: client_info = kwargs['client_info']; del kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'quota_project_id' in kwargs: quota_project_id = kwargs['quota_project_id']; del kwargs['quota_project_id']
+        else: quota_project_id =  None
+        if 'scopes' in kwargs: scopes = kwargs['scopes']; del kwargs['scopes']
+        else: scopes =  AUTH_SCOPES
+        if 'credentials_file' in kwargs: credentials_file = kwargs['credentials_file']; del kwargs['credentials_file']
+        else: credentials_file =  None
+        if 'credentials' in kwargs: credentials = kwargs['credentials']; del kwargs['credentials']
+        else: credentials =  None
+        if 'host' in kwargs: host = kwargs['host']; del kwargs['host']
+        else: host =  u"spanner.googleapis.com"
+        u"""Instantiate the transport.
 
         Args:
             host (Optional[str]): The hostname to connect to.
@@ -86,15 +92,15 @@ class DatabaseAdminTransport(abc.ABC):
                 your own client library.
         """
         # Save the hostname. Default to port 443 (HTTPS) if none is specified.
-        if ":" not in host:
-            host += ":443"
+        if u":" not in host:
+            host += u":443"
         self._host = host
 
         # If no credentials are provided, then determine the appropriate
         # defaults.
         if credentials and credentials_file:
             raise exceptions.DuplicateCredentialArgs(
-                "'credentials_file' and 'credentials' are mutually exclusive"
+                u"'credentials_file' and 'credentials' are mutually exclusive"
             )
 
         if credentials_file is not None:
@@ -292,182 +298,111 @@ class DatabaseAdminTransport(abc.ABC):
         }
 
     @property
-    def operations_client(self) -> operations_v1.OperationsClient:
-        """Return the client designed to process long-running operations."""
+    def operations_client(self):
+        u"""Return the client designed to process long-running operations."""
         raise NotImplementedError()
 
     @property
     def list_databases(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.ListDatabasesRequest],
-        typing.Union[
-            spanner_database_admin.ListDatabasesResponse,
-            typing.Awaitable[spanner_database_admin.ListDatabasesResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def create_database(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.CreateDatabaseRequest],
-        typing.Union[operations.Operation, typing.Awaitable[operations.Operation]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def get_database(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.GetDatabaseRequest],
-        typing.Union[
-            spanner_database_admin.Database,
-            typing.Awaitable[spanner_database_admin.Database],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def update_database_ddl(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.UpdateDatabaseDdlRequest],
-        typing.Union[operations.Operation, typing.Awaitable[operations.Operation]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def drop_database(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.DropDatabaseRequest],
-        typing.Union[empty.Empty, typing.Awaitable[empty.Empty]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def get_database_ddl(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.GetDatabaseDdlRequest],
-        typing.Union[
-            spanner_database_admin.GetDatabaseDdlResponse,
-            typing.Awaitable[spanner_database_admin.GetDatabaseDdlResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def set_iam_policy(
         self,
-    ) -> typing.Callable[
-        [iam_policy.SetIamPolicyRequest],
-        typing.Union[policy.Policy, typing.Awaitable[policy.Policy]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def get_iam_policy(
         self,
-    ) -> typing.Callable[
-        [iam_policy.GetIamPolicyRequest],
-        typing.Union[policy.Policy, typing.Awaitable[policy.Policy]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def test_iam_permissions(
         self,
-    ) -> typing.Callable[
-        [iam_policy.TestIamPermissionsRequest],
-        typing.Union[
-            iam_policy.TestIamPermissionsResponse,
-            typing.Awaitable[iam_policy.TestIamPermissionsResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def create_backup(
         self,
-    ) -> typing.Callable[
-        [gsad_backup.CreateBackupRequest],
-        typing.Union[operations.Operation, typing.Awaitable[operations.Operation]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def get_backup(
         self,
-    ) -> typing.Callable[
-        [backup.GetBackupRequest],
-        typing.Union[backup.Backup, typing.Awaitable[backup.Backup]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def update_backup(
         self,
-    ) -> typing.Callable[
-        [gsad_backup.UpdateBackupRequest],
-        typing.Union[gsad_backup.Backup, typing.Awaitable[gsad_backup.Backup]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def delete_backup(
         self,
-    ) -> typing.Callable[
-        [backup.DeleteBackupRequest],
-        typing.Union[empty.Empty, typing.Awaitable[empty.Empty]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def list_backups(
         self,
-    ) -> typing.Callable[
-        [backup.ListBackupsRequest],
-        typing.Union[
-            backup.ListBackupsResponse, typing.Awaitable[backup.ListBackupsResponse]
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def restore_database(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.RestoreDatabaseRequest],
-        typing.Union[operations.Operation, typing.Awaitable[operations.Operation]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def list_database_operations(
         self,
-    ) -> typing.Callable[
-        [spanner_database_admin.ListDatabaseOperationsRequest],
-        typing.Union[
-            spanner_database_admin.ListDatabaseOperationsResponse,
-            typing.Awaitable[spanner_database_admin.ListDatabaseOperationsResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def list_backup_operations(
         self,
-    ) -> typing.Callable[
-        [backup.ListBackupOperationsRequest],
-        typing.Union[
-            backup.ListBackupOperationsResponse,
-            typing.Awaitable[backup.ListBackupOperationsResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
 
-__all__ = ("DatabaseAdminTransport",)
+__all__ = (u"DatabaseAdminTransport",)

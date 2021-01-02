@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""User friendly container for Cloud Spanner Instance."""
+u"""User friendly container for Cloud Spanner Instance."""
 
+from __future__ import absolute_import
 import re
 
 from google.cloud.spanner_admin_instance_v1 import Instance as InstancePB
@@ -36,7 +37,7 @@ from google.cloud.spanner_v1.database import Database
 
 
 _INSTANCE_NAME_RE = re.compile(
-    r"^projects/(?P<project>[^/]+)/" r"instances/(?P<instance_id>[a-z][-a-z0-9]*)$"
+    ur"^projects/(?P<project>[^/]+)/" ur"instances/(?P<instance_id>[a-z][-a-z0-9]*)$"
 )
 
 DEFAULT_NODE_COUNT = 1
@@ -51,10 +52,9 @@ _OPERATION_METADATA_MESSAGES = (
     spanner_database_admin.UpdateDatabaseDdlMetadata,
 )
 
-_OPERATION_METADATA_TYPES = {
-    "type.googleapis.com/{}".format(message._meta.full_name): message
-    for message in _OPERATION_METADATA_MESSAGES
-}
+_OPERATION_METADATA_TYPES = dict((
+    u"type.googleapis.com/{}".format(message._meta.full_name), message)
+    for message in _OPERATION_METADATA_MESSAGES)
 
 _OPERATION_RESPONSE_TYPES = {
     backup.CreateBackupMetadata: backup.Backup,
@@ -70,7 +70,7 @@ def _type_string_to_type_pb(type_string):
 
 
 class Instance(object):
-    """Representation of a Cloud Spanner Instance.
+    u"""Representation of a Cloud Spanner Instance.
 
     We can use a :class:`Instance` to:
 
@@ -118,19 +118,19 @@ class Instance(object):
         self.emulator_host = emulator_host
 
     def _update_from_pb(self, instance_pb):
-        """Refresh self from the server-provided protobuf.
+        u"""Refresh self from the server-provided protobuf.
 
         Helper for :meth:`from_pb` and :meth:`reload`.
         """
         if not instance_pb.display_name:  # Simple field (string)
-            raise ValueError("Instance protobuf does not contain display_name")
+            raise ValueError(u"Instance protobuf does not contain display_name")
         self.display_name = instance_pb.display_name
         self.configuration_name = instance_pb.config
         self.node_count = instance_pb.node_count
 
     @classmethod
     def from_pb(cls, instance_pb, client):
-        """Creates an instance from a protobuf.
+        u"""Creates an instance from a protobuf.
 
         :type instance_pb:
             :class:`~google.spanner.v2.spanner_instance_admin_pb2.Instance`
@@ -149,14 +149,14 @@ class Instance(object):
         match = _INSTANCE_NAME_RE.match(instance_pb.name)
         if match is None:
             raise ValueError(
-                "Instance protobuf name was not in the " "expected format.",
+                u"Instance protobuf name was not in the " u"expected format.",
                 instance_pb.name,
             )
-        if match.group("project") != client.project:
+        if match.group(u"project") != client.project:
             raise ValueError(
-                "Project ID on instance does not match the " "project ID on the client"
+                u"Project ID on instance does not match the " u"project ID on the client"
             )
-        instance_id = match.group("instance_id")
+        instance_id = match.group(u"instance_id")
         configuration_name = instance_pb.config
 
         result = cls(instance_id, client, configuration_name)
@@ -165,7 +165,7 @@ class Instance(object):
 
     @property
     def name(self):
-        """Instance name used in requests.
+        u"""Instance name used in requests.
 
         .. note::
 
@@ -179,7 +179,7 @@ class Instance(object):
         :rtype: str
         :returns: The instance name.
         """
-        return self._client.project_name + "/instances/" + self.instance_id
+        return self._client.project_name + u"/instances/" + self.instance_id
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -196,7 +196,7 @@ class Instance(object):
         return not self == other
 
     def copy(self):
-        """Make a copy of this instance.
+        u"""Make a copy of this instance.
 
         Copies the local data stored as simple types and copies the client
         attached to this instance.
@@ -214,7 +214,7 @@ class Instance(object):
         )
 
     def create(self):
-        """Create this instance.
+        u"""Create this instance.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.instance.v1#google.spanner.admin.instance.v1.InstanceAdmin.CreateInstance
@@ -255,7 +255,7 @@ class Instance(object):
         return future
 
     def exists(self):
-        """Test whether this instance exists.
+        u"""Test whether this instance exists.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.instance.v1#google.spanner.admin.instance.v1.InstanceAdmin.GetInstanceConfig
@@ -274,7 +274,7 @@ class Instance(object):
         return True
 
     def reload(self):
-        """Reload the metadata for this instance.
+        u"""Reload the metadata for this instance.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.instance.v1#google.spanner.admin.instance.v1.InstanceAdmin.GetInstanceConfig
@@ -289,7 +289,7 @@ class Instance(object):
         self._update_from_pb(instance_pb)
 
     def update(self):
-        """Update this instance.
+        u"""Update this instance.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.instance.v1#google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance
@@ -317,7 +317,7 @@ class Instance(object):
             display_name=self.display_name,
             node_count=self.node_count,
         )
-        field_mask = FieldMask(paths=["config", "display_name", "node_count"])
+        field_mask = FieldMask(paths=[u"config", u"display_name", u"node_count"])
         metadata = _metadata_with_prefix(self.name)
 
         future = api.update_instance(
@@ -327,7 +327,7 @@ class Instance(object):
         return future
 
     def delete(self):
-        """Mark an instance and all of its databases for permanent deletion.
+        u"""Mark an instance and all of its databases for permanent deletion.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.instance.v1#google.spanner.admin.instance.v1.InstanceAdmin.DeleteInstance
@@ -347,7 +347,7 @@ class Instance(object):
         api.delete_instance(name=self.name, metadata=metadata)
 
     def database(self, database_id, ddl_statements=(), pool=None):
-        """Factory to create a database within this instance.
+        u"""Factory to create a database within this instance.
 
         :type database_id: str
         :param database_id: The ID of the instance.
@@ -366,7 +366,7 @@ class Instance(object):
         return Database(database_id, self, ddl_statements=ddl_statements, pool=pool)
 
     def list_databases(self, page_size=None):
-        """List databases for the instance.
+        u"""List databases for the instance.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.database.v1#google.spanner.admin.database.v1.DatabaseAdmin.ListDatabases
@@ -389,8 +389,8 @@ class Instance(object):
         )
         return page_iter
 
-    def backup(self, backup_id, database="", expire_time=None):
-        """Factory to create a backup within this instance.
+    def backup(self, backup_id, database=u"", expire_time=None):
+        u"""Factory to create a backup within this instance.
 
         :type backup_id: str
         :param backup_id: The ID of the backup.
@@ -412,8 +412,8 @@ class Instance(object):
         except AttributeError:
             return Backup(backup_id, self, database=database, expire_time=expire_time)
 
-    def list_backups(self, filter_="", page_size=None):
-        """List backups for the instance.
+    def list_backups(self, filter_=u"", page_size=None):
+        u"""List backups for the instance.
 
         :type filter_: str
         :param filter_:
@@ -439,8 +439,8 @@ class Instance(object):
         )
         return page_iter
 
-    def list_backup_operations(self, filter_="", page_size=None):
-        """List backup operations for the instance.
+    def list_backup_operations(self, filter_=u"", page_size=None):
+        u"""List backup operations for the instance.
 
         :type filter_: str
         :param filter_:
@@ -467,8 +467,8 @@ class Instance(object):
         )
         return page_iter
 
-    def list_database_operations(self, filter_="", page_size=None):
-        """List database operations for the instance.
+    def list_database_operations(self, filter_=u"", page_size=None):
+        u"""List database operations for the instance.
 
         :type filter_: str
         :param filter_:

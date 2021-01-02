@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import os
 import mock
 
@@ -47,10 +49,11 @@ from google.protobuf import duration_pb2 as duration  # type: ignore
 from google.protobuf import struct_pb2 as struct  # type: ignore
 from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
 from google.rpc import status_pb2 as status  # type: ignore
+from itertools import izip
 
 
 def client_cert_source_callback():
-    return b"cert bytes", b"key bytes"
+    return "cert bytes", "key bytes"
 
 
 # If default endpoint is localhost, then default mtls endpoint will be the same.
@@ -58,18 +61,18 @@ def client_cert_source_callback():
 # mtls endpoint for endpoint testing purposes.
 def modify_default_endpoint(client):
     return (
-        "foo.googleapis.com"
-        if ("localhost" in client.DEFAULT_ENDPOINT)
+        u"foo.googleapis.com"
+        if (u"localhost" in client.DEFAULT_ENDPOINT)
         else client.DEFAULT_ENDPOINT
     )
 
 
 def test__get_default_mtls_endpoint():
-    api_endpoint = "example.googleapis.com"
-    api_mtls_endpoint = "example.mtls.googleapis.com"
-    sandbox_endpoint = "example.sandbox.googleapis.com"
-    sandbox_mtls_endpoint = "example.mtls.sandbox.googleapis.com"
-    non_googleapi = "api.example.com"
+    api_endpoint = u"example.googleapis.com"
+    api_mtls_endpoint = u"example.mtls.googleapis.com"
+    sandbox_endpoint = u"example.sandbox.googleapis.com"
+    sandbox_mtls_endpoint = u"example.mtls.sandbox.googleapis.com"
+    non_googleapi = u"api.example.com"
 
     assert SpannerClient._get_default_mtls_endpoint(None) is None
     assert SpannerClient._get_default_mtls_endpoint(api_endpoint) == api_mtls_endpoint
@@ -87,64 +90,64 @@ def test__get_default_mtls_endpoint():
     assert SpannerClient._get_default_mtls_endpoint(non_googleapi) == non_googleapi
 
 
-@pytest.mark.parametrize("client_class", [SpannerClient, SpannerAsyncClient])
+@pytest.mark.parametrize(u"client_class", [SpannerClient, SpannerAsyncClient])
 def test_spanner_client_from_service_account_file(client_class):
     creds = credentials.AnonymousCredentials()
     with mock.patch.object(
-        service_account.Credentials, "from_service_account_file"
+        service_account.Credentials, u"from_service_account_file"
     ) as factory:
         factory.return_value = creds
-        client = client_class.from_service_account_file("dummy/file/path.json")
+        client = client_class.from_service_account_file(u"dummy/file/path.json")
         assert client.transport._credentials == creds
 
-        client = client_class.from_service_account_json("dummy/file/path.json")
+        client = client_class.from_service_account_json(u"dummy/file/path.json")
         assert client.transport._credentials == creds
 
-        assert client.transport._host == "spanner.googleapis.com:443"
+        assert client.transport._host == u"spanner.googleapis.com:443"
 
 
 def test_spanner_client_get_transport_class():
     transport = SpannerClient.get_transport_class()
     assert transport == transports.SpannerGrpcTransport
 
-    transport = SpannerClient.get_transport_class("grpc")
+    transport = SpannerClient.get_transport_class(u"grpc")
     assert transport == transports.SpannerGrpcTransport
 
 
 @pytest.mark.parametrize(
-    "client_class,transport_class,transport_name",
+    u"client_class,transport_class,transport_name",
     [
-        (SpannerClient, transports.SpannerGrpcTransport, "grpc"),
-        (SpannerAsyncClient, transports.SpannerGrpcAsyncIOTransport, "grpc_asyncio"),
+        (SpannerClient, transports.SpannerGrpcTransport, u"grpc"),
+        (SpannerAsyncClient, transports.SpannerGrpcAsyncIOTransport, u"grpc_asyncio"),
     ],
 )
 @mock.patch.object(
-    SpannerClient, "DEFAULT_ENDPOINT", modify_default_endpoint(SpannerClient)
+    SpannerClient, u"DEFAULT_ENDPOINT", modify_default_endpoint(SpannerClient)
 )
 @mock.patch.object(
-    SpannerAsyncClient, "DEFAULT_ENDPOINT", modify_default_endpoint(SpannerAsyncClient)
+    SpannerAsyncClient, u"DEFAULT_ENDPOINT", modify_default_endpoint(SpannerAsyncClient)
 )
 def test_spanner_client_client_options(client_class, transport_class, transport_name):
     # Check that if channel is provided we won't create a new one.
-    with mock.patch.object(SpannerClient, "get_transport_class") as gtc:
+    with mock.patch.object(SpannerClient, u"get_transport_class") as gtc:
         transport = transport_class(credentials=credentials.AnonymousCredentials())
         client = client_class(transport=transport)
         gtc.assert_not_called()
 
     # Check that if channel is provided via str we will create a new one.
-    with mock.patch.object(SpannerClient, "get_transport_class") as gtc:
+    with mock.patch.object(SpannerClient, u"get_transport_class") as gtc:
         client = client_class(transport=transport_name)
         gtc.assert_called()
 
     # Check the case api_endpoint is provided.
-    options = client_options.ClientOptions(api_endpoint="squid.clam.whelk")
-    with mock.patch.object(transport_class, "__init__") as patched:
+    options = client_options.ClientOptions(api_endpoint=u"squid.clam.whelk")
+    with mock.patch.object(transport_class, u"__init__") as patched:
         patched.return_value = None
         client = client_class(client_options=options)
         patched.assert_called_once_with(
             credentials=None,
             credentials_file=None,
-            host="squid.clam.whelk",
+            host=u"squid.clam.whelk",
             scopes=None,
             ssl_channel_credentials=None,
             quota_project_id=None,
@@ -153,8 +156,8 @@ def test_spanner_client_client_options(client_class, transport_class, transport_
 
     # Check the case api_endpoint is not provided and GOOGLE_API_USE_MTLS_ENDPOINT is
     # "never".
-    with mock.patch.dict(os.environ, {"GOOGLE_API_USE_MTLS_ENDPOINT": "never"}):
-        with mock.patch.object(transport_class, "__init__") as patched:
+    with mock.patch.dict(os.environ, {u"GOOGLE_API_USE_MTLS_ENDPOINT": u"never"}):
+        with mock.patch.object(transport_class, u"__init__") as patched:
             patched.return_value = None
             client = client_class()
             patched.assert_called_once_with(
@@ -169,8 +172,8 @@ def test_spanner_client_client_options(client_class, transport_class, transport_
 
     # Check the case api_endpoint is not provided and GOOGLE_API_USE_MTLS_ENDPOINT is
     # "always".
-    with mock.patch.dict(os.environ, {"GOOGLE_API_USE_MTLS_ENDPOINT": "always"}):
-        with mock.patch.object(transport_class, "__init__") as patched:
+    with mock.patch.dict(os.environ, {u"GOOGLE_API_USE_MTLS_ENDPOINT": u"always"}):
+        with mock.patch.object(transport_class, u"__init__") as patched:
             patched.return_value = None
             client = client_class()
             patched.assert_called_once_with(
@@ -185,20 +188,20 @@ def test_spanner_client_client_options(client_class, transport_class, transport_
 
     # Check the case api_endpoint is not provided and GOOGLE_API_USE_MTLS_ENDPOINT has
     # unsupported value.
-    with mock.patch.dict(os.environ, {"GOOGLE_API_USE_MTLS_ENDPOINT": "Unsupported"}):
+    with mock.patch.dict(os.environ, {u"GOOGLE_API_USE_MTLS_ENDPOINT": u"Unsupported"}):
         with pytest.raises(MutualTLSChannelError):
             client = client_class()
 
     # Check the case GOOGLE_API_USE_CLIENT_CERTIFICATE has unsupported value.
     with mock.patch.dict(
-        os.environ, {"GOOGLE_API_USE_CLIENT_CERTIFICATE": "Unsupported"}
+        os.environ, {u"GOOGLE_API_USE_CLIENT_CERTIFICATE": u"Unsupported"}
     ):
         with pytest.raises(ValueError):
             client = client_class()
 
     # Check the case quota_project_id is provided
-    options = client_options.ClientOptions(quota_project_id="octopus")
-    with mock.patch.object(transport_class, "__init__") as patched:
+    options = client_options.ClientOptions(quota_project_id=u"octopus")
+    with mock.patch.object(transport_class, u"__init__") as patched:
         patched.return_value = None
         client = client_class(client_options=options)
         patched.assert_called_once_with(
@@ -207,37 +210,37 @@ def test_spanner_client_client_options(client_class, transport_class, transport_
             host=client.DEFAULT_ENDPOINT,
             scopes=None,
             ssl_channel_credentials=None,
-            quota_project_id="octopus",
+            quota_project_id=u"octopus",
             client_info=transports.base.DEFAULT_CLIENT_INFO,
         )
 
 
 @pytest.mark.parametrize(
-    "client_class,transport_class,transport_name,use_client_cert_env",
+    u"client_class,transport_class,transport_name,use_client_cert_env",
     [
-        (SpannerClient, transports.SpannerGrpcTransport, "grpc", "true"),
+        (SpannerClient, transports.SpannerGrpcTransport, u"grpc", u"true"),
         (
             SpannerAsyncClient,
             transports.SpannerGrpcAsyncIOTransport,
-            "grpc_asyncio",
-            "true",
+            u"grpc_asyncio",
+            u"true",
         ),
-        (SpannerClient, transports.SpannerGrpcTransport, "grpc", "false"),
+        (SpannerClient, transports.SpannerGrpcTransport, u"grpc", u"false"),
         (
             SpannerAsyncClient,
             transports.SpannerGrpcAsyncIOTransport,
-            "grpc_asyncio",
-            "false",
+            u"grpc_asyncio",
+            u"false",
         ),
     ],
 )
 @mock.patch.object(
-    SpannerClient, "DEFAULT_ENDPOINT", modify_default_endpoint(SpannerClient)
+    SpannerClient, u"DEFAULT_ENDPOINT", modify_default_endpoint(SpannerClient)
 )
 @mock.patch.object(
-    SpannerAsyncClient, "DEFAULT_ENDPOINT", modify_default_endpoint(SpannerAsyncClient)
+    SpannerAsyncClient, u"DEFAULT_ENDPOINT", modify_default_endpoint(SpannerAsyncClient)
 )
-@mock.patch.dict(os.environ, {"GOOGLE_API_USE_MTLS_ENDPOINT": "auto"})
+@mock.patch.dict(os.environ, {u"GOOGLE_API_USE_MTLS_ENDPOINT": u"auto"})
 def test_spanner_client_mtls_env_auto(
     client_class, transport_class, transport_name, use_client_cert_env
 ):
@@ -247,20 +250,20 @@ def test_spanner_client_mtls_env_auto(
     # Check the case client_cert_source is provided. Whether client cert is used depends on
     # GOOGLE_API_USE_CLIENT_CERTIFICATE value.
     with mock.patch.dict(
-        os.environ, {"GOOGLE_API_USE_CLIENT_CERTIFICATE": use_client_cert_env}
+        os.environ, {u"GOOGLE_API_USE_CLIENT_CERTIFICATE": use_client_cert_env}
     ):
         options = client_options.ClientOptions(
             client_cert_source=client_cert_source_callback
         )
-        with mock.patch.object(transport_class, "__init__") as patched:
+        with mock.patch.object(transport_class, u"__init__") as patched:
             ssl_channel_creds = mock.Mock()
             with mock.patch(
-                "grpc.ssl_channel_credentials", return_value=ssl_channel_creds
+                u"grpc.ssl_channel_credentials", return_value=ssl_channel_creds
             ):
                 patched.return_value = None
                 client = client_class(client_options=options)
 
-                if use_client_cert_env == "false":
+                if use_client_cert_env == u"false":
                     expected_ssl_channel_creds = None
                     expected_host = client.DEFAULT_ENDPOINT
                 else:
@@ -280,21 +283,21 @@ def test_spanner_client_mtls_env_auto(
     # Check the case ADC client cert is provided. Whether client cert is used depends on
     # GOOGLE_API_USE_CLIENT_CERTIFICATE value.
     with mock.patch.dict(
-        os.environ, {"GOOGLE_API_USE_CLIENT_CERTIFICATE": use_client_cert_env}
+        os.environ, {u"GOOGLE_API_USE_CLIENT_CERTIFICATE": use_client_cert_env}
     ):
-        with mock.patch.object(transport_class, "__init__") as patched:
+        with mock.patch.object(transport_class, u"__init__") as patched:
             with mock.patch(
-                "google.auth.transport.grpc.SslCredentials.__init__", return_value=None
+                u"google.auth.transport.grpc.SslCredentials.__init__", return_value=None
             ):
                 with mock.patch(
-                    "google.auth.transport.grpc.SslCredentials.is_mtls",
+                    u"google.auth.transport.grpc.SslCredentials.is_mtls",
                     new_callable=mock.PropertyMock,
                 ) as is_mtls_mock:
                     with mock.patch(
-                        "google.auth.transport.grpc.SslCredentials.ssl_credentials",
+                        u"google.auth.transport.grpc.SslCredentials.ssl_credentials",
                         new_callable=mock.PropertyMock,
                     ) as ssl_credentials_mock:
-                        if use_client_cert_env == "false":
+                        if use_client_cert_env == u"false":
                             is_mtls_mock.return_value = False
                             ssl_credentials_mock.return_value = None
                             expected_host = client.DEFAULT_ENDPOINT
@@ -321,14 +324,14 @@ def test_spanner_client_mtls_env_auto(
 
     # Check the case client_cert_source and ADC client cert are not provided.
     with mock.patch.dict(
-        os.environ, {"GOOGLE_API_USE_CLIENT_CERTIFICATE": use_client_cert_env}
+        os.environ, {u"GOOGLE_API_USE_CLIENT_CERTIFICATE": use_client_cert_env}
     ):
-        with mock.patch.object(transport_class, "__init__") as patched:
+        with mock.patch.object(transport_class, u"__init__") as patched:
             with mock.patch(
-                "google.auth.transport.grpc.SslCredentials.__init__", return_value=None
+                u"google.auth.transport.grpc.SslCredentials.__init__", return_value=None
             ):
                 with mock.patch(
-                    "google.auth.transport.grpc.SslCredentials.is_mtls",
+                    u"google.auth.transport.grpc.SslCredentials.is_mtls",
                     new_callable=mock.PropertyMock,
                 ) as is_mtls_mock:
                     is_mtls_mock.return_value = False
@@ -346,25 +349,25 @@ def test_spanner_client_mtls_env_auto(
 
 
 @pytest.mark.parametrize(
-    "client_class,transport_class,transport_name",
+    u"client_class,transport_class,transport_name",
     [
-        (SpannerClient, transports.SpannerGrpcTransport, "grpc"),
-        (SpannerAsyncClient, transports.SpannerGrpcAsyncIOTransport, "grpc_asyncio"),
+        (SpannerClient, transports.SpannerGrpcTransport, u"grpc"),
+        (SpannerAsyncClient, transports.SpannerGrpcAsyncIOTransport, u"grpc_asyncio"),
     ],
 )
 def test_spanner_client_client_options_scopes(
     client_class, transport_class, transport_name
 ):
     # Check the case scopes are provided.
-    options = client_options.ClientOptions(scopes=["1", "2"],)
-    with mock.patch.object(transport_class, "__init__") as patched:
+    options = client_options.ClientOptions(scopes=[u"1", u"2"],)
+    with mock.patch.object(transport_class, u"__init__") as patched:
         patched.return_value = None
         client = client_class(client_options=options)
         patched.assert_called_once_with(
             credentials=None,
             credentials_file=None,
             host=client.DEFAULT_ENDPOINT,
-            scopes=["1", "2"],
+            scopes=[u"1", u"2"],
             ssl_channel_credentials=None,
             quota_project_id=None,
             client_info=transports.base.DEFAULT_CLIENT_INFO,
@@ -372,23 +375,23 @@ def test_spanner_client_client_options_scopes(
 
 
 @pytest.mark.parametrize(
-    "client_class,transport_class,transport_name",
+    u"client_class,transport_class,transport_name",
     [
-        (SpannerClient, transports.SpannerGrpcTransport, "grpc"),
-        (SpannerAsyncClient, transports.SpannerGrpcAsyncIOTransport, "grpc_asyncio"),
+        (SpannerClient, transports.SpannerGrpcTransport, u"grpc"),
+        (SpannerAsyncClient, transports.SpannerGrpcAsyncIOTransport, u"grpc_asyncio"),
     ],
 )
 def test_spanner_client_client_options_credentials_file(
     client_class, transport_class, transport_name
 ):
     # Check the case credentials file is provided.
-    options = client_options.ClientOptions(credentials_file="credentials.json")
-    with mock.patch.object(transport_class, "__init__") as patched:
+    options = client_options.ClientOptions(credentials_file=u"credentials.json")
+    with mock.patch.object(transport_class, u"__init__") as patched:
         patched.return_value = None
         client = client_class(client_options=options)
         patched.assert_called_once_with(
             credentials=None,
-            credentials_file="credentials.json",
+            credentials_file=u"credentials.json",
             host=client.DEFAULT_ENDPOINT,
             scopes=None,
             ssl_channel_credentials=None,
@@ -399,14 +402,14 @@ def test_spanner_client_client_options_credentials_file(
 
 def test_spanner_client_client_options_from_dict():
     with mock.patch(
-        "google.cloud.spanner_v1.services.spanner.transports.SpannerGrpcTransport.__init__"
+        u"google.cloud.spanner_v1.services.spanner.transports.SpannerGrpcTransport.__init__"
     ) as grpc_transport:
         grpc_transport.return_value = None
-        client = SpannerClient(client_options={"api_endpoint": "squid.clam.whelk"})
+        client = SpannerClient(client_options={u"api_endpoint": u"squid.clam.whelk"})
         grpc_transport.assert_called_once_with(
             credentials=None,
             credentials_file=None,
-            host="squid.clam.whelk",
+            host=u"squid.clam.whelk",
             scopes=None,
             ssl_channel_credentials=None,
             quota_project_id=None,
@@ -415,7 +418,7 @@ def test_spanner_client_client_options_from_dict():
 
 
 def test_create_session(
-    transport: str = "grpc", request_type=spanner.CreateSessionRequest
+    transport = u"grpc", request_type=spanner.CreateSessionRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -426,9 +429,9 @@ def test_create_session(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.create_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.create_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
-        call.return_value = spanner.Session(name="name_value",)
+        call.return_value = spanner.Session(name=u"name_value",)
 
         response = client.create_session(request)
 
@@ -442,7 +445,7 @@ def test_create_session(
 
     assert isinstance(response, spanner.Session)
 
-    assert response.name == "name_value"
+    assert response.name == u"name_value"
 
 
 def test_create_session_from_dict():
@@ -451,7 +454,7 @@ def test_create_session_from_dict():
 
 @pytest.mark.asyncio
 async def test_create_session_async(
-    transport: str = "grpc_asyncio", request_type=spanner.CreateSessionRequest
+    transport = u"grpc_asyncio", request_type=spanner.CreateSessionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -462,10 +465,10 @@ async def test_create_session_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.create_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.create_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
-            spanner.Session(name="name_value",)
+            spanner.Session(name=u"name_value",)
         )
 
         response = await client.create_session(request)
@@ -479,7 +482,7 @@ async def test_create_session_async(
     # Establish that the response is the type that we expect.
     assert isinstance(response, spanner.Session)
 
-    assert response.name == "name_value"
+    assert response.name == u"name_value"
 
 
 @pytest.mark.asyncio
@@ -493,10 +496,10 @@ def test_create_session_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.CreateSessionRequest()
-    request.database = "database/value"
+    request.database = u"database/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.create_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.create_session), u"__call__") as call:
         call.return_value = spanner.Session()
 
         client.create_session(request)
@@ -508,7 +511,7 @@ def test_create_session_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "database=database/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"database=database/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -518,10 +521,10 @@ async def test_create_session_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.CreateSessionRequest()
-    request.database = "database/value"
+    request.database = u"database/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.create_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.create_session), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(spanner.Session())
 
         await client.create_session(request)
@@ -533,27 +536,27 @@ async def test_create_session_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "database=database/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"database=database/value",) in kw[u"metadata"]
 
 
 def test_create_session_flattened():
     client = SpannerClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.create_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.create_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.Session()
 
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.create_session(database="database_value",)
+        client.create_session(database=u"database_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].database == "database_value"
+        assert args[0].database == u"database_value"
 
 
 def test_create_session_flattened_error():
@@ -563,7 +566,7 @@ def test_create_session_flattened_error():
     # fields is an error.
     with pytest.raises(ValueError):
         client.create_session(
-            spanner.CreateSessionRequest(), database="database_value",
+            spanner.CreateSessionRequest(), database=u"database_value",
         )
 
 
@@ -572,21 +575,21 @@ async def test_create_session_flattened_async():
     client = SpannerAsyncClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.create_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.create_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.Session()
 
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(spanner.Session())
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.create_session(database="database_value",)
+        response = await client.create_session(database=u"database_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].database == "database_value"
+        assert args[0].database == u"database_value"
 
 
 @pytest.mark.asyncio
@@ -597,12 +600,12 @@ async def test_create_session_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.create_session(
-            spanner.CreateSessionRequest(), database="database_value",
+            spanner.CreateSessionRequest(), database=u"database_value",
         )
 
 
 def test_batch_create_sessions(
-    transport: str = "grpc", request_type=spanner.BatchCreateSessionsRequest
+    transport = u"grpc", request_type=spanner.BatchCreateSessionsRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -614,7 +617,7 @@ def test_batch_create_sessions(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.batch_create_sessions), "__call__"
+        type(client.transport.batch_create_sessions), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.BatchCreateSessionsResponse()
@@ -638,7 +641,7 @@ def test_batch_create_sessions_from_dict():
 
 @pytest.mark.asyncio
 async def test_batch_create_sessions_async(
-    transport: str = "grpc_asyncio", request_type=spanner.BatchCreateSessionsRequest
+    transport = u"grpc_asyncio", request_type=spanner.BatchCreateSessionsRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -650,7 +653,7 @@ async def test_batch_create_sessions_async(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.batch_create_sessions), "__call__"
+        type(client.transport.batch_create_sessions), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
@@ -680,11 +683,11 @@ def test_batch_create_sessions_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.BatchCreateSessionsRequest()
-    request.database = "database/value"
+    request.database = u"database/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.batch_create_sessions), "__call__"
+        type(client.transport.batch_create_sessions), u"__call__"
     ) as call:
         call.return_value = spanner.BatchCreateSessionsResponse()
 
@@ -697,7 +700,7 @@ def test_batch_create_sessions_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "database=database/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"database=database/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -707,11 +710,11 @@ async def test_batch_create_sessions_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.BatchCreateSessionsRequest()
-    request.database = "database/value"
+    request.database = u"database/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.batch_create_sessions), "__call__"
+        type(client.transport.batch_create_sessions), u"__call__"
     ) as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.BatchCreateSessionsResponse()
@@ -726,7 +729,7 @@ async def test_batch_create_sessions_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "database=database/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"database=database/value",) in kw[u"metadata"]
 
 
 def test_batch_create_sessions_flattened():
@@ -734,7 +737,7 @@ def test_batch_create_sessions_flattened():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.batch_create_sessions), "__call__"
+        type(client.transport.batch_create_sessions), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.BatchCreateSessionsResponse()
@@ -742,7 +745,7 @@ def test_batch_create_sessions_flattened():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         client.batch_create_sessions(
-            database="database_value", session_count=1420,
+            database=u"database_value", session_count=1420,
         )
 
         # Establish that the underlying call was made with the expected
@@ -750,7 +753,7 @@ def test_batch_create_sessions_flattened():
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].database == "database_value"
+        assert args[0].database == u"database_value"
 
         assert args[0].session_count == 1420
 
@@ -763,7 +766,7 @@ def test_batch_create_sessions_flattened_error():
     with pytest.raises(ValueError):
         client.batch_create_sessions(
             spanner.BatchCreateSessionsRequest(),
-            database="database_value",
+            database=u"database_value",
             session_count=1420,
         )
 
@@ -774,7 +777,7 @@ async def test_batch_create_sessions_flattened_async():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.batch_create_sessions), "__call__"
+        type(client.transport.batch_create_sessions), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.BatchCreateSessionsResponse()
@@ -785,7 +788,7 @@ async def test_batch_create_sessions_flattened_async():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         response = await client.batch_create_sessions(
-            database="database_value", session_count=1420,
+            database=u"database_value", session_count=1420,
         )
 
         # Establish that the underlying call was made with the expected
@@ -793,7 +796,7 @@ async def test_batch_create_sessions_flattened_async():
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].database == "database_value"
+        assert args[0].database == u"database_value"
 
         assert args[0].session_count == 1420
 
@@ -807,12 +810,12 @@ async def test_batch_create_sessions_flattened_error_async():
     with pytest.raises(ValueError):
         await client.batch_create_sessions(
             spanner.BatchCreateSessionsRequest(),
-            database="database_value",
+            database=u"database_value",
             session_count=1420,
         )
 
 
-def test_get_session(transport: str = "grpc", request_type=spanner.GetSessionRequest):
+def test_get_session(transport = u"grpc", request_type=spanner.GetSessionRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -822,9 +825,9 @@ def test_get_session(transport: str = "grpc", request_type=spanner.GetSessionReq
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.get_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.get_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
-        call.return_value = spanner.Session(name="name_value",)
+        call.return_value = spanner.Session(name=u"name_value",)
 
         response = client.get_session(request)
 
@@ -838,7 +841,7 @@ def test_get_session(transport: str = "grpc", request_type=spanner.GetSessionReq
 
     assert isinstance(response, spanner.Session)
 
-    assert response.name == "name_value"
+    assert response.name == u"name_value"
 
 
 def test_get_session_from_dict():
@@ -847,7 +850,7 @@ def test_get_session_from_dict():
 
 @pytest.mark.asyncio
 async def test_get_session_async(
-    transport: str = "grpc_asyncio", request_type=spanner.GetSessionRequest
+    transport = u"grpc_asyncio", request_type=spanner.GetSessionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -858,10 +861,10 @@ async def test_get_session_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.get_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.get_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
-            spanner.Session(name="name_value",)
+            spanner.Session(name=u"name_value",)
         )
 
         response = await client.get_session(request)
@@ -875,7 +878,7 @@ async def test_get_session_async(
     # Establish that the response is the type that we expect.
     assert isinstance(response, spanner.Session)
 
-    assert response.name == "name_value"
+    assert response.name == u"name_value"
 
 
 @pytest.mark.asyncio
@@ -889,10 +892,10 @@ def test_get_session_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.GetSessionRequest()
-    request.name = "name/value"
+    request.name = u"name/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.get_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.get_session), u"__call__") as call:
         call.return_value = spanner.Session()
 
         client.get_session(request)
@@ -904,7 +907,7 @@ def test_get_session_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"name=name/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -914,10 +917,10 @@ async def test_get_session_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.GetSessionRequest()
-    request.name = "name/value"
+    request.name = u"name/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.get_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.get_session), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(spanner.Session())
 
         await client.get_session(request)
@@ -929,27 +932,27 @@ async def test_get_session_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"name=name/value",) in kw[u"metadata"]
 
 
 def test_get_session_flattened():
     client = SpannerClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.get_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.get_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.Session()
 
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.get_session(name="name_value",)
+        client.get_session(name=u"name_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].name == "name_value"
+        assert args[0].name == u"name_value"
 
 
 def test_get_session_flattened_error():
@@ -959,7 +962,7 @@ def test_get_session_flattened_error():
     # fields is an error.
     with pytest.raises(ValueError):
         client.get_session(
-            spanner.GetSessionRequest(), name="name_value",
+            spanner.GetSessionRequest(), name=u"name_value",
         )
 
 
@@ -968,21 +971,21 @@ async def test_get_session_flattened_async():
     client = SpannerAsyncClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.get_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.get_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.Session()
 
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(spanner.Session())
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.get_session(name="name_value",)
+        response = await client.get_session(name=u"name_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].name == "name_value"
+        assert args[0].name == u"name_value"
 
 
 @pytest.mark.asyncio
@@ -993,12 +996,12 @@ async def test_get_session_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.get_session(
-            spanner.GetSessionRequest(), name="name_value",
+            spanner.GetSessionRequest(), name=u"name_value",
         )
 
 
 def test_list_sessions(
-    transport: str = "grpc", request_type=spanner.ListSessionsRequest
+    transport = u"grpc", request_type=spanner.ListSessionsRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1009,10 +1012,10 @@ def test_list_sessions(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.ListSessionsResponse(
-            next_page_token="next_page_token_value",
+            next_page_token=u"next_page_token_value",
         )
 
         response = client.list_sessions(request)
@@ -1027,7 +1030,7 @@ def test_list_sessions(
 
     assert isinstance(response, pagers.ListSessionsPager)
 
-    assert response.next_page_token == "next_page_token_value"
+    assert response.next_page_token == u"next_page_token_value"
 
 
 def test_list_sessions_from_dict():
@@ -1036,7 +1039,7 @@ def test_list_sessions_from_dict():
 
 @pytest.mark.asyncio
 async def test_list_sessions_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ListSessionsRequest
+    transport = u"grpc_asyncio", request_type=spanner.ListSessionsRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1047,10 +1050,10 @@ async def test_list_sessions_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
-            spanner.ListSessionsResponse(next_page_token="next_page_token_value",)
+            spanner.ListSessionsResponse(next_page_token=u"next_page_token_value",)
         )
 
         response = await client.list_sessions(request)
@@ -1064,7 +1067,7 @@ async def test_list_sessions_async(
     # Establish that the response is the type that we expect.
     assert isinstance(response, pagers.ListSessionsAsyncPager)
 
-    assert response.next_page_token == "next_page_token_value"
+    assert response.next_page_token == u"next_page_token_value"
 
 
 @pytest.mark.asyncio
@@ -1078,10 +1081,10 @@ def test_list_sessions_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ListSessionsRequest()
-    request.database = "database/value"
+    request.database = u"database/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         call.return_value = spanner.ListSessionsResponse()
 
         client.list_sessions(request)
@@ -1093,7 +1096,7 @@ def test_list_sessions_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "database=database/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"database=database/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -1103,10 +1106,10 @@ async def test_list_sessions_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ListSessionsRequest()
-    request.database = "database/value"
+    request.database = u"database/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.ListSessionsResponse()
         )
@@ -1120,27 +1123,27 @@ async def test_list_sessions_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "database=database/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"database=database/value",) in kw[u"metadata"]
 
 
 def test_list_sessions_flattened():
     client = SpannerClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.ListSessionsResponse()
 
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.list_sessions(database="database_value",)
+        client.list_sessions(database=u"database_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].database == "database_value"
+        assert args[0].database == u"database_value"
 
 
 def test_list_sessions_flattened_error():
@@ -1150,7 +1153,7 @@ def test_list_sessions_flattened_error():
     # fields is an error.
     with pytest.raises(ValueError):
         client.list_sessions(
-            spanner.ListSessionsRequest(), database="database_value",
+            spanner.ListSessionsRequest(), database=u"database_value",
         )
 
 
@@ -1159,7 +1162,7 @@ async def test_list_sessions_flattened_async():
     client = SpannerAsyncClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.ListSessionsResponse()
 
@@ -1168,14 +1171,14 @@ async def test_list_sessions_flattened_async():
         )
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.list_sessions(database="database_value",)
+        response = await client.list_sessions(database=u"database_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].database == "database_value"
+        assert args[0].database == u"database_value"
 
 
 @pytest.mark.asyncio
@@ -1186,7 +1189,7 @@ async def test_list_sessions_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.list_sessions(
-            spanner.ListSessionsRequest(), database="database_value",
+            spanner.ListSessionsRequest(), database=u"database_value",
         )
 
 
@@ -1194,16 +1197,16 @@ def test_list_sessions_pager():
     client = SpannerClient(credentials=credentials.AnonymousCredentials,)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         # Set the response to a series of pages.
         call.side_effect = (
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(), spanner.Session(),],
-                next_page_token="abc",
+                next_page_token=u"abc",
             ),
-            spanner.ListSessionsResponse(sessions=[], next_page_token="def",),
+            spanner.ListSessionsResponse(sessions=[], next_page_token=u"def",),
             spanner.ListSessionsResponse(
-                sessions=[spanner.Session(),], next_page_token="ghi",
+                sessions=[spanner.Session(),], next_page_token=u"ghi",
             ),
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(),],
@@ -1213,7 +1216,7 @@ def test_list_sessions_pager():
 
         metadata = ()
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("database", ""),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"database", u""),)),
         )
         pager = client.list_sessions(request={})
 
@@ -1228,16 +1231,16 @@ def test_list_sessions_pages():
     client = SpannerClient(credentials=credentials.AnonymousCredentials,)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.list_sessions), "__call__") as call:
+    with mock.patch.object(type(client.transport.list_sessions), u"__call__") as call:
         # Set the response to a series of pages.
         call.side_effect = (
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(), spanner.Session(),],
-                next_page_token="abc",
+                next_page_token=u"abc",
             ),
-            spanner.ListSessionsResponse(sessions=[], next_page_token="def",),
+            spanner.ListSessionsResponse(sessions=[], next_page_token=u"def",),
             spanner.ListSessionsResponse(
-                sessions=[spanner.Session(),], next_page_token="ghi",
+                sessions=[spanner.Session(),], next_page_token=u"ghi",
             ),
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(),],
@@ -1245,7 +1248,7 @@ def test_list_sessions_pages():
             RuntimeError,
         )
         pages = list(client.list_sessions(request={}).pages)
-        for page_, token in zip(pages, ["abc", "def", "ghi", ""]):
+        for page_, token in izip(pages, [u"abc", u"def", u"ghi", u""]):
             assert page_.raw_page.next_page_token == token
 
 
@@ -1255,17 +1258,17 @@ async def test_list_sessions_async_pager():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.list_sessions), "__call__", new_callable=mock.AsyncMock
+        type(client.transport.list_sessions), u"__call__", new_callable=mock.AsyncMock
     ) as call:
         # Set the response to a series of pages.
         call.side_effect = (
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(), spanner.Session(),],
-                next_page_token="abc",
+                next_page_token=u"abc",
             ),
-            spanner.ListSessionsResponse(sessions=[], next_page_token="def",),
+            spanner.ListSessionsResponse(sessions=[], next_page_token=u"def",),
             spanner.ListSessionsResponse(
-                sessions=[spanner.Session(),], next_page_token="ghi",
+                sessions=[spanner.Session(),], next_page_token=u"ghi",
             ),
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(),],
@@ -1273,7 +1276,7 @@ async def test_list_sessions_async_pager():
             RuntimeError,
         )
         async_pager = await client.list_sessions(request={},)
-        assert async_pager.next_page_token == "abc"
+        assert async_pager.next_page_token == u"abc"
         responses = []
         async for response in async_pager:
             responses.append(response)
@@ -1288,17 +1291,17 @@ async def test_list_sessions_async_pages():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.list_sessions), "__call__", new_callable=mock.AsyncMock
+        type(client.transport.list_sessions), u"__call__", new_callable=mock.AsyncMock
     ) as call:
         # Set the response to a series of pages.
         call.side_effect = (
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(), spanner.Session(),],
-                next_page_token="abc",
+                next_page_token=u"abc",
             ),
-            spanner.ListSessionsResponse(sessions=[], next_page_token="def",),
+            spanner.ListSessionsResponse(sessions=[], next_page_token=u"def",),
             spanner.ListSessionsResponse(
-                sessions=[spanner.Session(),], next_page_token="ghi",
+                sessions=[spanner.Session(),], next_page_token=u"ghi",
             ),
             spanner.ListSessionsResponse(
                 sessions=[spanner.Session(), spanner.Session(),],
@@ -1308,12 +1311,12 @@ async def test_list_sessions_async_pages():
         pages = []
         async for page_ in (await client.list_sessions(request={})).pages:
             pages.append(page_)
-        for page_, token in zip(pages, ["abc", "def", "ghi", ""]):
+        for page_, token in izip(pages, [u"abc", u"def", u"ghi", u""]):
             assert page_.raw_page.next_page_token == token
 
 
 def test_delete_session(
-    transport: str = "grpc", request_type=spanner.DeleteSessionRequest
+    transport = u"grpc", request_type=spanner.DeleteSessionRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1324,7 +1327,7 @@ def test_delete_session(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.delete_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.delete_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = None
 
@@ -1346,7 +1349,7 @@ def test_delete_session_from_dict():
 
 @pytest.mark.asyncio
 async def test_delete_session_async(
-    transport: str = "grpc_asyncio", request_type=spanner.DeleteSessionRequest
+    transport = u"grpc_asyncio", request_type=spanner.DeleteSessionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1357,7 +1360,7 @@ async def test_delete_session_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.delete_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.delete_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(None)
 
@@ -1384,10 +1387,10 @@ def test_delete_session_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.DeleteSessionRequest()
-    request.name = "name/value"
+    request.name = u"name/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.delete_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.delete_session), u"__call__") as call:
         call.return_value = None
 
         client.delete_session(request)
@@ -1399,7 +1402,7 @@ def test_delete_session_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"name=name/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -1409,10 +1412,10 @@ async def test_delete_session_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.DeleteSessionRequest()
-    request.name = "name/value"
+    request.name = u"name/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.delete_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.delete_session), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(None)
 
         await client.delete_session(request)
@@ -1424,27 +1427,27 @@ async def test_delete_session_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"name=name/value",) in kw[u"metadata"]
 
 
 def test_delete_session_flattened():
     client = SpannerClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.delete_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.delete_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = None
 
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.delete_session(name="name_value",)
+        client.delete_session(name=u"name_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].name == "name_value"
+        assert args[0].name == u"name_value"
 
 
 def test_delete_session_flattened_error():
@@ -1454,7 +1457,7 @@ def test_delete_session_flattened_error():
     # fields is an error.
     with pytest.raises(ValueError):
         client.delete_session(
-            spanner.DeleteSessionRequest(), name="name_value",
+            spanner.DeleteSessionRequest(), name=u"name_value",
         )
 
 
@@ -1463,21 +1466,21 @@ async def test_delete_session_flattened_async():
     client = SpannerAsyncClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.delete_session), "__call__") as call:
+    with mock.patch.object(type(client.transport.delete_session), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = None
 
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(None)
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.delete_session(name="name_value",)
+        response = await client.delete_session(name=u"name_value",)
 
         # Establish that the underlying call was made with the expected
         # request object values.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].name == "name_value"
+        assert args[0].name == u"name_value"
 
 
 @pytest.mark.asyncio
@@ -1488,11 +1491,11 @@ async def test_delete_session_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.delete_session(
-            spanner.DeleteSessionRequest(), name="name_value",
+            spanner.DeleteSessionRequest(), name=u"name_value",
         )
 
 
-def test_execute_sql(transport: str = "grpc", request_type=spanner.ExecuteSqlRequest):
+def test_execute_sql(transport = u"grpc", request_type=spanner.ExecuteSqlRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -1502,7 +1505,7 @@ def test_execute_sql(transport: str = "grpc", request_type=spanner.ExecuteSqlReq
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.execute_sql), "__call__") as call:
+    with mock.patch.object(type(client.transport.execute_sql), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = result_set.ResultSet()
 
@@ -1525,7 +1528,7 @@ def test_execute_sql_from_dict():
 
 @pytest.mark.asyncio
 async def test_execute_sql_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ExecuteSqlRequest
+    transport = u"grpc_asyncio", request_type=spanner.ExecuteSqlRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1536,7 +1539,7 @@ async def test_execute_sql_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.execute_sql), "__call__") as call:
+    with mock.patch.object(type(client.transport.execute_sql), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             result_set.ResultSet()
@@ -1565,10 +1568,10 @@ def test_execute_sql_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ExecuteSqlRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.execute_sql), "__call__") as call:
+    with mock.patch.object(type(client.transport.execute_sql), u"__call__") as call:
         call.return_value = result_set.ResultSet()
 
         client.execute_sql(request)
@@ -1580,7 +1583,7 @@ def test_execute_sql_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -1590,10 +1593,10 @@ async def test_execute_sql_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ExecuteSqlRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.execute_sql), "__call__") as call:
+    with mock.patch.object(type(client.transport.execute_sql), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             result_set.ResultSet()
         )
@@ -1607,11 +1610,11 @@ async def test_execute_sql_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_execute_streaming_sql(
-    transport: str = "grpc", request_type=spanner.ExecuteSqlRequest
+    transport = u"grpc", request_type=spanner.ExecuteSqlRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1623,7 +1626,7 @@ def test_execute_streaming_sql(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_streaming_sql), "__call__"
+        type(client.transport.execute_streaming_sql), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = iter([result_set.PartialResultSet()])
@@ -1647,7 +1650,7 @@ def test_execute_streaming_sql_from_dict():
 
 @pytest.mark.asyncio
 async def test_execute_streaming_sql_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ExecuteSqlRequest
+    transport = u"grpc_asyncio", request_type=spanner.ExecuteSqlRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1659,7 +1662,7 @@ async def test_execute_streaming_sql_async(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_streaming_sql), "__call__"
+        type(client.transport.execute_streaming_sql), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = mock.Mock(aio.UnaryStreamCall, autospec=True)
@@ -1691,11 +1694,11 @@ def test_execute_streaming_sql_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ExecuteSqlRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_streaming_sql), "__call__"
+        type(client.transport.execute_streaming_sql), u"__call__"
     ) as call:
         call.return_value = iter([result_set.PartialResultSet()])
 
@@ -1708,7 +1711,7 @@ def test_execute_streaming_sql_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -1718,11 +1721,11 @@ async def test_execute_streaming_sql_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ExecuteSqlRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_streaming_sql), "__call__"
+        type(client.transport.execute_streaming_sql), u"__call__"
     ) as call:
         call.return_value = mock.Mock(aio.UnaryStreamCall, autospec=True)
         call.return_value.read = mock.AsyncMock(
@@ -1738,11 +1741,11 @@ async def test_execute_streaming_sql_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_execute_batch_dml(
-    transport: str = "grpc", request_type=spanner.ExecuteBatchDmlRequest
+    transport = u"grpc", request_type=spanner.ExecuteBatchDmlRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1754,7 +1757,7 @@ def test_execute_batch_dml(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_batch_dml), "__call__"
+        type(client.transport.execute_batch_dml), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.ExecuteBatchDmlResponse()
@@ -1778,7 +1781,7 @@ def test_execute_batch_dml_from_dict():
 
 @pytest.mark.asyncio
 async def test_execute_batch_dml_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ExecuteBatchDmlRequest
+    transport = u"grpc_asyncio", request_type=spanner.ExecuteBatchDmlRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1790,7 +1793,7 @@ async def test_execute_batch_dml_async(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_batch_dml), "__call__"
+        type(client.transport.execute_batch_dml), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
@@ -1820,11 +1823,11 @@ def test_execute_batch_dml_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ExecuteBatchDmlRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_batch_dml), "__call__"
+        type(client.transport.execute_batch_dml), u"__call__"
     ) as call:
         call.return_value = spanner.ExecuteBatchDmlResponse()
 
@@ -1837,7 +1840,7 @@ def test_execute_batch_dml_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -1847,11 +1850,11 @@ async def test_execute_batch_dml_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ExecuteBatchDmlRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.execute_batch_dml), "__call__"
+        type(client.transport.execute_batch_dml), u"__call__"
     ) as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.ExecuteBatchDmlResponse()
@@ -1866,10 +1869,10 @@ async def test_execute_batch_dml_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
-def test_read(transport: str = "grpc", request_type=spanner.ReadRequest):
+def test_read(transport = u"grpc", request_type=spanner.ReadRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -1879,7 +1882,7 @@ def test_read(transport: str = "grpc", request_type=spanner.ReadRequest):
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read), "__call__") as call:
+    with mock.patch.object(type(client.transport.read), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = result_set.ResultSet()
 
@@ -1902,7 +1905,7 @@ def test_read_from_dict():
 
 @pytest.mark.asyncio
 async def test_read_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ReadRequest
+    transport = u"grpc_asyncio", request_type=spanner.ReadRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -1913,7 +1916,7 @@ async def test_read_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read), "__call__") as call:
+    with mock.patch.object(type(client.transport.read), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             result_set.ResultSet()
@@ -1942,10 +1945,10 @@ def test_read_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ReadRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read), "__call__") as call:
+    with mock.patch.object(type(client.transport.read), u"__call__") as call:
         call.return_value = result_set.ResultSet()
 
         client.read(request)
@@ -1957,7 +1960,7 @@ def test_read_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -1967,10 +1970,10 @@ async def test_read_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ReadRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read), "__call__") as call:
+    with mock.patch.object(type(client.transport.read), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             result_set.ResultSet()
         )
@@ -1984,10 +1987,10 @@ async def test_read_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
-def test_streaming_read(transport: str = "grpc", request_type=spanner.ReadRequest):
+def test_streaming_read(transport = u"grpc", request_type=spanner.ReadRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -1997,7 +2000,7 @@ def test_streaming_read(transport: str = "grpc", request_type=spanner.ReadReques
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.streaming_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.streaming_read), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = iter([result_set.PartialResultSet()])
 
@@ -2020,7 +2023,7 @@ def test_streaming_read_from_dict():
 
 @pytest.mark.asyncio
 async def test_streaming_read_async(
-    transport: str = "grpc_asyncio", request_type=spanner.ReadRequest
+    transport = u"grpc_asyncio", request_type=spanner.ReadRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2031,7 +2034,7 @@ async def test_streaming_read_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.streaming_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.streaming_read), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = mock.Mock(aio.UnaryStreamCall, autospec=True)
         call.return_value.read = mock.AsyncMock(
@@ -2062,10 +2065,10 @@ def test_streaming_read_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ReadRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.streaming_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.streaming_read), u"__call__") as call:
         call.return_value = iter([result_set.PartialResultSet()])
 
         client.streaming_read(request)
@@ -2077,7 +2080,7 @@ def test_streaming_read_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -2087,10 +2090,10 @@ async def test_streaming_read_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.ReadRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.streaming_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.streaming_read), u"__call__") as call:
         call.return_value = mock.Mock(aio.UnaryStreamCall, autospec=True)
         call.return_value.read = mock.AsyncMock(
             side_effect=[result_set.PartialResultSet()]
@@ -2105,11 +2108,11 @@ async def test_streaming_read_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_begin_transaction(
-    transport: str = "grpc", request_type=spanner.BeginTransactionRequest
+    transport = u"grpc", request_type=spanner.BeginTransactionRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2121,10 +2124,10 @@ def test_begin_transaction(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.begin_transaction), "__call__"
+        type(client.transport.begin_transaction), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
-        call.return_value = transaction.Transaction(id=b"id_blob",)
+        call.return_value = transaction.Transaction(id="id_blob",)
 
         response = client.begin_transaction(request)
 
@@ -2138,7 +2141,7 @@ def test_begin_transaction(
 
     assert isinstance(response, transaction.Transaction)
 
-    assert response.id == b"id_blob"
+    assert response.id == "id_blob"
 
 
 def test_begin_transaction_from_dict():
@@ -2147,7 +2150,7 @@ def test_begin_transaction_from_dict():
 
 @pytest.mark.asyncio
 async def test_begin_transaction_async(
-    transport: str = "grpc_asyncio", request_type=spanner.BeginTransactionRequest
+    transport = u"grpc_asyncio", request_type=spanner.BeginTransactionRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2159,11 +2162,11 @@ async def test_begin_transaction_async(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.begin_transaction), "__call__"
+        type(client.transport.begin_transaction), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
-            transaction.Transaction(id=b"id_blob",)
+            transaction.Transaction(id="id_blob",)
         )
 
         response = await client.begin_transaction(request)
@@ -2177,7 +2180,7 @@ async def test_begin_transaction_async(
     # Establish that the response is the type that we expect.
     assert isinstance(response, transaction.Transaction)
 
-    assert response.id == b"id_blob"
+    assert response.id == "id_blob"
 
 
 @pytest.mark.asyncio
@@ -2191,11 +2194,11 @@ def test_begin_transaction_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.BeginTransactionRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.begin_transaction), "__call__"
+        type(client.transport.begin_transaction), u"__call__"
     ) as call:
         call.return_value = transaction.Transaction()
 
@@ -2208,7 +2211,7 @@ def test_begin_transaction_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -2218,11 +2221,11 @@ async def test_begin_transaction_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.BeginTransactionRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.begin_transaction), "__call__"
+        type(client.transport.begin_transaction), u"__call__"
     ) as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             transaction.Transaction()
@@ -2237,7 +2240,7 @@ async def test_begin_transaction_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_begin_transaction_flattened():
@@ -2245,7 +2248,7 @@ def test_begin_transaction_flattened():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.begin_transaction), "__call__"
+        type(client.transport.begin_transaction), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = transaction.Transaction()
@@ -2253,7 +2256,7 @@ def test_begin_transaction_flattened():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         client.begin_transaction(
-            session="session_value",
+            session=u"session_value",
             options=transaction.TransactionOptions(read_write=None),
         )
 
@@ -2262,7 +2265,7 @@ def test_begin_transaction_flattened():
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].session == "session_value"
+        assert args[0].session == u"session_value"
 
         assert args[0].options == transaction.TransactionOptions(read_write=None)
 
@@ -2275,7 +2278,7 @@ def test_begin_transaction_flattened_error():
     with pytest.raises(ValueError):
         client.begin_transaction(
             spanner.BeginTransactionRequest(),
-            session="session_value",
+            session=u"session_value",
             options=transaction.TransactionOptions(read_write=None),
         )
 
@@ -2286,7 +2289,7 @@ async def test_begin_transaction_flattened_async():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.begin_transaction), "__call__"
+        type(client.transport.begin_transaction), u"__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = transaction.Transaction()
@@ -2297,7 +2300,7 @@ async def test_begin_transaction_flattened_async():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         response = await client.begin_transaction(
-            session="session_value",
+            session=u"session_value",
             options=transaction.TransactionOptions(read_write=None),
         )
 
@@ -2306,7 +2309,7 @@ async def test_begin_transaction_flattened_async():
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].session == "session_value"
+        assert args[0].session == u"session_value"
 
         assert args[0].options == transaction.TransactionOptions(read_write=None)
 
@@ -2320,12 +2323,12 @@ async def test_begin_transaction_flattened_error_async():
     with pytest.raises(ValueError):
         await client.begin_transaction(
             spanner.BeginTransactionRequest(),
-            session="session_value",
+            session=u"session_value",
             options=transaction.TransactionOptions(read_write=None),
         )
 
 
-def test_commit(transport: str = "grpc", request_type=spanner.CommitRequest):
+def test_commit(transport = u"grpc", request_type=spanner.CommitRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -2335,7 +2338,7 @@ def test_commit(transport: str = "grpc", request_type=spanner.CommitRequest):
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.commit), "__call__") as call:
+    with mock.patch.object(type(client.transport.commit), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.CommitResponse()
 
@@ -2358,7 +2361,7 @@ def test_commit_from_dict():
 
 @pytest.mark.asyncio
 async def test_commit_async(
-    transport: str = "grpc_asyncio", request_type=spanner.CommitRequest
+    transport = u"grpc_asyncio", request_type=spanner.CommitRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2369,7 +2372,7 @@ async def test_commit_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.commit), "__call__") as call:
+    with mock.patch.object(type(client.transport.commit), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.CommitResponse()
@@ -2398,10 +2401,10 @@ def test_commit_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.CommitRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.commit), "__call__") as call:
+    with mock.patch.object(type(client.transport.commit), u"__call__") as call:
         call.return_value = spanner.CommitResponse()
 
         client.commit(request)
@@ -2413,7 +2416,7 @@ def test_commit_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -2423,10 +2426,10 @@ async def test_commit_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.CommitRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.commit), "__call__") as call:
+    with mock.patch.object(type(client.transport.commit), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.CommitResponse()
         )
@@ -2440,24 +2443,24 @@ async def test_commit_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_commit_flattened():
     client = SpannerClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.commit), "__call__") as call:
+    with mock.patch.object(type(client.transport.commit), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.CommitResponse()
 
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         client.commit(
-            session="session_value",
-            transaction_id=b"transaction_id_blob",
+            session=u"session_value",
+            transaction_id="transaction_id_blob",
             mutations=[
-                mutation.Mutation(insert=mutation.Mutation.Write(table="table_value"))
+                mutation.Mutation(insert=mutation.Mutation.Write(table=u"table_value"))
             ],
             single_use_transaction=transaction.TransactionOptions(read_write=None),
         )
@@ -2467,10 +2470,10 @@ def test_commit_flattened():
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].session == "session_value"
+        assert args[0].session == u"session_value"
 
         assert args[0].mutations == [
-            mutation.Mutation(insert=mutation.Mutation.Write(table="table_value"))
+            mutation.Mutation(insert=mutation.Mutation.Write(table=u"table_value"))
         ]
 
         assert args[0].single_use_transaction == transaction.TransactionOptions(
@@ -2486,10 +2489,10 @@ def test_commit_flattened_error():
     with pytest.raises(ValueError):
         client.commit(
             spanner.CommitRequest(),
-            session="session_value",
-            transaction_id=b"transaction_id_blob",
+            session=u"session_value",
+            transaction_id="transaction_id_blob",
             mutations=[
-                mutation.Mutation(insert=mutation.Mutation.Write(table="table_value"))
+                mutation.Mutation(insert=mutation.Mutation.Write(table=u"table_value"))
             ],
             single_use_transaction=transaction.TransactionOptions(read_write=None),
         )
@@ -2500,7 +2503,7 @@ async def test_commit_flattened_async():
     client = SpannerAsyncClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.commit), "__call__") as call:
+    with mock.patch.object(type(client.transport.commit), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.CommitResponse()
 
@@ -2510,10 +2513,10 @@ async def test_commit_flattened_async():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         response = await client.commit(
-            session="session_value",
-            transaction_id=b"transaction_id_blob",
+            session=u"session_value",
+            transaction_id="transaction_id_blob",
             mutations=[
-                mutation.Mutation(insert=mutation.Mutation.Write(table="table_value"))
+                mutation.Mutation(insert=mutation.Mutation.Write(table=u"table_value"))
             ],
             single_use_transaction=transaction.TransactionOptions(read_write=None),
         )
@@ -2523,10 +2526,10 @@ async def test_commit_flattened_async():
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].session == "session_value"
+        assert args[0].session == u"session_value"
 
         assert args[0].mutations == [
-            mutation.Mutation(insert=mutation.Mutation.Write(table="table_value"))
+            mutation.Mutation(insert=mutation.Mutation.Write(table=u"table_value"))
         ]
 
         assert args[0].single_use_transaction == transaction.TransactionOptions(
@@ -2543,16 +2546,16 @@ async def test_commit_flattened_error_async():
     with pytest.raises(ValueError):
         await client.commit(
             spanner.CommitRequest(),
-            session="session_value",
-            transaction_id=b"transaction_id_blob",
+            session=u"session_value",
+            transaction_id="transaction_id_blob",
             mutations=[
-                mutation.Mutation(insert=mutation.Mutation.Write(table="table_value"))
+                mutation.Mutation(insert=mutation.Mutation.Write(table=u"table_value"))
             ],
             single_use_transaction=transaction.TransactionOptions(read_write=None),
         )
 
 
-def test_rollback(transport: str = "grpc", request_type=spanner.RollbackRequest):
+def test_rollback(transport = u"grpc", request_type=spanner.RollbackRequest):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
@@ -2562,7 +2565,7 @@ def test_rollback(transport: str = "grpc", request_type=spanner.RollbackRequest)
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.rollback), "__call__") as call:
+    with mock.patch.object(type(client.transport.rollback), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = None
 
@@ -2584,7 +2587,7 @@ def test_rollback_from_dict():
 
 @pytest.mark.asyncio
 async def test_rollback_async(
-    transport: str = "grpc_asyncio", request_type=spanner.RollbackRequest
+    transport = u"grpc_asyncio", request_type=spanner.RollbackRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2595,7 +2598,7 @@ async def test_rollback_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.rollback), "__call__") as call:
+    with mock.patch.object(type(client.transport.rollback), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(None)
 
@@ -2622,10 +2625,10 @@ def test_rollback_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.RollbackRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.rollback), "__call__") as call:
+    with mock.patch.object(type(client.transport.rollback), u"__call__") as call:
         call.return_value = None
 
         client.rollback(request)
@@ -2637,7 +2640,7 @@ def test_rollback_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -2647,10 +2650,10 @@ async def test_rollback_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.RollbackRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.rollback), "__call__") as call:
+    with mock.patch.object(type(client.transport.rollback), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(None)
 
         await client.rollback(request)
@@ -2662,21 +2665,21 @@ async def test_rollback_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_rollback_flattened():
     client = SpannerClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.rollback), "__call__") as call:
+    with mock.patch.object(type(client.transport.rollback), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = None
 
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         client.rollback(
-            session="session_value", transaction_id=b"transaction_id_blob",
+            session=u"session_value", transaction_id="transaction_id_blob",
         )
 
         # Establish that the underlying call was made with the expected
@@ -2684,9 +2687,9 @@ def test_rollback_flattened():
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].session == "session_value"
+        assert args[0].session == u"session_value"
 
-        assert args[0].transaction_id == b"transaction_id_blob"
+        assert args[0].transaction_id == "transaction_id_blob"
 
 
 def test_rollback_flattened_error():
@@ -2697,8 +2700,8 @@ def test_rollback_flattened_error():
     with pytest.raises(ValueError):
         client.rollback(
             spanner.RollbackRequest(),
-            session="session_value",
-            transaction_id=b"transaction_id_blob",
+            session=u"session_value",
+            transaction_id="transaction_id_blob",
         )
 
 
@@ -2707,7 +2710,7 @@ async def test_rollback_flattened_async():
     client = SpannerAsyncClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.rollback), "__call__") as call:
+    with mock.patch.object(type(client.transport.rollback), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = None
 
@@ -2715,7 +2718,7 @@ async def test_rollback_flattened_async():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         response = await client.rollback(
-            session="session_value", transaction_id=b"transaction_id_blob",
+            session=u"session_value", transaction_id="transaction_id_blob",
         )
 
         # Establish that the underlying call was made with the expected
@@ -2723,9 +2726,9 @@ async def test_rollback_flattened_async():
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0].session == "session_value"
+        assert args[0].session == u"session_value"
 
-        assert args[0].transaction_id == b"transaction_id_blob"
+        assert args[0].transaction_id == "transaction_id_blob"
 
 
 @pytest.mark.asyncio
@@ -2737,13 +2740,13 @@ async def test_rollback_flattened_error_async():
     with pytest.raises(ValueError):
         await client.rollback(
             spanner.RollbackRequest(),
-            session="session_value",
-            transaction_id=b"transaction_id_blob",
+            session=u"session_value",
+            transaction_id="transaction_id_blob",
         )
 
 
 def test_partition_query(
-    transport: str = "grpc", request_type=spanner.PartitionQueryRequest
+    transport = u"grpc", request_type=spanner.PartitionQueryRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2754,7 +2757,7 @@ def test_partition_query(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_query), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_query), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.PartitionResponse()
 
@@ -2777,7 +2780,7 @@ def test_partition_query_from_dict():
 
 @pytest.mark.asyncio
 async def test_partition_query_async(
-    transport: str = "grpc_asyncio", request_type=spanner.PartitionQueryRequest
+    transport = u"grpc_asyncio", request_type=spanner.PartitionQueryRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2788,7 +2791,7 @@ async def test_partition_query_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_query), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_query), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.PartitionResponse()
@@ -2817,10 +2820,10 @@ def test_partition_query_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.PartitionQueryRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_query), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_query), u"__call__") as call:
         call.return_value = spanner.PartitionResponse()
 
         client.partition_query(request)
@@ -2832,7 +2835,7 @@ def test_partition_query_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -2842,10 +2845,10 @@ async def test_partition_query_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.PartitionQueryRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_query), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_query), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.PartitionResponse()
         )
@@ -2859,11 +2862,11 @@ async def test_partition_query_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_partition_read(
-    transport: str = "grpc", request_type=spanner.PartitionReadRequest
+    transport = u"grpc", request_type=spanner.PartitionReadRequest
 ):
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2874,7 +2877,7 @@ def test_partition_read(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_read), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = spanner.PartitionResponse()
 
@@ -2897,7 +2900,7 @@ def test_partition_read_from_dict():
 
 @pytest.mark.asyncio
 async def test_partition_read_async(
-    transport: str = "grpc_asyncio", request_type=spanner.PartitionReadRequest
+    transport = u"grpc_asyncio", request_type=spanner.PartitionReadRequest
 ):
     client = SpannerAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
@@ -2908,7 +2911,7 @@ async def test_partition_read_async(
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_read), u"__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.PartitionResponse()
@@ -2937,10 +2940,10 @@ def test_partition_read_field_headers():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.PartitionReadRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_read), u"__call__") as call:
         call.return_value = spanner.PartitionResponse()
 
         client.partition_read(request)
@@ -2952,7 +2955,7 @@ def test_partition_read_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 @pytest.mark.asyncio
@@ -2962,10 +2965,10 @@ async def test_partition_read_field_headers_async():
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = spanner.PartitionReadRequest()
-    request.session = "session/value"
+    request.session = u"session/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.partition_read), "__call__") as call:
+    with mock.patch.object(type(client.transport.partition_read), u"__call__") as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             spanner.PartitionResponse()
         )
@@ -2979,7 +2982,7 @@ async def test_partition_read_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "session=session/value",) in kw["metadata"]
+    assert (u"x-goog-request-params", u"session=session/value",) in kw[u"metadata"]
 
 
 def test_credentials_transport_error():
@@ -2998,7 +3001,7 @@ def test_credentials_transport_error():
     )
     with pytest.raises(ValueError):
         client = SpannerClient(
-            client_options={"credentials_file": "credentials.json"},
+            client_options={u"credentials_file": u"credentials.json"},
             transport=transport,
         )
 
@@ -3008,7 +3011,7 @@ def test_credentials_transport_error():
     )
     with pytest.raises(ValueError):
         client = SpannerClient(
-            client_options={"scopes": ["1", "2"]}, transport=transport,
+            client_options={u"scopes": [u"1", u"2"]}, transport=transport,
         )
 
 
@@ -3037,12 +3040,12 @@ def test_transport_get_channel():
 
 
 @pytest.mark.parametrize(
-    "transport_class",
+    u"transport_class",
     [transports.SpannerGrpcTransport, transports.SpannerGrpcAsyncIOTransport],
 )
 def test_transport_adc(transport_class):
     # Test default credentials are used if not provided.
-    with mock.patch.object(auth, "default") as adc:
+    with mock.patch.object(auth, u"default") as adc:
         adc.return_value = (credentials.AnonymousCredentials(), None)
         transport_class()
         adc.assert_called_once()
@@ -3059,14 +3062,14 @@ def test_spanner_base_transport_error():
     with pytest.raises(exceptions.DuplicateCredentialArgs):
         transport = transports.SpannerTransport(
             credentials=credentials.AnonymousCredentials(),
-            credentials_file="credentials.json",
+            credentials_file=u"credentials.json",
         )
 
 
 def test_spanner_base_transport():
     # Instantiate the base transport.
     with mock.patch(
-        "google.cloud.spanner_v1.services.spanner.transports.SpannerTransport.__init__"
+        u"google.cloud.spanner_v1.services.spanner.transports.SpannerTransport.__init__"
     ) as Transport:
         Transport.return_value = None
         transport = transports.SpannerTransport(
@@ -3076,21 +3079,21 @@ def test_spanner_base_transport():
     # Every method on the transport should just blindly
     # raise NotImplementedError.
     methods = (
-        "create_session",
-        "batch_create_sessions",
-        "get_session",
-        "list_sessions",
-        "delete_session",
-        "execute_sql",
-        "execute_streaming_sql",
-        "execute_batch_dml",
-        "read",
-        "streaming_read",
-        "begin_transaction",
-        "commit",
-        "rollback",
-        "partition_query",
-        "partition_read",
+        u"create_session",
+        u"batch_create_sessions",
+        u"get_session",
+        u"list_sessions",
+        u"delete_session",
+        u"execute_sql",
+        u"execute_streaming_sql",
+        u"execute_batch_dml",
+        u"read",
+        u"streaming_read",
+        u"begin_transaction",
+        u"commit",
+        u"rollback",
+        u"partition_query",
+        u"partition_read",
     )
     for method in methods:
         with pytest.raises(NotImplementedError):
@@ -3100,29 +3103,29 @@ def test_spanner_base_transport():
 def test_spanner_base_transport_with_credentials_file():
     # Instantiate the base transport with a credentials file
     with mock.patch.object(
-        auth, "load_credentials_from_file"
+        auth, u"load_credentials_from_file"
     ) as load_creds, mock.patch(
-        "google.cloud.spanner_v1.services.spanner.transports.SpannerTransport._prep_wrapped_messages"
+        u"google.cloud.spanner_v1.services.spanner.transports.SpannerTransport._prep_wrapped_messages"
     ) as Transport:
         Transport.return_value = None
         load_creds.return_value = (credentials.AnonymousCredentials(), None)
         transport = transports.SpannerTransport(
-            credentials_file="credentials.json", quota_project_id="octopus",
+            credentials_file=u"credentials.json", quota_project_id=u"octopus",
         )
         load_creds.assert_called_once_with(
-            "credentials.json",
+            u"credentials.json",
             scopes=(
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/spanner.data",
+                u"https://www.googleapis.com/auth/cloud-platform",
+                u"https://www.googleapis.com/auth/spanner.data",
             ),
-            quota_project_id="octopus",
+            quota_project_id=u"octopus",
         )
 
 
 def test_spanner_base_transport_with_adc():
     # Test the default credentials are used if credentials and credentials_file are None.
-    with mock.patch.object(auth, "default") as adc, mock.patch(
-        "google.cloud.spanner_v1.services.spanner.transports.SpannerTransport._prep_wrapped_messages"
+    with mock.patch.object(auth, u"default") as adc, mock.patch(
+        u"google.cloud.spanner_v1.services.spanner.transports.SpannerTransport._prep_wrapped_messages"
     ) as Transport:
         Transport.return_value = None
         adc.return_value = (credentials.AnonymousCredentials(), None)
@@ -3132,13 +3135,13 @@ def test_spanner_base_transport_with_adc():
 
 def test_spanner_auth_adc():
     # If no credentials are provided, we should use ADC credentials.
-    with mock.patch.object(auth, "default") as adc:
+    with mock.patch.object(auth, u"default") as adc:
         adc.return_value = (credentials.AnonymousCredentials(), None)
         SpannerClient()
         adc.assert_called_once_with(
             scopes=(
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/spanner.data",
+                u"https://www.googleapis.com/auth/cloud-platform",
+                u"https://www.googleapis.com/auth/spanner.data",
             ),
             quota_project_id=None,
         )
@@ -3147,17 +3150,17 @@ def test_spanner_auth_adc():
 def test_spanner_transport_auth_adc():
     # If credentials and host are not provided, the transport class should use
     # ADC credentials.
-    with mock.patch.object(auth, "default") as adc:
+    with mock.patch.object(auth, u"default") as adc:
         adc.return_value = (credentials.AnonymousCredentials(), None)
         transports.SpannerGrpcTransport(
-            host="squid.clam.whelk", quota_project_id="octopus"
+            host=u"squid.clam.whelk", quota_project_id=u"octopus"
         )
         adc.assert_called_once_with(
             scopes=(
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/spanner.data",
+                u"https://www.googleapis.com/auth/cloud-platform",
+                u"https://www.googleapis.com/auth/spanner.data",
             ),
-            quota_project_id="octopus",
+            quota_project_id=u"octopus",
         )
 
 
@@ -3165,54 +3168,54 @@ def test_spanner_host_no_port():
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(),
         client_options=client_options.ClientOptions(
-            api_endpoint="spanner.googleapis.com"
+            api_endpoint=u"spanner.googleapis.com"
         ),
     )
-    assert client.transport._host == "spanner.googleapis.com:443"
+    assert client.transport._host == u"spanner.googleapis.com:443"
 
 
 def test_spanner_host_with_port():
     client = SpannerClient(
         credentials=credentials.AnonymousCredentials(),
         client_options=client_options.ClientOptions(
-            api_endpoint="spanner.googleapis.com:8000"
+            api_endpoint=u"spanner.googleapis.com:8000"
         ),
     )
-    assert client.transport._host == "spanner.googleapis.com:8000"
+    assert client.transport._host == u"spanner.googleapis.com:8000"
 
 
 def test_spanner_grpc_transport_channel():
-    channel = grpc.insecure_channel("http://localhost/")
+    channel = grpc.insecure_channel(u"http://localhost/")
 
     # Check that channel is used if provided.
     transport = transports.SpannerGrpcTransport(
-        host="squid.clam.whelk", channel=channel,
+        host=u"squid.clam.whelk", channel=channel,
     )
     assert transport.grpc_channel == channel
-    assert transport._host == "squid.clam.whelk:443"
+    assert transport._host == u"squid.clam.whelk:443"
 
 
 def test_spanner_grpc_asyncio_transport_channel():
-    channel = aio.insecure_channel("http://localhost/")
+    channel = aio.insecure_channel(u"http://localhost/")
 
     # Check that channel is used if provided.
     transport = transports.SpannerGrpcAsyncIOTransport(
-        host="squid.clam.whelk", channel=channel,
+        host=u"squid.clam.whelk", channel=channel,
     )
     assert transport.grpc_channel == channel
-    assert transport._host == "squid.clam.whelk:443"
+    assert transport._host == u"squid.clam.whelk:443"
 
 
 @pytest.mark.parametrize(
-    "transport_class",
+    u"transport_class",
     [transports.SpannerGrpcTransport, transports.SpannerGrpcAsyncIOTransport],
 )
 def test_spanner_transport_channel_mtls_with_client_cert_source(transport_class):
     with mock.patch(
-        "grpc.ssl_channel_credentials", autospec=True
+        u"grpc.ssl_channel_credentials", autospec=True
     ) as grpc_ssl_channel_cred:
         with mock.patch.object(
-            transport_class, "create_channel", autospec=True
+            transport_class, u"create_channel", autospec=True
         ) as grpc_create_channel:
             mock_ssl_cred = mock.Mock()
             grpc_ssl_channel_cred.return_value = mock_ssl_cred
@@ -3222,25 +3225,25 @@ def test_spanner_transport_channel_mtls_with_client_cert_source(transport_class)
 
             cred = credentials.AnonymousCredentials()
             with pytest.warns(DeprecationWarning):
-                with mock.patch.object(auth, "default") as adc:
+                with mock.patch.object(auth, u"default") as adc:
                     adc.return_value = (cred, None)
                     transport = transport_class(
-                        host="squid.clam.whelk",
-                        api_mtls_endpoint="mtls.squid.clam.whelk",
+                        host=u"squid.clam.whelk",
+                        api_mtls_endpoint=u"mtls.squid.clam.whelk",
                         client_cert_source=client_cert_source_callback,
                     )
                     adc.assert_called_once()
 
             grpc_ssl_channel_cred.assert_called_once_with(
-                certificate_chain=b"cert bytes", private_key=b"key bytes"
+                certificate_chain="cert bytes", private_key="key bytes"
             )
             grpc_create_channel.assert_called_once_with(
-                "mtls.squid.clam.whelk:443",
+                u"mtls.squid.clam.whelk:443",
                 credentials=cred,
                 credentials_file=None,
                 scopes=(
-                    "https://www.googleapis.com/auth/cloud-platform",
-                    "https://www.googleapis.com/auth/spanner.data",
+                    u"https://www.googleapis.com/auth/cloud-platform",
+                    u"https://www.googleapis.com/auth/spanner.data",
                 ),
                 ssl_credentials=mock_ssl_cred,
                 quota_project_id=None,
@@ -3249,18 +3252,18 @@ def test_spanner_transport_channel_mtls_with_client_cert_source(transport_class)
 
 
 @pytest.mark.parametrize(
-    "transport_class",
+    u"transport_class",
     [transports.SpannerGrpcTransport, transports.SpannerGrpcAsyncIOTransport],
 )
 def test_spanner_transport_channel_mtls_with_adc(transport_class):
     mock_ssl_cred = mock.Mock()
     with mock.patch.multiple(
-        "google.auth.transport.grpc.SslCredentials",
+        u"google.auth.transport.grpc.SslCredentials",
         __init__=mock.Mock(return_value=None),
         ssl_credentials=mock.PropertyMock(return_value=mock_ssl_cred),
     ):
         with mock.patch.object(
-            transport_class, "create_channel", autospec=True
+            transport_class, u"create_channel", autospec=True
         ) as grpc_create_channel:
             mock_grpc_channel = mock.Mock()
             grpc_create_channel.return_value = mock_grpc_channel
@@ -3268,19 +3271,19 @@ def test_spanner_transport_channel_mtls_with_adc(transport_class):
 
             with pytest.warns(DeprecationWarning):
                 transport = transport_class(
-                    host="squid.clam.whelk",
+                    host=u"squid.clam.whelk",
                     credentials=mock_cred,
-                    api_mtls_endpoint="mtls.squid.clam.whelk",
+                    api_mtls_endpoint=u"mtls.squid.clam.whelk",
                     client_cert_source=None,
                 )
 
             grpc_create_channel.assert_called_once_with(
-                "mtls.squid.clam.whelk:443",
+                u"mtls.squid.clam.whelk:443",
                 credentials=mock_cred,
                 credentials_file=None,
                 scopes=(
-                    "https://www.googleapis.com/auth/cloud-platform",
-                    "https://www.googleapis.com/auth/spanner.data",
+                    u"https://www.googleapis.com/auth/cloud-platform",
+                    u"https://www.googleapis.com/auth/spanner.data",
                 ),
                 ssl_credentials=mock_ssl_cred,
                 quota_project_id=None,
@@ -3289,11 +3292,11 @@ def test_spanner_transport_channel_mtls_with_adc(transport_class):
 
 
 def test_database_path():
-    project = "squid"
-    instance = "clam"
-    database = "whelk"
+    project = u"squid"
+    instance = u"clam"
+    database = u"whelk"
 
-    expected = "projects/{project}/instances/{instance}/databases/{database}".format(
+    expected = u"projects/{project}/instances/{instance}/databases/{database}".format(
         project=project, instance=instance, database=database,
     )
     actual = SpannerClient.database_path(project, instance, database)
@@ -3302,9 +3305,9 @@ def test_database_path():
 
 def test_parse_database_path():
     expected = {
-        "project": "octopus",
-        "instance": "oyster",
-        "database": "nudibranch",
+        u"project": u"octopus",
+        u"instance": u"oyster",
+        u"database": u"nudibranch",
     }
     path = SpannerClient.database_path(**expected)
 
@@ -3314,12 +3317,12 @@ def test_parse_database_path():
 
 
 def test_session_path():
-    project = "cuttlefish"
-    instance = "mussel"
-    database = "winkle"
-    session = "nautilus"
+    project = u"cuttlefish"
+    instance = u"mussel"
+    database = u"winkle"
+    session = u"nautilus"
 
-    expected = "projects/{project}/instances/{instance}/databases/{database}/sessions/{session}".format(
+    expected = u"projects/{project}/instances/{instance}/databases/{database}/sessions/{session}".format(
         project=project, instance=instance, database=database, session=session,
     )
     actual = SpannerClient.session_path(project, instance, database, session)
@@ -3328,10 +3331,10 @@ def test_session_path():
 
 def test_parse_session_path():
     expected = {
-        "project": "scallop",
-        "instance": "abalone",
-        "database": "squid",
-        "session": "clam",
+        u"project": u"scallop",
+        u"instance": u"abalone",
+        u"database": u"squid",
+        u"session": u"clam",
     }
     path = SpannerClient.session_path(**expected)
 
@@ -3341,9 +3344,9 @@ def test_parse_session_path():
 
 
 def test_common_billing_account_path():
-    billing_account = "whelk"
+    billing_account = u"whelk"
 
-    expected = "billingAccounts/{billing_account}".format(
+    expected = u"billingAccounts/{billing_account}".format(
         billing_account=billing_account,
     )
     actual = SpannerClient.common_billing_account_path(billing_account)
@@ -3352,7 +3355,7 @@ def test_common_billing_account_path():
 
 def test_parse_common_billing_account_path():
     expected = {
-        "billing_account": "octopus",
+        u"billing_account": u"octopus",
     }
     path = SpannerClient.common_billing_account_path(**expected)
 
@@ -3362,16 +3365,16 @@ def test_parse_common_billing_account_path():
 
 
 def test_common_folder_path():
-    folder = "oyster"
+    folder = u"oyster"
 
-    expected = "folders/{folder}".format(folder=folder,)
+    expected = u"folders/{folder}".format(folder=folder,)
     actual = SpannerClient.common_folder_path(folder)
     assert expected == actual
 
 
 def test_parse_common_folder_path():
     expected = {
-        "folder": "nudibranch",
+        u"folder": u"nudibranch",
     }
     path = SpannerClient.common_folder_path(**expected)
 
@@ -3381,16 +3384,16 @@ def test_parse_common_folder_path():
 
 
 def test_common_organization_path():
-    organization = "cuttlefish"
+    organization = u"cuttlefish"
 
-    expected = "organizations/{organization}".format(organization=organization,)
+    expected = u"organizations/{organization}".format(organization=organization,)
     actual = SpannerClient.common_organization_path(organization)
     assert expected == actual
 
 
 def test_parse_common_organization_path():
     expected = {
-        "organization": "mussel",
+        u"organization": u"mussel",
     }
     path = SpannerClient.common_organization_path(**expected)
 
@@ -3400,16 +3403,16 @@ def test_parse_common_organization_path():
 
 
 def test_common_project_path():
-    project = "winkle"
+    project = u"winkle"
 
-    expected = "projects/{project}".format(project=project,)
+    expected = u"projects/{project}".format(project=project,)
     actual = SpannerClient.common_project_path(project)
     assert expected == actual
 
 
 def test_parse_common_project_path():
     expected = {
-        "project": "nautilus",
+        u"project": u"nautilus",
     }
     path = SpannerClient.common_project_path(**expected)
 
@@ -3419,10 +3422,10 @@ def test_parse_common_project_path():
 
 
 def test_common_location_path():
-    project = "scallop"
-    location = "abalone"
+    project = u"scallop"
+    location = u"abalone"
 
-    expected = "projects/{project}/locations/{location}".format(
+    expected = u"projects/{project}/locations/{location}".format(
         project=project, location=location,
     )
     actual = SpannerClient.common_location_path(project, location)
@@ -3431,8 +3434,8 @@ def test_common_location_path():
 
 def test_parse_common_location_path():
     expected = {
-        "project": "squid",
-        "location": "clam",
+        u"project": u"squid",
+        u"location": u"clam",
     }
     path = SpannerClient.common_location_path(**expected)
 
@@ -3445,7 +3448,7 @@ def test_client_withDEFAULT_CLIENT_INFO():
     client_info = gapic_v1.client_info.ClientInfo()
 
     with mock.patch.object(
-        transports.SpannerTransport, "_prep_wrapped_messages"
+        transports.SpannerTransport, u"_prep_wrapped_messages"
     ) as prep:
         client = SpannerClient(
             credentials=credentials.AnonymousCredentials(), client_info=client_info,
@@ -3453,7 +3456,7 @@ def test_client_withDEFAULT_CLIENT_INFO():
         prep.assert_called_once_with(client_info)
 
     with mock.patch.object(
-        transports.SpannerTransport, "_prep_wrapped_messages"
+        transports.SpannerTransport, u"_prep_wrapped_messages"
     ) as prep:
         transport_class = SpannerClient.get_transport_class()
         transport = transport_class(

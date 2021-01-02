@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Spanner DB API exceptions."""
+u"""Spanner DB API exceptions."""
 
 
 class Warning(Exception):
-    """Important DB API warning."""
+    u"""Important DB API warning."""
 
     pass
 
 
 class Error(Exception):
-    """The base class for all the DB API exceptions.
+    u"""The base class for all the DB API exceptions.
 
     Does not include :class:`Warning`.
     """
@@ -31,7 +31,7 @@ class Error(Exception):
 
 
 class InterfaceError(Error):
-    """
+    u"""
     Error related to the database interface
     rather than the database itself.
     """
@@ -40,13 +40,13 @@ class InterfaceError(Error):
 
 
 class DatabaseError(Error):
-    """Error related to the database."""
+    u"""Error related to the database."""
 
     pass
 
 
 class DataError(DatabaseError):
-    """
+    u"""
     Error due to problems with the processed data like
     division by zero, numeric value out of range, etc.
     """
@@ -55,7 +55,7 @@ class DataError(DatabaseError):
 
 
 class OperationalError(DatabaseError):
-    """
+    u"""
     Error related to the database's operation, e.g. an
     unexpected disconnect, the data source name is not
     found, a transaction could not be processed, a
@@ -66,7 +66,7 @@ class OperationalError(DatabaseError):
 
 
 class IntegrityError(DatabaseError):
-    """
+    u"""
     Error for cases of relational integrity of the database
     is affected, e.g. a foreign key check fails.
     """
@@ -75,7 +75,7 @@ class IntegrityError(DatabaseError):
 
 
 class InternalError(DatabaseError):
-    """
+    u"""
     Internal database error, e.g. the cursor is not valid
     anymore, the transaction is out of sync, etc.
     """
@@ -84,7 +84,7 @@ class InternalError(DatabaseError):
 
 
 class ProgrammingError(DatabaseError):
-    """
+    u"""
     Programming error, e.g. table not found or already
     exists, syntax error in the SQL statement, wrong
     number of parameters specified, etc.
@@ -94,7 +94,7 @@ class ProgrammingError(DatabaseError):
 
 
 class NotSupportedError(DatabaseError):
-    """
+    u"""
     Error for case of a method or database API not
     supported by the database was used.
     """

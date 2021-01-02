@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -22,11 +23,11 @@ from google.cloud.spanner_v1.types import keys
 from google.protobuf import struct_pb2 as struct  # type: ignore
 
 
-__protobuf__ = proto.module(package="google.spanner.v1", manifest={"Mutation",},)
+__protobuf__ = proto.module(package=u"google.spanner.v1", manifest=set([u"Mutation",]),)
 
 
 class Mutation(proto.Message):
-    r"""A modification to one or more Cloud Spanner rows. Mutations can be
+    ur"""A modification to one or more Cloud Spanner rows. Mutations can be
     applied to a Cloud Spanner database by sending them in a
     [Commit][google.spanner.v1.Spanner.Commit] call.
 
@@ -70,7 +71,7 @@ class Mutation(proto.Message):
     """
 
     class Write(proto.Message):
-        r"""Arguments to [insert][google.spanner.v1.Mutation.insert],
+        ur"""Arguments to [insert][google.spanner.v1.Mutation.insert],
         [update][google.spanner.v1.Mutation.update],
         [insert_or_update][google.spanner.v1.Mutation.insert_or_update], and
         [replace][google.spanner.v1.Mutation.replace] operations.
@@ -109,7 +110,7 @@ class Mutation(proto.Message):
         values = proto.RepeatedField(proto.MESSAGE, number=3, message=struct.ListValue,)
 
     class Delete(proto.Message):
-        r"""Arguments to [delete][google.spanner.v1.Mutation.delete] operations.
+        ur"""Arguments to [delete][google.spanner.v1.Mutation.delete] operations.
 
         Attributes:
             table (str):
@@ -129,17 +130,17 @@ class Mutation(proto.Message):
 
         key_set = proto.Field(proto.MESSAGE, number=2, message=keys.KeySet,)
 
-    insert = proto.Field(proto.MESSAGE, number=1, oneof="operation", message=Write,)
+    insert = proto.Field(proto.MESSAGE, number=1, oneof=u"operation", message=Write,)
 
-    update = proto.Field(proto.MESSAGE, number=2, oneof="operation", message=Write,)
+    update = proto.Field(proto.MESSAGE, number=2, oneof=u"operation", message=Write,)
 
     insert_or_update = proto.Field(
-        proto.MESSAGE, number=3, oneof="operation", message=Write,
+        proto.MESSAGE, number=3, oneof=u"operation", message=Write,
     )
 
-    replace = proto.Field(proto.MESSAGE, number=4, oneof="operation", message=Write,)
+    replace = proto.Field(proto.MESSAGE, number=4, oneof=u"operation", message=Write,)
 
-    delete = proto.Field(proto.MESSAGE, number=5, oneof="operation", message=Delete,)
+    delete = proto.Field(proto.MESSAGE, number=5, oneof=u"operation", message=Delete,)
 
 
 __all__ = tuple(sorted(__protobuf__.manifest))

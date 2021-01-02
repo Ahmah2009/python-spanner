@@ -29,19 +29,19 @@ from google.cloud.spanner_v1 import COMMIT_TIMESTAMP
 
 __all__ = (
     # google.cloud.spanner
-    "__version__",
-    "param_types",
+    u"__version__",
+    u"param_types",
     # google.cloud.spanner_v1.client
-    "Client",
+    u"Client",
     # google.cloud.spanner_v1.keyset
-    "KeyRange",
-    "KeySet",
+    u"KeyRange",
+    u"KeySet",
     # google.cloud.spanner_v1.pool
-    "AbstractSessionPool",
-    "BurstyPool",
-    "FixedSizePool",
-    "PingingPool",
-    "TransactionPingingPool",
+    u"AbstractSessionPool",
+    u"BurstyPool",
+    u"FixedSizePool",
+    u"PingingPool",
+    u"TransactionPingingPool",
     # local
-    "COMMIT_TIMESTAMP",
+    u"COMMIT_TIMESTAMP",
 )

@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -22,12 +23,12 @@ from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.admin.database.v1", manifest={"OperationProgress",},
+    package=u"google.spanner.admin.database.v1", manifest=set([u"OperationProgress",]),
 )
 
 
 class OperationProgress(proto.Message):
-    r"""Encapsulates progress related information for a Cloud Spanner
+    ur"""Encapsulates progress related information for a Cloud Spanner
     long running operation.
 
     Attributes:

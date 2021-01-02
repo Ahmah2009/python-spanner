@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""User friendly container for Cloud Spanner Database."""
+u"""User friendly container for Cloud Spanner Database."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import copy
 import functools
 import grpc
@@ -56,22 +58,22 @@ from google.cloud.spanner_v1 import (
 # pylint: enable=ungrouped-imports
 
 
-SPANNER_DATA_SCOPE = "https://www.googleapis.com/auth/spanner.data"
+SPANNER_DATA_SCOPE = u"https://www.googleapis.com/auth/spanner.data"
 
 
 _DATABASE_NAME_RE = re.compile(
-    r"^projects/(?P<project>[^/]+)/"
-    r"instances/(?P<instance_id>[a-z][-a-z0-9]*)/"
-    r"databases/(?P<database_id>[a-z][a-z0-9_\-]*[a-z0-9])$"
+    ur"^projects/(?P<project>[^/]+)/"
+    ur"instances/(?P<instance_id>[a-z][-a-z0-9]*)/"
+    ur"databases/(?P<database_id>[a-z][a-z0-9_\-]*[a-z0-9])$"
 )
 
-_DATABASE_METADATA_FILTER = "name:{0}/operations/"
+_DATABASE_METADATA_FILTER = u"name:{0}/operations/"
 
 DEFAULT_RETRY_BACKOFF = Retry(initial=0.02, maximum=32, multiplier=1.3)
 
 
 class Database(object):
-    """Representation of a Cloud Spanner Database.
+    u"""Representation of a Cloud Spanner Database.
 
     We can use a :class:`Database` to:
 
@@ -116,7 +118,7 @@ class Database(object):
 
     @classmethod
     def from_pb(cls, database_pb, instance, pool=None):
-        """Creates an instance of this class from a protobuf.
+        u"""Creates an instance of this class from a protobuf.
 
         :type database_pb:
             :class:`~google.cloud.spanner_admin_instance_v1.Instance`
@@ -140,27 +142,27 @@ class Database(object):
         match = _DATABASE_NAME_RE.match(database_pb.name)
         if match is None:
             raise ValueError(
-                "Database protobuf name was not in the " "expected format.",
+                u"Database protobuf name was not in the " u"expected format.",
                 database_pb.name,
             )
-        if match.group("project") != instance._client.project:
+        if match.group(u"project") != instance._client.project:
             raise ValueError(
-                "Project ID on database does not match the "
-                "project ID on the instance's client"
+                u"Project ID on database does not match the "
+                u"project ID on the instance's client"
             )
-        instance_id = match.group("instance_id")
+        instance_id = match.group(u"instance_id")
         if instance_id != instance.instance_id:
             raise ValueError(
-                "Instance ID on database does not match the "
-                "Instance ID on the instance"
+                u"Instance ID on database does not match the "
+                u"Instance ID on the instance"
             )
-        database_id = match.group("database_id")
+        database_id = match.group(u"database_id")
 
         return cls(database_id, instance, pool=pool)
 
     @property
     def name(self):
-        """Database name used in requests.
+        u"""Database name used in requests.
 
         .. note::
 
@@ -174,11 +176,11 @@ class Database(object):
         :rtype: str
         :returns: The database name.
         """
-        return self._instance.name + "/databases/" + self.database_id
+        return self._instance.name + u"/databases/" + self.database_id
 
     @property
     def state(self):
-        """State of this database.
+        u"""State of this database.
 
         :rtype: :class:`~google.cloud.spanner_admin_database_v1.Database.State`
         :returns: an enum describing the state of the database
@@ -187,7 +189,7 @@ class Database(object):
 
     @property
     def create_time(self):
-        """Create time of this database.
+        u"""Create time of this database.
 
         :rtype: :class:`datetime.datetime`
         :returns: a datetime object representing the create time of
@@ -197,7 +199,7 @@ class Database(object):
 
     @property
     def restore_info(self):
-        """Restore info for this database.
+        u"""Restore info for this database.
 
         :rtype: :class:`~google.cloud.spanner_v1.database.RestoreInfo`
         :returns: an object representing the restore info for this database
@@ -206,7 +208,7 @@ class Database(object):
 
     @property
     def ddl_statements(self):
-        """DDL Statements used to define database schema.
+        u"""DDL Statements used to define database schema.
 
         See
         cloud.google.com/spanner/docs/data-definition-language
@@ -218,7 +220,7 @@ class Database(object):
 
     @property
     def spanner_api(self):
-        """Helper for session-related API calls."""
+        u"""Helper for session-related API calls."""
         if self._spanner_api is None:
             client_info = self._instance._client._client_info
             client_options = self._instance._client._client_options
@@ -251,7 +253,7 @@ class Database(object):
         return not self == other
 
     def create(self):
-        """Create this database within its instance
+        u"""Create this database within its instance
 
         Inclues any configured schema assigned to :attr:`ddl_statements`.
 
@@ -266,19 +268,19 @@ class Database(object):
         api = self._instance._client.database_admin_api
         metadata = _metadata_with_prefix(self.name)
         db_name = self.database_id
-        if "-" in db_name:
-            db_name = "`%s`" % (db_name,)
+        if u"-" in db_name:
+            db_name = u"`%s`" % (db_name,)
 
         request = CreateDatabaseRequest(
             parent=self._instance.name,
-            create_statement="CREATE DATABASE %s" % (db_name,),
+            create_statement=u"CREATE DATABASE %s" % (db_name,),
             extra_statements=list(self._ddl_statements),
         )
         future = api.create_database(request=request, metadata=metadata)
         return future
 
     def exists(self):
-        """Test whether this database exists.
+        u"""Test whether this database exists.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.database.v1#google.spanner.admin.database.v1.DatabaseAdmin.GetDatabaseDDL
@@ -296,7 +298,7 @@ class Database(object):
         return True
 
     def reload(self):
-        """Reload this database.
+        u"""Reload this database.
 
         Refresh any configured schema into :attr:`ddl_statements`.
 
@@ -314,8 +316,8 @@ class Database(object):
         self._create_time = response.create_time
         self._restore_info = response.restore_info
 
-    def update_ddl(self, ddl_statements, operation_id=""):
-        """Update DDL for this database.
+    def update_ddl(self, ddl_statements, operation_id=u""):
+        u"""Update DDL for this database.
 
         Apply any configured schema from :attr:`ddl_statements`.
 
@@ -343,7 +345,7 @@ class Database(object):
         return future
 
     def drop(self):
-        """Drop this database.
+        u"""Drop this database.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.database.v1#google.spanner.admin.database.v1.DatabaseAdmin.DropDatabase
@@ -355,7 +357,7 @@ class Database(object):
     def execute_partitioned_dml(
         self, dml, params=None, param_types=None, query_options=None
     ):
-        """Execute a partitionable DML statement.
+        u"""Execute a partitionable DML statement.
 
         :type dml: str
         :param dml: DML statement
@@ -387,7 +389,7 @@ class Database(object):
             from google.cloud.spanner_v1.transaction import Transaction
 
             if param_types is None:
-                raise ValueError("Specify 'param_types' when passing 'params'.")
+                raise ValueError(u"Specify 'param_types' when passing 'params'.")
             params_pb = Transaction._make_params_pb(params, param_types)
         else:
             params_pb = {}
@@ -431,7 +433,7 @@ class Database(object):
         return _retry_on_aborted(execute_pdml, DEFAULT_RETRY_BACKOFF)()
 
     def session(self, labels=None):
-        """Factory to create a session for this database.
+        u"""Factory to create a session for this database.
 
         :type labels: dict (str -> str) or None
         :param labels: (Optional) user-assigned labels for the session.
@@ -442,7 +444,7 @@ class Database(object):
         return Session(self, labels=labels)
 
     def snapshot(self, **kw):
-        """Return an object which wraps a snapshot.
+        u"""Return an object which wraps a snapshot.
 
         The wrapper *must* be used as a context manager, with the snapshot
         as the value returned by the wrapper.
@@ -461,7 +463,7 @@ class Database(object):
         return SnapshotCheckout(self, **kw)
 
     def batch(self):
-        """Return an object which wraps a batch.
+        u"""Return an object which wraps a batch.
 
         The wrapper *must* be used as a context manager, with the batch
         as the value returned by the wrapper.
@@ -472,7 +474,7 @@ class Database(object):
         return BatchCheckout(self)
 
     def batch_snapshot(self, read_timestamp=None, exact_staleness=None):
-        """Return an object which wraps a batch read / query.
+        u"""Return an object which wraps a batch read / query.
 
         :type read_timestamp: :class:`datetime.datetime`
         :param read_timestamp: Execute all reads at the given timestamp.
@@ -489,7 +491,7 @@ class Database(object):
         )
 
     def run_in_transaction(self, func, *args, **kw):
-        """Perform a unit of work in a transaction, retrying on abort.
+        u"""Perform a unit of work in a transaction, retrying on abort.
 
         :type func: callable
         :param func: takes a required positional argument, the transaction,
@@ -514,8 +516,8 @@ class Database(object):
         # Sanity check: Is there a transaction already running?
         # If there is, then raise a red flag. Otherwise, mark that this one
         # is running.
-        if getattr(self._local, "transaction_running", False):
-            raise RuntimeError("Spanner does not support nested transactions.")
+        if getattr(self._local, u"transaction_running", False):
+            raise RuntimeError(u"Spanner does not support nested transactions.")
         self._local.transaction_running = True
 
         # Check out a session and run the function in a transaction; once
@@ -527,7 +529,7 @@ class Database(object):
             self._local.transaction_running = False
 
     def restore(self, source):
-        """Restore from a backup to this database.
+        u"""Restore from a backup to this database.
 
         :type backup: :class:`~google.cloud.spanner_v1.backup.Backup`
         :param backup: the path of the backup being restored from.
@@ -541,7 +543,7 @@ class Database(object):
         :raises ValueError: if backup is not set
         """
         if source is None:
-            raise ValueError("Restore source not specified")
+            raise ValueError(u"Restore source not specified")
         api = self._instance._client.database_admin_api
         metadata = _metadata_with_prefix(self.name)
         future = api.restore_database(
@@ -553,7 +555,7 @@ class Database(object):
         return future
 
     def is_ready(self):
-        """Test whether this database is ready for use.
+        u"""Test whether this database is ready for use.
 
         :rtype: bool
         :returns: True if the database state is READY_OPTIMIZING or READY, else False.
@@ -564,15 +566,15 @@ class Database(object):
         )
 
     def is_optimized(self):
-        """Test whether this database has finished optimizing.
+        u"""Test whether this database has finished optimizing.
 
         :rtype: bool
         :returns: True if the database state is READY, else False.
         """
         return self.state == DatabasePB.State.READY
 
-    def list_database_operations(self, filter_="", page_size=None):
-        """List database operations for the database.
+    def list_database_operations(self, filter_=u"", page_size=None):
+        u"""List database operations for the database.
 
         :type filter_: str
         :param filter_:
@@ -591,14 +593,14 @@ class Database(object):
         """
         database_filter = _DATABASE_METADATA_FILTER.format(self.name)
         if filter_:
-            database_filter = "({0}) AND ({1})".format(filter_, database_filter)
+            database_filter = u"({0}) AND ({1})".format(filter_, database_filter)
         return self._instance.list_database_operations(
             filter_=database_filter, page_size=page_size
         )
 
 
 class BatchCheckout(object):
-    """Context manager for using a batch from a database.
+    u"""Context manager for using a batch from a database.
 
     Inside the context manager, checks out a session from the database,
     creates a batch from it, making the batch available.
@@ -615,13 +617,13 @@ class BatchCheckout(object):
         self._session = self._batch = None
 
     def __enter__(self):
-        """Begin ``with`` block."""
+        u"""Begin ``with`` block."""
         session = self._session = self._database._pool.get()
         batch = self._batch = Batch(session)
         return batch
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """End ``with`` block."""
+        u"""End ``with`` block."""
         try:
             if exc_type is None:
                 self._batch.commit()
@@ -630,7 +632,7 @@ class BatchCheckout(object):
 
 
 class SnapshotCheckout(object):
-    """Context manager for using a snapshot from a database.
+    u"""Context manager for using a snapshot from a database.
 
     Inside the context manager, checks out a session from the database,
     creates a snapshot from it, making the snapshot available.
@@ -653,17 +655,17 @@ class SnapshotCheckout(object):
         self._kw = kw
 
     def __enter__(self):
-        """Begin ``with`` block."""
+        u"""Begin ``with`` block."""
         session = self._session = self._database._pool.get()
         return Snapshot(session, **self._kw)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """End ``with`` block."""
+        u"""End ``with`` block."""
         self._database._pool.put(self._session)
 
 
 class BatchSnapshot(object):
-    """Wrapper for generating and processing read / query batches.
+    u"""Wrapper for generating and processing read / query batches.
 
     :type database: :class:`~google.cloud.spanner_v1.database.Database`
     :param database: database to use
@@ -685,7 +687,7 @@ class BatchSnapshot(object):
 
     @classmethod
     def from_dict(cls, database, mapping):
-        """Reconstruct an instance from a mapping.
+        u"""Reconstruct an instance from a mapping.
 
         :type database: :class:`~google.cloud.spanner_v1.database.Database`
         :param database: database to use
@@ -697,13 +699,13 @@ class BatchSnapshot(object):
         """
         instance = cls(database)
         session = instance._session = database.session()
-        session._session_id = mapping["session_id"]
+        session._session_id = mapping[u"session_id"]
         snapshot = instance._snapshot = session.snapshot()
-        snapshot._transaction_id = mapping["transaction_id"]
+        snapshot._transaction_id = mapping[u"transaction_id"]
         return instance
 
     def to_dict(self):
-        """Return state as a dictionary.
+        u"""Return state as a dictionary.
 
         Result can be used to serialize the instance and reconstitute
         it later using :meth:`from_dict`.
@@ -713,12 +715,12 @@ class BatchSnapshot(object):
         session = self._get_session()
         snapshot = self._get_snapshot()
         return {
-            "session_id": session._session_id,
-            "transaction_id": snapshot._transaction_id,
+            u"session_id": session._session_id,
+            u"transaction_id": snapshot._transaction_id,
         }
 
     def _get_session(self):
-        """Create session as needed.
+        u"""Create session as needed.
 
         .. note::
 
@@ -731,7 +733,7 @@ class BatchSnapshot(object):
         return self._session
 
     def _get_snapshot(self):
-        """Create snapshot if needed."""
+        u"""Create snapshot if needed."""
         if self._snapshot is None:
             self._snapshot = self._get_session().snapshot(
                 read_timestamp=self._read_timestamp,
@@ -742,14 +744,14 @@ class BatchSnapshot(object):
         return self._snapshot
 
     def read(self, *args, **kw):
-        """Convenience method:  perform read operation via snapshot.
+        u"""Convenience method:  perform read operation via snapshot.
 
         See :meth:`~google.cloud.spanner_v1.snapshot.Snapshot.read`.
         """
         return self._get_snapshot().read(*args, **kw)
 
     def execute_sql(self, *args, **kw):
-        """Convenience method:  perform query operation via snapshot.
+        u"""Convenience method:  perform query operation via snapshot.
 
         See :meth:`~google.cloud.spanner_v1.snapshot.Snapshot.execute_sql`.
         """
@@ -760,11 +762,11 @@ class BatchSnapshot(object):
         table,
         columns,
         keyset,
-        index="",
+        index=u"",
         partition_size_bytes=None,
         max_partitions=None,
     ):
-        """Start a partitioned batch read operation.
+        u"""Start a partitioned batch read operation.
 
         Uses the ``PartitionRead`` API request to initiate the partitioned
         read.  Returns a list of batch information needed to perform the
@@ -809,16 +811,16 @@ class BatchSnapshot(object):
         )
 
         read_info = {
-            "table": table,
-            "columns": columns,
-            "keyset": keyset._to_dict(),
-            "index": index,
+            u"table": table,
+            u"columns": columns,
+            u"keyset": keyset._to_dict(),
+            u"index": index,
         }
         for partition in partitions:
-            yield {"partition": partition, "read": read_info.copy()}
+            yield {u"partition": partition, u"read": read_info.copy()}
 
     def process_read_batch(self, batch):
-        """Process a single, partitioned read.
+        u"""Process a single, partitioned read.
 
         :type batch: mapping
         :param batch:
@@ -828,10 +830,10 @@ class BatchSnapshot(object):
         :rtype: :class:`~google.cloud.spanner_v1.streamed.StreamedResultSet`
         :returns: a result set instance which can be used to consume rows.
         """
-        kwargs = copy.deepcopy(batch["read"])
-        keyset_dict = kwargs.pop("keyset")
-        kwargs["keyset"] = KeySet._from_dict(keyset_dict)
-        return self._get_snapshot().read(partition=batch["partition"], **kwargs)
+        kwargs = copy.deepcopy(batch[u"read"])
+        keyset_dict = kwargs.pop(u"keyset")
+        kwargs[u"keyset"] = KeySet._from_dict(keyset_dict)
+        return self._get_snapshot().read(partition=batch[u"partition"], **kwargs)
 
     def generate_query_batches(
         self,
@@ -842,7 +844,7 @@ class BatchSnapshot(object):
         max_partitions=None,
         query_options=None,
     ):
-        """Start a partitioned query operation.
+        u"""Start a partitioned query operation.
 
         Uses the ``PartitionQuery`` API request to start a partitioned
         query operation.  Returns a list of batch information needed to
@@ -897,23 +899,23 @@ class BatchSnapshot(object):
             max_partitions=max_partitions,
         )
 
-        query_info = {"sql": sql}
+        query_info = {u"sql": sql}
         if params:
-            query_info["params"] = params
-            query_info["param_types"] = param_types
+            query_info[u"params"] = params
+            query_info[u"param_types"] = param_types
 
         # Query-level options have higher precedence than client-level and
         # environment-level options
         default_query_options = self._database._instance._client._query_options
-        query_info["query_options"] = _merge_query_options(
+        query_info[u"query_options"] = _merge_query_options(
             default_query_options, query_options
         )
 
         for partition in partitions:
-            yield {"partition": partition, "query": query_info}
+            yield {u"partition": partition, u"query": query_info}
 
     def process_query_batch(self, batch):
-        """Process a single, partitioned query.
+        u"""Process a single, partitioned query.
 
         :type batch: mapping
         :param batch:
@@ -924,11 +926,11 @@ class BatchSnapshot(object):
         :returns: a result set instance which can be used to consume rows.
         """
         return self._get_snapshot().execute_sql(
-            partition=batch["partition"], **batch["query"]
+            partition=batch[u"partition"], **batch[u"query"]
         )
 
     def process(self, batch):
-        """Process a single, partitioned query or read.
+        u"""Process a single, partitioned query or read.
 
         :type batch: mapping
         :param batch:
@@ -939,14 +941,14 @@ class BatchSnapshot(object):
         :returns: a result set instance which can be used to consume rows.
         :raises ValueError: if batch does not contain either 'read' or 'query'
         """
-        if "query" in batch:
+        if u"query" in batch:
             return self.process_query_batch(batch)
-        if "read" in batch:
+        if u"read" in batch:
             return self.process_read_batch(batch)
-        raise ValueError("Invalid batch")
+        raise ValueError(u"Invalid batch")
 
     def close(self):
-        """Clean up underlying session.
+        u"""Clean up underlying session.
 
         .. note::
 
@@ -960,7 +962,7 @@ class BatchSnapshot(object):
 
 
 def _check_ddl_statements(value):
-    """Validate DDL Statements used to define database schema.
+    u"""Validate DDL Statements used to define database schema.
 
     See
     https://cloud.google.com/spanner/docs/data-definition-language
@@ -975,16 +977,16 @@ def _check_ddl_statements(value):
         a ``CREATE DATABASE`` statement.
     """
     if not all(isinstance(line, six.string_types) for line in value):
-        raise ValueError("Pass a list of strings")
+        raise ValueError(u"Pass a list of strings")
 
-    if any("create database" in line.lower() for line in value):
-        raise ValueError("Do not pass a 'CREATE DATABASE' statement")
+    if any(u"create database" in line.lower() for line in value):
+        raise ValueError(u"Do not pass a 'CREATE DATABASE' statement")
 
     return tuple(value)
 
 
 def _retry_on_aborted(func, retry_config):
-    """Helper for :meth:`Database.execute_partitioned_dml`.
+    u"""Helper for :meth:`Database.execute_partitioned_dml`.
 
     Wrap function in a Retry that will retry on Aborted exceptions
     with the retry config specified.

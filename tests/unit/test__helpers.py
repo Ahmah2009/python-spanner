@@ -13,7 +13,10 @@
 # limitations under the License.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import unittest
+from itertools import izip
 
 
 class Test_merge_query_options(unittest.TestCase):
@@ -30,9 +33,9 @@ class Test_merge_query_options(unittest.TestCase):
     def test_base_dict_and_merge_none(self):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
-        base = {"optimizer_version": "2"}
+        base = {u"optimizer_version": u"2"}
         merge = None
-        expected = ExecuteSqlRequest.QueryOptions(optimizer_version="2")
+        expected = ExecuteSqlRequest.QueryOptions(optimizer_version=u"2")
         result = self._callFUT(base, merge)
         self.assertEqual(result, expected)
 
@@ -48,7 +51,7 @@ class Test_merge_query_options(unittest.TestCase):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
         base = None
-        merge = ExecuteSqlRequest.QueryOptions(optimizer_version="3")
+        merge = ExecuteSqlRequest.QueryOptions(optimizer_version=u"3")
         result = self._callFUT(base, merge)
         self.assertEqual(result, merge)
 
@@ -56,17 +59,17 @@ class Test_merge_query_options(unittest.TestCase):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
         base = None
-        merge = {"optimizer_version": "3"}
-        expected = ExecuteSqlRequest.QueryOptions(optimizer_version="3")
+        merge = {u"optimizer_version": u"3"}
+        expected = ExecuteSqlRequest.QueryOptions(optimizer_version=u"3")
         result = self._callFUT(base, merge)
         self.assertEqual(result, expected)
 
     def test_base_object_merge_dict(self):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
-        base = ExecuteSqlRequest.QueryOptions(optimizer_version="1")
-        merge = {"optimizer_version": "3"}
-        expected = ExecuteSqlRequest.QueryOptions(optimizer_version="3")
+        base = ExecuteSqlRequest.QueryOptions(optimizer_version=u"1")
+        merge = {u"optimizer_version": u"3"}
+        expected = ExecuteSqlRequest.QueryOptions(optimizer_version=u"3")
         result = self._callFUT(base, merge)
         self.assertEqual(result, expected)
 
@@ -79,19 +82,19 @@ class Test_make_value_pb(unittest.TestCase):
 
     def test_w_None(self):
         value_pb = self._callFUT(None)
-        self.assertTrue(value_pb.HasField("null_value"))
+        self.assertTrue(value_pb.HasField(u"null_value"))
 
     def test_w_bytes(self):
         from google.protobuf.struct_pb2 import Value
 
-        BYTES = b"BYTES"
+        BYTES = "BYTES"
         expected = Value(string_value=BYTES)
         value_pb = self._callFUT(BYTES)
         self.assertIsInstance(value_pb, Value)
         self.assertEqual(value_pb, expected)
 
     def test_w_invalid_bytes(self):
-        BYTES = b"\xff\xfe\x03&"
+        BYTES = "\xff\xfe\x03&"
         with self.assertRaises(ValueError):
             self._callFUT(BYTES)
 
@@ -137,7 +140,7 @@ class Test_make_value_pb(unittest.TestCase):
         for int_type in six.integer_types:  # include 'long' on Python 2
             value_pb = self._callFUT(int_type(42))
         self.assertIsInstance(value_pb, Value)
-        self.assertEqual(value_pb.string_value, "42")
+        self.assertEqual(value_pb.string_value, u"42")
 
     def test_w_float(self):
         from google.protobuf.struct_pb2 import Value
@@ -156,23 +159,23 @@ class Test_make_value_pb(unittest.TestCase):
     def test_w_float_nan(self):
         from google.protobuf.struct_pb2 import Value
 
-        value_pb = self._callFUT(float("nan"))
+        value_pb = self._callFUT(float(u"nan"))
         self.assertIsInstance(value_pb, Value)
-        self.assertEqual(value_pb.string_value, "NaN")
+        self.assertEqual(value_pb.string_value, u"NaN")
 
     def test_w_float_neg_inf(self):
         from google.protobuf.struct_pb2 import Value
 
-        value_pb = self._callFUT(float("-inf"))
+        value_pb = self._callFUT(float(u"-inf"))
         self.assertIsInstance(value_pb, Value)
-        self.assertEqual(value_pb.string_value, "-Infinity")
+        self.assertEqual(value_pb.string_value, u"-Infinity")
 
     def test_w_float_pos_inf(self):
         from google.protobuf.struct_pb2 import Value
 
-        value_pb = self._callFUT(float("inf"))
+        value_pb = self._callFUT(float(u"inf"))
         self.assertIsInstance(value_pb, Value)
-        self.assertEqual(value_pb.string_value, "Infinity")
+        self.assertEqual(value_pb.string_value, u"Infinity")
 
     def test_w_date(self):
         import datetime
@@ -219,10 +222,10 @@ class Test_make_value_pb(unittest.TestCase):
         import decimal
         from google.protobuf.struct_pb2 import Value
 
-        value = decimal.Decimal("9999999999999999999999999999.999999999")
+        value = decimal.Decimal(u"9999999999999999999999999999.999999999")
         value_pb = self._callFUT(value)
         self.assertIsInstance(value_pb, Value)
-        self.assertEqual(value_pb.string_value, str(value))
+        self.assertEqual(value_pb.string_value, unicode(value))
 
     def test_w_unknown_type(self):
         with self.assertRaises(ValueError):
@@ -260,7 +263,7 @@ class Test_make_list_value_pb(unittest.TestCase):
         self.assertIsInstance(result, ListValue)
         self.assertEqual(len(result.values), 2)
         self.assertEqual(result.values[0].string_value, VALUE_1)
-        self.assertEqual(result.values[1].string_value, str(VALUE_2))
+        self.assertEqual(result.values[1].string_value, unicode(VALUE_2))
 
 
 class Test_make_list_value_pbs(unittest.TestCase):
@@ -279,10 +282,10 @@ class Test_make_list_value_pbs(unittest.TestCase):
         values = [[0], [1]]
         result = self._callFUT(values=values)
         self.assertEqual(len(result), len(values))
-        for found, expected in zip(result, values):
+        for found, expected in izip(result, values):
             self.assertIsInstance(found, ListValue)
             self.assertEqual(len(found.values), 1)
-            self.assertEqual(found.values[0].string_value, str(expected[0]))
+            self.assertEqual(found.values[0].string_value, unicode(expected[0]))
 
     def test_w_multiple_values(self):
         from google.protobuf.struct_pb2 import ListValue
@@ -290,10 +293,10 @@ class Test_make_list_value_pbs(unittest.TestCase):
         values = [[0, u"A"], [1, u"B"]]
         result = self._callFUT(values=values)
         self.assertEqual(len(result), len(values))
-        for found, expected in zip(result, values):
+        for found, expected in izip(result, values):
             self.assertIsInstance(found, ListValue)
             self.assertEqual(len(found.values), 2)
-            self.assertEqual(found.values[0].string_value, str(expected[0]))
+            self.assertEqual(found.values[0].string_value, unicode(expected[0]))
             self.assertEqual(found.values[1].string_value, expected[1])
 
 
@@ -326,8 +329,8 @@ class Test_parse_value(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         field_type = Type(code=TypeCode.BYTES)
-        value = "Value"
-        expected_value = b"Value"
+        value = u"Value"
+        expected_value = "Value"
 
         self.assertEqual(self._callFUT(value, field_type), expected_value)
 
@@ -345,7 +348,7 @@ class Test_parse_value(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         field_type = Type(code=TypeCode.INT64)
-        value = "12345"
+        value = u"12345"
         expected_value = 12345
 
         self.assertEqual(self._callFUT(value, field_type), expected_value)
@@ -355,7 +358,7 @@ class Test_parse_value(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         field_type = Type(code=TypeCode.FLOAT64)
-        value = "3.14159"
+        value = u"3.14159"
         expected_value = 3.14159
 
         self.assertEqual(self._callFUT(value, field_type), expected_value)
@@ -365,7 +368,7 @@ class Test_parse_value(unittest.TestCase):
         from google.cloud.spanner_v1 import Type
         from google.cloud.spanner_v1 import TypeCode
 
-        value = "2020-09-22"
+        value = u"2020-09-22"
         expected_value = datetime.date(2020, 9, 22)
         field_type = Type(code=TypeCode.DATE)
 
@@ -378,7 +381,7 @@ class Test_parse_value(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         field_type = Type(code=TypeCode.TIMESTAMP)
-        value = "2016-12-20T21:13:47.123456Z"
+        value = u"2016-12-20T21:13:47.123456Z"
         expected_value = datetime_helpers.DatetimeWithNanoseconds(
             2016, 12, 20, 21, 13, 47, microsecond=123456, tzinfo=pytz.UTC
         )
@@ -394,7 +397,7 @@ class Test_parse_value(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         field_type = Type(code=TypeCode.TIMESTAMP)
-        value = "2016-12-20T21:13:47.123456789Z"
+        value = u"2016-12-20T21:13:47.123456789Z"
         expected_value = datetime_helpers.DatetimeWithNanoseconds(
             2016, 12, 20, 21, 13, 47, nanosecond=123456789, tzinfo=pytz.UTC
         )
@@ -421,7 +424,7 @@ class Test_parse_value(unittest.TestCase):
         field_type = Type(
             code=TypeCode.ARRAY, array_element_type=Type(code=TypeCode.INT64)
         )
-        values = ["32", "19", "5"]
+        values = [u"32", u"19", u"5"]
         expected_values = [32, 19, 5]
 
         self.assertEqual(self._callFUT(values, field_type), expected_values)
@@ -433,12 +436,12 @@ class Test_parse_value(unittest.TestCase):
 
         struct_type_pb = StructType(
             fields=[
-                StructType.Field(name="name", type_=Type(code=TypeCode.STRING)),
-                StructType.Field(name="age", type_=Type(code=TypeCode.INT64)),
+                StructType.Field(name=u"name", type_=Type(code=TypeCode.STRING)),
+                StructType.Field(name=u"age", type_=Type(code=TypeCode.INT64)),
             ]
         )
         field_type = Type(code=TypeCode.STRUCT, struct_type=struct_type_pb)
-        values = [u"phred", "32"]
+        values = [u"phred", u"32"]
         expected_values = [u"phred", 32]
 
         self.assertEqual(self._callFUT(values, field_type), expected_values)
@@ -449,8 +452,8 @@ class Test_parse_value(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         field_type = Type(code=TypeCode.NUMERIC)
-        expected_value = decimal.Decimal("99999999999999999999999999999.999999999")
-        value = "99999999999999999999999999999.999999999"
+        expected_value = decimal.Decimal(u"99999999999999999999999999999.999999999")
+        value = u"99999999999999999999999999999.999999999"
 
         self.assertEqual(self._callFUT(value, field_type), expected_value)
 
@@ -497,7 +500,7 @@ class Test_parse_value_pb(unittest.TestCase):
         from google.cloud.spanner_v1 import Type
         from google.cloud.spanner_v1 import TypeCode
 
-        VALUE = b"Value"
+        VALUE = "Value"
         field_type = Type(code=TypeCode.BYTES)
         value_pb = Value(string_value=VALUE)
 
@@ -521,7 +524,7 @@ class Test_parse_value_pb(unittest.TestCase):
 
         VALUE = 12345
         field_type = Type(code=TypeCode.INT64)
-        value_pb = Value(string_value=str(VALUE))
+        value_pb = Value(string_value=unicode(VALUE))
 
         self.assertEqual(self._callFUT(value_pb, field_type), VALUE)
 
@@ -541,7 +544,7 @@ class Test_parse_value_pb(unittest.TestCase):
         from google.cloud.spanner_v1 import Type
         from google.cloud.spanner_v1 import TypeCode
 
-        VALUE = "3.14159"
+        VALUE = u"3.14159"
         field_type = Type(code=TypeCode.FLOAT64)
         value_pb = Value(string_value=VALUE)
         expected_value = 3.14159
@@ -616,7 +619,7 @@ class Test_parse_value_pb(unittest.TestCase):
         )
         VALUES = [32, 19, 5]
         values_pb = ListValue(
-            values=[Value(string_value=str(value)) for value in VALUES]
+            values=[Value(string_value=unicode(value)) for value in VALUES]
         )
         value_pb = Value(list_value=values_pb)
 
@@ -632,8 +635,8 @@ class Test_parse_value_pb(unittest.TestCase):
         VALUES = [u"phred", 32]
         struct_type_pb = StructType(
             fields=[
-                StructType.Field(name="name", type_=Type(code=TypeCode.STRING)),
-                StructType.Field(name="age", type_=Type(code=TypeCode.INT64)),
+                StructType.Field(name=u"name", type_=Type(code=TypeCode.STRING)),
+                StructType.Field(name=u"age", type_=Type(code=TypeCode.INT64)),
             ]
         )
         field_type = Type(code=TypeCode.STRUCT, struct_type=struct_type_pb)
@@ -647,9 +650,9 @@ class Test_parse_value_pb(unittest.TestCase):
         from google.cloud.spanner_v1 import Type
         from google.cloud.spanner_v1 import TypeCode
 
-        VALUE = decimal.Decimal("99999999999999999999999999999.999999999")
+        VALUE = decimal.Decimal(u"99999999999999999999999999999.999999999")
         field_type = Type(code=TypeCode.NUMERIC)
-        value_pb = Value(string_value=str(VALUE))
+        value_pb = Value(string_value=unicode(VALUE))
 
         self.assertEqual(self._callFUT(value_pb, field_type), VALUE)
 
@@ -659,7 +662,7 @@ class Test_parse_value_pb(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         field_type = Type(code=TypeCode.TYPE_CODE_UNSPECIFIED)
-        value_pb = Value(string_value="Borked")
+        value_pb = Value(string_value=u"Borked")
 
         with self.assertRaises(ValueError):
             self._callFUT(value_pb, field_type)
@@ -689,8 +692,8 @@ class Test_parse_list_value_pbs(unittest.TestCase):
 
         struct_type_pb = StructType(
             fields=[
-                StructType.Field(name="name", type_=Type(code=TypeCode.STRING)),
-                StructType.Field(name="age", type_=Type(code=TypeCode.INT64)),
+                StructType.Field(name=u"name", type_=Type(code=TypeCode.STRING)),
+                StructType.Field(name=u"age", type_=Type(code=TypeCode.INT64)),
             ]
         )
 
@@ -705,8 +708,8 @@ class Test_parse_list_value_pbs(unittest.TestCase):
         VALUES = [[u"phred", 32], [u"bharney", 31]]
         struct_type_pb = StructType(
             fields=[
-                StructType.Field(name="name", type_=Type(code=TypeCode.STRING)),
-                StructType.Field(name="age", type_=Type(code=TypeCode.INT64)),
+                StructType.Field(name=u"name", type_=Type(code=TypeCode.STRING)),
+                StructType.Field(name=u"age", type_=Type(code=TypeCode.INT64)),
             ]
         )
         values_pbs = _make_list_value_pbs(VALUES)
@@ -738,6 +741,6 @@ class Test_metadata_with_prefix(unittest.TestCase):
         return _metadata_with_prefix(*args, **kw)
 
     def test(self):
-        prefix = "prefix"
+        prefix = u"prefix"
         metadata = self._call_fut(prefix)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", prefix)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", prefix)])

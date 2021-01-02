@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import abc
 import typing
 import pkg_resources
@@ -36,7 +37,7 @@ from google.protobuf import empty_pb2 as empty  # type: ignore
 try:
     DEFAULT_CLIENT_INFO = gapic_v1.client_info.ClientInfo(
         gapic_version=pkg_resources.get_distribution(
-            "google-cloud-spanner-admin-instance",
+            u"google-cloud-spanner-admin-instance",
         ).version,
     )
 except pkg_resources.DistributionNotFound:
@@ -44,25 +45,30 @@ except pkg_resources.DistributionNotFound:
 
 
 class InstanceAdminTransport(abc.ABC):
-    """Abstract transport class for InstanceAdmin."""
+    u"""Abstract transport class for InstanceAdmin."""
 
     AUTH_SCOPES = (
-        "https://www.googleapis.com/auth/cloud-platform",
-        "https://www.googleapis.com/auth/spanner.admin",
+        u"https://www.googleapis.com/auth/cloud-platform",
+        u"https://www.googleapis.com/auth/spanner.admin",
     )
 
     def __init__(
         self,
-        *,
-        host: str = "spanner.googleapis.com",
-        credentials: credentials.Credentials = None,
-        credentials_file: typing.Optional[str] = None,
-        scopes: typing.Optional[typing.Sequence[str]] = AUTH_SCOPES,
-        quota_project_id: typing.Optional[str] = None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
         **kwargs,
-    ) -> None:
-        """Instantiate the transport.
+    ):
+        if 'client_info' in kwargs: client_info = kwargs['client_info']; del kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'quota_project_id' in kwargs: quota_project_id = kwargs['quota_project_id']; del kwargs['quota_project_id']
+        else: quota_project_id =  None
+        if 'scopes' in kwargs: scopes = kwargs['scopes']; del kwargs['scopes']
+        else: scopes =  AUTH_SCOPES
+        if 'credentials_file' in kwargs: credentials_file = kwargs['credentials_file']; del kwargs['credentials_file']
+        else: credentials_file =  None
+        if 'credentials' in kwargs: credentials = kwargs['credentials']; del kwargs['credentials']
+        else: credentials =  None
+        if 'host' in kwargs: host = kwargs['host']; del kwargs['host']
+        else: host =  u"spanner.googleapis.com"
+        u"""Instantiate the transport.
 
         Args:
             host (Optional[str]): The hostname to connect to.
@@ -84,15 +90,15 @@ class InstanceAdminTransport(abc.ABC):
                 your own client library.
         """
         # Save the hostname. Default to port 443 (HTTPS) if none is specified.
-        if ":" not in host:
-            host += ":443"
+        if u":" not in host:
+            host += u":443"
         self._host = host
 
         # If no credentials are provided, then determine the appropriate
         # defaults.
         if credentials and credentials_file:
             raise exceptions.DuplicateCredentialArgs(
-                "'credentials_file' and 'credentials' are mutually exclusive"
+                u"'credentials_file' and 'credentials' are mutually exclusive"
             )
 
         if credentials_file is not None:
@@ -209,114 +215,69 @@ class InstanceAdminTransport(abc.ABC):
         }
 
     @property
-    def operations_client(self) -> operations_v1.OperationsClient:
-        """Return the client designed to process long-running operations."""
+    def operations_client(self):
+        u"""Return the client designed to process long-running operations."""
         raise NotImplementedError()
 
     @property
     def list_instance_configs(
         self,
-    ) -> typing.Callable[
-        [spanner_instance_admin.ListInstanceConfigsRequest],
-        typing.Union[
-            spanner_instance_admin.ListInstanceConfigsResponse,
-            typing.Awaitable[spanner_instance_admin.ListInstanceConfigsResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def get_instance_config(
         self,
-    ) -> typing.Callable[
-        [spanner_instance_admin.GetInstanceConfigRequest],
-        typing.Union[
-            spanner_instance_admin.InstanceConfig,
-            typing.Awaitable[spanner_instance_admin.InstanceConfig],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def list_instances(
         self,
-    ) -> typing.Callable[
-        [spanner_instance_admin.ListInstancesRequest],
-        typing.Union[
-            spanner_instance_admin.ListInstancesResponse,
-            typing.Awaitable[spanner_instance_admin.ListInstancesResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def get_instance(
         self,
-    ) -> typing.Callable[
-        [spanner_instance_admin.GetInstanceRequest],
-        typing.Union[
-            spanner_instance_admin.Instance,
-            typing.Awaitable[spanner_instance_admin.Instance],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def create_instance(
         self,
-    ) -> typing.Callable[
-        [spanner_instance_admin.CreateInstanceRequest],
-        typing.Union[operations.Operation, typing.Awaitable[operations.Operation]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def update_instance(
         self,
-    ) -> typing.Callable[
-        [spanner_instance_admin.UpdateInstanceRequest],
-        typing.Union[operations.Operation, typing.Awaitable[operations.Operation]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def delete_instance(
         self,
-    ) -> typing.Callable[
-        [spanner_instance_admin.DeleteInstanceRequest],
-        typing.Union[empty.Empty, typing.Awaitable[empty.Empty]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def set_iam_policy(
         self,
-    ) -> typing.Callable[
-        [iam_policy.SetIamPolicyRequest],
-        typing.Union[policy.Policy, typing.Awaitable[policy.Policy]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def get_iam_policy(
         self,
-    ) -> typing.Callable[
-        [iam_policy.GetIamPolicyRequest],
-        typing.Union[policy.Policy, typing.Awaitable[policy.Policy]],
-    ]:
+    ):
         raise NotImplementedError()
 
     @property
     def test_iam_permissions(
         self,
-    ) -> typing.Callable[
-        [iam_policy.TestIamPermissionsRequest],
-        typing.Union[
-            iam_policy.TestIamPermissionsResponse,
-            typing.Awaitable[iam_policy.TestIamPermissionsResponse],
-        ],
-    ]:
+    ):
         raise NotImplementedError()
 
 
-__all__ = ("InstanceAdminTransport",)
+__all__ = (u"InstanceAdminTransport",)

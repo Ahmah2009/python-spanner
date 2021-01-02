@@ -15,19 +15,23 @@
 # limitations under the License.
 #
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import argparse
 import os
 import libcst as cst
 import pathlib
 import sys
 from typing import (Any, Callable, Dict, List, Sequence, Tuple)
+from itertools import izip
+from io import open
 
 
 def partition(
-    predicate: Callable[[Any], bool],
-    iterator: Sequence[Any]
-) -> Tuple[List[Any], List[Any]]:
-    """A stable, out-of-place partition."""
+    predicate,
+    iterator
+):
+    u"""A stable, out-of-place partition."""
     results = ([], [])
 
     for i in iterator:
@@ -38,27 +42,27 @@ def partition(
 
 
 class spannerCallTransformer(cst.CSTTransformer):
-    CTRL_PARAMS: Tuple[str] = ('retry', 'timeout', 'metadata')
-    METHOD_TO_PARAMS: Dict[str, Tuple[str]] = {
-    'batch_create_sessions': ('database', 'session_count', 'session_template', ),
-    'begin_transaction': ('session', 'options', ),
-    'commit': ('session', 'transaction_id', 'single_use_transaction', 'mutations', ),
-    'create_session': ('database', 'session', ),
-    'delete_session': ('name', ),
-    'execute_batch_dml': ('session', 'transaction', 'statements', 'seqno', ),
-    'execute_sql': ('session', 'sql', 'transaction', 'params', 'param_types', 'resume_token', 'query_mode', 'partition_token', 'seqno', 'query_options', ),
-    'execute_streaming_sql': ('session', 'sql', 'transaction', 'params', 'param_types', 'resume_token', 'query_mode', 'partition_token', 'seqno', 'query_options', ),
-    'get_session': ('name', ),
-    'list_sessions': ('database', 'page_size', 'page_token', 'filter', ),
-    'partition_query': ('session', 'sql', 'transaction', 'params', 'param_types', 'partition_options', ),
-    'partition_read': ('session', 'table', 'key_set', 'transaction', 'index', 'columns', 'partition_options', ),
-    'read': ('session', 'table', 'columns', 'key_set', 'transaction', 'index', 'limit', 'resume_token', 'partition_token', ),
-    'rollback': ('session', 'transaction_id', ),
-    'streaming_read': ('session', 'table', 'columns', 'key_set', 'transaction', 'index', 'limit', 'resume_token', 'partition_token', ),
+    CTRL_PARAMS: Tuple[unicode] = (u'retry', u'timeout', u'metadata')
+    METHOD_TO_PARAMS: Dict[unicode, Tuple[unicode]] = {
+    u'batch_create_sessions': (u'database', u'session_count', u'session_template', ),
+    u'begin_transaction': (u'session', u'options', ),
+    u'commit': (u'session', u'transaction_id', u'single_use_transaction', u'mutations', ),
+    u'create_session': (u'database', u'session', ),
+    u'delete_session': (u'name', ),
+    u'execute_batch_dml': (u'session', u'transaction', u'statements', u'seqno', ),
+    u'execute_sql': (u'session', u'sql', u'transaction', u'params', u'param_types', u'resume_token', u'query_mode', u'partition_token', u'seqno', u'query_options', ),
+    u'execute_streaming_sql': (u'session', u'sql', u'transaction', u'params', u'param_types', u'resume_token', u'query_mode', u'partition_token', u'seqno', u'query_options', ),
+    u'get_session': (u'name', ),
+    u'list_sessions': (u'database', u'page_size', u'page_token', u'filter', ),
+    u'partition_query': (u'session', u'sql', u'transaction', u'params', u'param_types', u'partition_options', ),
+    u'partition_read': (u'session', u'table', u'key_set', u'transaction', u'index', u'columns', u'partition_options', ),
+    u'read': (u'session', u'table', u'columns', u'key_set', u'transaction', u'index', u'limit', u'resume_token', u'partition_token', ),
+    u'rollback': (u'session', u'transaction_id', ),
+    u'streaming_read': (u'session', u'table', u'columns', u'key_set', u'transaction', u'index', u'limit', u'resume_token', u'partition_token', ),
 
     }
 
-    def leave_Call(self, original: cst.Call, updated: cst.Call) -> cst.CSTNode:
+    def leave_Call(self, original, updated):
         try:
             key = original.func.attr.value
             kword_params = self.METHOD_TO_PARAMS[key]
@@ -69,7 +73,7 @@ class spannerCallTransformer(cst.CSTTransformer):
         # If the existing code is valid, keyword args come after positional args.
         # Therefore, all positional args must map to the first parameters.
         args, kwargs = partition(lambda a: not bool(a.keyword), updated.args)
-        if any(k.keyword.value == "request" for k in kwargs):
+        if any(k.keyword.value == u"request" for k in kwargs):
             # We've already fixed this file, don't fix it again.
             return updated
 
@@ -80,19 +84,19 @@ class spannerCallTransformer(cst.CSTTransformer):
 
         args, ctrl_args = args[:len(kword_params)], args[len(kword_params):]
         ctrl_kwargs.extend(cst.Arg(value=a.value, keyword=cst.Name(value=ctrl))
-                           for a, ctrl in zip(ctrl_args, self.CTRL_PARAMS))
+                           for a, ctrl in izip(ctrl_args, self.CTRL_PARAMS))
 
         request_arg = cst.Arg(
             value=cst.Dict([
                 cst.DictElement(
-                    cst.SimpleString("'{}'".format(name)),
+                    cst.SimpleString(u"'{}'".format(name)),
                     cst.Element(value=arg.value)
                 )
                 # Note: the args + kwargs looks silly, but keep in mind that
                 # the control parameters had to be stripped out, and that
                 # those could have been passed positionally or by keyword.
-                for name, arg in zip(kword_params, args + kwargs)]),
-            keyword=cst.Name("request")
+                for name, arg in izip(kword_params, args + kwargs)]),
+            keyword=cst.Name(u"request")
         )
 
         return updated.with_changes(
@@ -101,12 +105,12 @@ class spannerCallTransformer(cst.CSTTransformer):
 
 
 def fix_files(
-    in_dir: pathlib.Path,
-    out_dir: pathlib.Path,
-    *,
-    transformer=spannerCallTransformer(),
+    in_dir,
+    out_dir, **_3to2kwargs
 ):
-    """Duplicate the input dir to the output dir, fixing file method calls.
+    if 'transformer' in _3to2kwargs: transformer = _3to2kwargs['transformer']; del _3to2kwargs['transformer']
+    else: transformer = spannerCallTransformer()
+    u"""Duplicate the input dir to the output dir, fixing file method calls.
 
     Preconditions:
     * in_dir is a real directory
@@ -115,11 +119,11 @@ def fix_files(
     pyfile_gen = (
         pathlib.Path(os.path.join(root, f))
         for root, _, files in os.walk(in_dir)
-        for f in files if os.path.splitext(f)[1] == ".py"
+        for f in files if os.path.splitext(f)[1] == u".py"
     )
 
     for fpath in pyfile_gen:
-        with open(fpath, 'r') as f:
+        with open(fpath, u'r') as f:
             src = f.read()
 
         # Parse the code and insert method call fixes.
@@ -131,13 +135,13 @@ def fix_files(
         updated_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Generate the updated source file at the corresponding path.
-        with open(updated_path, 'w') as f:
+        with open(updated_path, u'w') as f:
             f.write(updated.code)
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     parser = argparse.ArgumentParser(
-        description="""Fix up source that uses the spanner client library.
+        description=u"""Fix up source that uses the spanner client library.
 
 The existing sources are NOT overwritten but are copied to output_dir with changes made.
 
@@ -152,41 +156,32 @@ Note: This tool operates at a best-effort level at converting positional
       positives when an API method shares a name with another method.
 """)
     parser.add_argument(
-        '-d',
-        '--input-directory',
+        u'-d',
+        u'--input-directory',
         required=True,
-        dest='input_dir',
-        help='the input directory to walk for python files to fix up',
+        dest=u'input_dir',
+        help=u'the input directory to walk for python files to fix up',
     )
     parser.add_argument(
-        '-o',
-        '--output-directory',
+        u'-o',
+        u'--output-directory',
         required=True,
-        dest='output_dir',
-        help='the directory to output files fixed via un-flattening',
+        dest=u'output_dir',
+        help=u'the directory to output files fixed via un-flattening',
     )
     args = parser.parse_args()
     input_dir = pathlib.Path(args.input_dir)
     output_dir = pathlib.Path(args.output_dir)
     if not input_dir.is_dir():
-        print(
-            f"input directory '{input_dir}' does not exist or is not a directory",
-            file=sys.stderr,
-        )
+        print >>sys.stderr, f"input directory '{input_dir}' does not exist or is not a directory"
         sys.exit(-1)
 
     if not output_dir.is_dir():
-        print(
-            f"output directory '{output_dir}' does not exist or is not a directory",
-            file=sys.stderr,
-        )
+        print >>sys.stderr, f"output directory '{output_dir}' does not exist or is not a directory"
         sys.exit(-1)
 
     if os.listdir(output_dir):
-        print(
-            f"output directory '{output_dir}' is not empty",
-            file=sys.stderr,
-        )
+        print >>sys.stderr, f"output directory '{output_dir}' is not empty"
         sys.exit(-1)
 
     fix_files(input_dir, output_dir)

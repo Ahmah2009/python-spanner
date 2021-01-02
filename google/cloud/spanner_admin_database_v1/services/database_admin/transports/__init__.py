@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from collections import OrderedDict
 from typing import Dict, Type
 
@@ -25,12 +26,12 @@ from .grpc_asyncio import DatabaseAdminGrpcAsyncIOTransport
 
 # Compile a registry of transports.
 _transport_registry = OrderedDict()  # type: Dict[str, Type[DatabaseAdminTransport]]
-_transport_registry["grpc"] = DatabaseAdminGrpcTransport
-_transport_registry["grpc_asyncio"] = DatabaseAdminGrpcAsyncIOTransport
+_transport_registry[u"grpc"] = DatabaseAdminGrpcTransport
+_transport_registry[u"grpc_asyncio"] = DatabaseAdminGrpcAsyncIOTransport
 
 
 __all__ = (
-    "DatabaseAdminTransport",
-    "DatabaseAdminGrpcTransport",
-    "DatabaseAdminGrpcAsyncIOTransport",
+    u"DatabaseAdminTransport",
+    u"DatabaseAdminGrpcTransport",
+    u"DatabaseAdminGrpcAsyncIOTransport",
 )

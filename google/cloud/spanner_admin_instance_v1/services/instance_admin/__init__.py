@@ -15,10 +15,11 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from .client import InstanceAdminClient
 from .async_client import InstanceAdminAsyncClient
 
 __all__ = (
-    "InstanceAdminClient",
-    "InstanceAdminAsyncClient",
+    u"InstanceAdminClient",
+    u"InstanceAdminAsyncClient",
 )

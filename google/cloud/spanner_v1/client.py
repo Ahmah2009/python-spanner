@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Parent client for calling the Cloud Spanner API.
+u"""Parent client for calling the Cloud Spanner API.
 
 This is the base from which all interactions with the API occur.
 
@@ -23,6 +23,7 @@ In the hierarchy of API concepts
 * a :class:`~google.cloud.spanner_v1.instance.Instance` owns a
   :class:`~google.cloud.spanner_v1.database.Database`
 """
+from __future__ import absolute_import
 import grpc
 import os
 import warnings
@@ -56,14 +57,14 @@ from google.cloud.spanner_admin_instance_v1 import ListInstanceConfigsRequest
 from google.cloud.spanner_admin_instance_v1 import ListInstancesRequest
 
 _CLIENT_INFO = client_info.ClientInfo(client_library_version=__version__)
-EMULATOR_ENV_VAR = "SPANNER_EMULATOR_HOST"
+EMULATOR_ENV_VAR = u"SPANNER_EMULATOR_HOST"
 _EMULATOR_HOST_HTTP_SCHEME = (
-    "%s contains a http scheme. When used with a scheme it may cause gRPC's "
-    "DNS resolver to endlessly attempt to resolve. %s is intended to be used "
-    "without a scheme: ex %s=localhost:8080."
+    u"%s contains a http scheme. When used with a scheme it may cause gRPC's "
+    u"DNS resolver to endlessly attempt to resolve. %s is intended to be used "
+    u"without a scheme: ex %s=localhost:8080."
 ) % ((EMULATOR_ENV_VAR,) * 3)
-SPANNER_ADMIN_SCOPE = "https://www.googleapis.com/auth/spanner.admin"
-OPTIMIZER_VERSION_ENV_VAR = "SPANNER_OPTIMIZER_VERSION"
+SPANNER_ADMIN_SCOPE = u"https://www.googleapis.com/auth/spanner.admin"
+OPTIMIZER_VERSION_ENV_VAR = u"SPANNER_OPTIMIZER_VERSION"
 
 
 def _get_spanner_emulator_host():
@@ -71,11 +72,11 @@ def _get_spanner_emulator_host():
 
 
 def _get_spanner_optimizer_version():
-    return os.getenv(OPTIMIZER_VERSION_ENV_VAR, "")
+    return os.getenv(OPTIMIZER_VERSION_ENV_VAR, u"")
 
 
 class Client(ClientWithProject):
-    """Client for interacting with Cloud Spanner API.
+    u"""Client for interacting with Cloud Spanner API.
 
     .. note::
 
@@ -124,7 +125,7 @@ class Client(ClientWithProject):
     _SET_PROJECT = True  # Used by from_service_account_json()
 
     SCOPE = (SPANNER_ADMIN_SCOPE,)
-    """The scopes required for Google Cloud Spanner."""
+    u"""The scopes required for Google Cloud Spanner."""
 
     def __init__(
         self,
@@ -167,13 +168,13 @@ class Client(ClientWithProject):
         self._query_options = _merge_query_options(query_options, env_query_options)
 
         if self._emulator_host is not None and (
-            "http://" in self._emulator_host or "https://" in self._emulator_host
+            u"http://" in self._emulator_host or u"https://" in self._emulator_host
         ):
             warnings.warn(_EMULATOR_HOST_HTTP_SCHEME)
 
     @property
     def credentials(self):
-        """Getter for client's credentials.
+        u"""Getter for client's credentials.
 
         :rtype:
             :class:`Credentials <google.auth.credentials.Credentials>`
@@ -183,7 +184,7 @@ class Client(ClientWithProject):
 
     @property
     def project_name(self):
-        """Project name to be used with Spanner APIs.
+        u"""Project name to be used with Spanner APIs.
 
         .. note::
 
@@ -198,11 +199,11 @@ class Client(ClientWithProject):
         :returns: The project name to be used with the Cloud Spanner Admin
                   API RPC service.
         """
-        return "projects/" + self.project
+        return u"projects/" + self.project
 
     @property
     def instance_admin_api(self):
-        """Helper for session-related API calls."""
+        u"""Helper for session-related API calls."""
         if self._instance_admin_api is None:
             if self._emulator_host is not None:
                 transport = InstanceAdminGrpcTransport(
@@ -223,7 +224,7 @@ class Client(ClientWithProject):
 
     @property
     def database_admin_api(self):
-        """Helper for session-related API calls."""
+        u"""Helper for session-related API calls."""
         if self._database_admin_api is None:
             if self._emulator_host is not None:
                 transport = DatabaseAdminGrpcTransport(
@@ -243,7 +244,7 @@ class Client(ClientWithProject):
         return self._database_admin_api
 
     def copy(self):
-        """Make a copy of this client.
+        u"""Make a copy of this client.
 
         Copies the local data stored as simple types but does not copy the
         current state of any open connections with the Cloud Bigtable API.
@@ -254,7 +255,7 @@ class Client(ClientWithProject):
         return self.__class__(project=self.project, credentials=self._credentials)
 
     def list_instance_configs(self, page_size=None):
-        """List available instance configurations for the client's project.
+        u"""List available instance configurations for the client's project.
 
         .. _RPC docs: https://cloud.google.com/spanner/docs/reference/rpc/\
                       google.spanner.admin.instance.v1#google.spanner.admin.\
@@ -290,7 +291,7 @@ class Client(ClientWithProject):
         display_name=None,
         node_count=DEFAULT_NODE_COUNT,
     ):
-        """Factory to create a instance associated with this client.
+        u"""Factory to create a instance associated with this client.
 
         :type instance_id: str
         :param instance_id: The ID of the instance.
@@ -325,8 +326,8 @@ class Client(ClientWithProject):
             self._emulator_host,
         )
 
-    def list_instances(self, filter_="", page_size=None):
-        """List instances for the client's project.
+    def list_instances(self, filter_=u"", page_size=None):
+        u"""List instances for the client's project.
 
         See
         https://cloud.google.com/spanner/reference/rpc/google.spanner.admin.database.v1#google.spanner.admin.database.v1.InstanceAdmin.ListInstances

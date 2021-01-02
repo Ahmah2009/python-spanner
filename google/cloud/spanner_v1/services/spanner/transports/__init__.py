@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from collections import OrderedDict
 from typing import Dict, Type
 
@@ -25,12 +26,12 @@ from .grpc_asyncio import SpannerGrpcAsyncIOTransport
 
 # Compile a registry of transports.
 _transport_registry = OrderedDict()  # type: Dict[str, Type[SpannerTransport]]
-_transport_registry["grpc"] = SpannerGrpcTransport
-_transport_registry["grpc_asyncio"] = SpannerGrpcAsyncIOTransport
+_transport_registry[u"grpc"] = SpannerGrpcTransport
+_transport_registry[u"grpc_asyncio"] = SpannerGrpcAsyncIOTransport
 
 
 __all__ = (
-    "SpannerTransport",
-    "SpannerGrpcTransport",
-    "SpannerGrpcAsyncIOTransport",
+    u"SpannerTransport",
+    u"SpannerGrpcTransport",
+    u"SpannerGrpcAsyncIOTransport",
 )

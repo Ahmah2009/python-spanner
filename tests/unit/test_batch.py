@@ -13,32 +13,35 @@
 # limitations under the License.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import unittest
 from tests._helpers import OpenTelemetryBase, StatusCanonicalCode
+from itertools import izip
 
-TABLE_NAME = "citizens"
-COLUMNS = ["email", "first_name", "last_name", "age"]
+TABLE_NAME = u"citizens"
+COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
 VALUES = [
     [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
     [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
 ]
 BASE_ATTRIBUTES = {
-    "db.type": "spanner",
-    "db.url": "spanner.googleapis.com",
-    "db.instance": "testing",
-    "net.host.name": "spanner.googleapis.com",
+    u"db.type": u"spanner",
+    u"db.url": u"spanner.googleapis.com",
+    u"db.instance": u"testing",
+    u"net.host.name": u"spanner.googleapis.com",
 }
 
 
 class _BaseTest(unittest.TestCase):
 
-    PROJECT_ID = "project-id"
-    INSTANCE_ID = "instance-id"
-    INSTANCE_NAME = "projects/" + PROJECT_ID + "/instances/" + INSTANCE_ID
-    DATABASE_ID = "database-id"
-    DATABASE_NAME = INSTANCE_NAME + "/databases/" + DATABASE_ID
-    SESSION_ID = "session-id"
-    SESSION_NAME = DATABASE_NAME + "/sessions/" + SESSION_ID
+    PROJECT_ID = u"project-id"
+    INSTANCE_ID = u"instance-id"
+    INSTANCE_NAME = u"projects/" + PROJECT_ID + u"/instances/" + INSTANCE_ID
+    DATABASE_ID = u"database-id"
+    DATABASE_NAME = INSTANCE_NAME + u"/databases/" + DATABASE_ID
+    SESSION_ID = u"session-id"
+    SESSION_NAME = DATABASE_NAME + u"/sessions/" + SESSION_ID
 
     def _make_one(self, *args, **kwargs):
         return self._getTargetClass()(*args, **kwargs)
@@ -51,9 +54,9 @@ class Test_BatchBase(_BaseTest):
         return _BatchBase
 
     def _compare_values(self, result, source):
-        for found, expected in zip(result, source):
+        for found, expected in izip(result, source):
             self.assertEqual(len(found), len(expected))
-            for found_cell, expected_cell in zip(found, expected):
+            for found_cell, expected_cell in izip(found, expected):
                 if isinstance(expected_cell, int):
                     self.assertEqual(int(found_cell), expected_cell)
                 else:
@@ -159,7 +162,7 @@ class Test_BatchBase(_BaseTest):
         key_set_pb = delete.key_set
         self.assertEqual(len(key_set_pb.ranges), 0)
         self.assertEqual(len(key_set_pb.keys), len(keys))
-        for found, expected in zip(key_set_pb.keys, keys):
+        for found, expected in izip(key_set_pb.keys, keys):
             self.assertEqual([int(value) for value in found], expected)
 
 
@@ -206,7 +209,7 @@ class TestBatch(_BaseTest, OpenTelemetryBase):
             batch.commit()
 
         self.assertSpanAttributes(
-            "CloudSpanner.Commit",
+            u"CloudSpanner.Commit",
             status=StatusCanonicalCode.UNKNOWN,
             attributes=dict(BASE_ATTRIBUTES, num_mutations=1),
         )
@@ -236,11 +239,11 @@ class TestBatch(_BaseTest, OpenTelemetryBase):
         self.assertEqual(session, self.SESSION_NAME)
         self.assertEqual(mutations, batch._mutations)
         self.assertIsInstance(single_use_txn, TransactionOptions)
-        self.assertTrue(type(single_use_txn).pb(single_use_txn).HasField("read_write"))
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", database.name)])
+        self.assertTrue(type(single_use_txn).pb(single_use_txn).HasField(u"read_write"))
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", database.name)])
 
         self.assertSpanAttributes(
-            "CloudSpanner.Commit", attributes=dict(BASE_ATTRIBUTES, num_mutations=1)
+            u"CloudSpanner.Commit", attributes=dict(BASE_ATTRIBUTES, num_mutations=1)
         )
 
     def test_context_mgr_already_committed(self):
@@ -284,11 +287,11 @@ class TestBatch(_BaseTest, OpenTelemetryBase):
         self.assertEqual(session, self.SESSION_NAME)
         self.assertEqual(mutations, batch._mutations)
         self.assertIsInstance(single_use_txn, TransactionOptions)
-        self.assertTrue(type(single_use_txn).pb(single_use_txn).HasField("read_write"))
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", database.name)])
+        self.assertTrue(type(single_use_txn).pb(single_use_txn).HasField(u"read_write"))
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", database.name)])
 
         self.assertSpanAttributes(
-            "CloudSpanner.Commit", attributes=dict(BASE_ATTRIBUTES, num_mutations=1)
+            u"CloudSpanner.Commit", attributes=dict(BASE_ATTRIBUTES, num_mutations=1)
         )
 
     def test_context_mgr_failure(self):
@@ -325,10 +328,10 @@ class _Session(object):
 
 
 class _Database(object):
-    name = "testing"
+    name = u"testing"
 
 
-class _FauxSpannerAPI:
+class _FauxSpannerAPI(object):
 
     _create_instance_conflict = False
     _instance_not_found = False
@@ -342,14 +345,14 @@ class _FauxSpannerAPI:
         self,
         session,
         mutations,
-        transaction_id="",
+        transaction_id=u"",
         single_use_transaction=None,
         metadata=None,
     ):
         from google.api_core.exceptions import Unknown
 
-        assert transaction_id == ""
+        assert transaction_id == u""
         self._committed = (session, mutations, single_use_transaction, metadata)
         if self._rpc_error:
-            raise Unknown("error")
+            raise Unknown(u"error")
         return self._commit_response

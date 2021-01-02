@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 from google.cloud.spanner_dbapi.parse_utils import get_param_types
 from google.cloud.spanner_dbapi.parse_utils import parse_insert
 from google.cloud.spanner_dbapi.parse_utils import sql_pyformat_args_to_spanner
 from google.cloud.spanner_v1 import param_types
+from itertools import ifilter
 
 
-SQL_LIST_TABLES = """
+SQL_LIST_TABLES = u"""
             SELECT
               t.table_name
             FROM
@@ -27,7 +29,7 @@ SQL_LIST_TABLES = """
               t.table_catalog = '' and t.table_schema = ''
             """
 
-SQL_GET_TABLE_COLUMN_SCHEMA = """SELECT
+SQL_GET_TABLE_COLUMN_SCHEMA = u"""SELECT
                 COLUMN_NAME, IS_NULLABLE, SPANNER_TYPE
             FROM
                 INFORMATION_SCHEMA.COLUMNS
@@ -64,9 +66,9 @@ def _execute_insert_heterogenous(transaction, sql_params_list):
 
 def _execute_insert_homogenous(transaction, parts):
     # Perform an insert in one shot.
-    table = parts.get("table")
-    columns = parts.get("columns")
-    values = parts.get("values")
+    table = parts.get(u"table")
+    columns = parts.get(u"columns")
+    values = parts.get(u"values")
     return transaction.insert(table, columns, values)
 
 
@@ -86,21 +88,21 @@ def handle_insert(connection, sql, params):
     #           transaction.execute_sql(sql, params, param_types)
     # which invokes more RPCs and is more costly.
 
-    if parts.get("homogenous"):
+    if parts.get(u"homogenous"):
         # The common case of multiple values being passed in
         # non-complex pyformat args and need to be uploaded in one RPC.
         return connection.database.run_in_transaction(_execute_insert_homogenous, parts)
     else:
         # All the other cases that are esoteric and need
         #   transaction.execute_sql
-        sql_params_list = parts.get("sql_params_list")
+        sql_params_list = parts.get(u"sql_params_list")
         return connection.database.run_in_transaction(
             _execute_insert_heterogenous, sql_params_list
         )
 
 
-class ColumnInfo:
-    """Row column description object."""
+class ColumnInfo(object):
+    u"""Row column description object."""
 
     def __init__(
         self,
@@ -137,22 +139,22 @@ class ColumnInfo:
         return self.fields[index]
 
     def __str__(self):
-        str_repr = ", ".join(
-            filter(
+        str_repr = u", ".join(
+            ifilter(
                 lambda part: part is not None,
                 [
-                    "name='%s'" % self.name,
-                    "type_code=%d" % self.type_code,
-                    "display_size=%d" % self.display_size
+                    u"name='%s'" % self.name,
+                    u"type_code=%d" % self.type_code,
+                    u"display_size=%d" % self.display_size
                     if self.display_size
                     else None,
-                    "internal_size=%d" % self.internal_size
+                    u"internal_size=%d" % self.internal_size
                     if self.internal_size
                     else None,
-                    "precision='%s'" % self.precision if self.precision else None,
-                    "scale='%s'" % self.scale if self.scale else None,
-                    "null_ok='%s'" % self.null_ok if self.null_ok else None,
+                    u"precision='%s'" % self.precision if self.precision else None,
+                    u"scale='%s'" % self.scale if self.scale else None,
+                    u"null_ok='%s'" % self.null_ok if self.null_ok else None,
                 ],
             )
         )
-        return "ColumnInfo(%s)" % str_repr
+        return u"ColumnInfo(%s)" % str_repr

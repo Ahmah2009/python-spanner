@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Run system tests locally with the emulator.
+u"""Run system tests locally with the emulator.
 
 First makes system calls to spawn the emulator and get the local environment
 variable needed for it. Then calls the system tests.
 """
 
 
+from __future__ import absolute_import
 import argparse
 import os
 import subprocess
@@ -32,38 +33,38 @@ from google.cloud.environment_vars import PUBSUB_EMULATOR
 from run_system_test import run_module_tests
 
 
-BIGTABLE = 'bigtable'
-DATASTORE = 'datastore'
-PUBSUB = 'pubsub'
+BIGTABLE = u'bigtable'
+DATASTORE = u'datastore'
+PUBSUB = u'pubsub'
 PACKAGE_INFO = {
     BIGTABLE: (BIGTABLE_EMULATOR,),
     DATASTORE: (GCD_DATASET, GCD_HOST),
     PUBSUB: (PUBSUB_EMULATOR,),
 }
 EXTRA = {
-    DATASTORE: ('--no-legacy',),
+    DATASTORE: (u'--no-legacy',),
 }
-_DS_READY_LINE = '[datastore] Dev App Server is now running.\n'
-_PS_READY_LINE_PREFIX = '[pubsub] INFO: Server started, listening on '
-_BT_READY_LINE_PREFIX = '[bigtable] Cloud Bigtable emulator running on '
+_DS_READY_LINE = u'[datastore] Dev App Server is now running.\n'
+_PS_READY_LINE_PREFIX = u'[pubsub] INFO: Server started, listening on '
+_BT_READY_LINE_PREFIX = u'[bigtable] Cloud Bigtable emulator running on '
 
 
 def get_parser():
-    """Get simple ``argparse`` parser to determine package.
+    u"""Get simple ``argparse`` parser to determine package.
 
     :rtype: :class:`argparse.ArgumentParser`
     :returns: The parser for this script.
     """
     parser = argparse.ArgumentParser(
-        description='Run google-cloud system tests against local emulator.')
-    parser.add_argument('--package', dest='package',
+        description=u'Run google-cloud system tests against local emulator.')
+    parser.add_argument(u'--package', dest=u'package',
                         choices=sorted(PACKAGE_INFO.keys()),
-                        default=DATASTORE, help='Package to be tested.')
+                        default=DATASTORE, help=u'Package to be tested.')
     return parser
 
 
 def get_start_command(package):
-    """Get command line arguments for starting emulator.
+    u"""Get command line arguments for starting emulator.
 
     :type package: str
     :param package: The package to start an emulator for.
@@ -71,13 +72,13 @@ def get_start_command(package):
     :rtype: tuple
     :returns: The arguments to be used, in a tuple.
     """
-    result = ('gcloud', 'beta', 'emulators', package, 'start')
+    result = (u'gcloud', u'beta', u'emulators', package, u'start')
     extra = EXTRA.get(package, ())
     return result + extra
 
 
 def get_env_init_command(package):
-    """Get command line arguments for getting emulator env. info.
+    u"""Get command line arguments for getting emulator env. info.
 
     :type package: str
     :param package: The package to get environment info for.
@@ -85,13 +86,13 @@ def get_env_init_command(package):
     :rtype: tuple
     :returns: The arguments to be used, in a tuple.
     """
-    result = ('gcloud', 'beta', 'emulators', package, 'env-init')
+    result = (u'gcloud', u'beta', u'emulators', package, u'env-init')
     extra = EXTRA.get(package, ())
     return result + extra
 
 
 def datastore_wait_ready(popen):
-    """Wait until the datastore emulator is ready to use.
+    u"""Wait until the datastore emulator is ready to use.
 
     :type popen: :class:`subprocess.Popen`
     :param popen: An open subprocess to interact with.
@@ -102,7 +103,7 @@ def datastore_wait_ready(popen):
 
 
 def wait_ready_prefix(popen, prefix):
-    """Wait until the a process encounters a line with matching prefix.
+    u"""Wait until the a process encounters a line with matching prefix.
 
     :type popen: :class:`subprocess.Popen`
     :param popen: An open subprocess to interact with.
@@ -116,7 +117,7 @@ def wait_ready_prefix(popen, prefix):
 
 
 def wait_ready(package, popen):
-    """Wait until the emulator is ready to use.
+    u"""Wait until the emulator is ready to use.
 
     :type package: str
     :param package: The package to check if ready.
@@ -134,11 +135,11 @@ def wait_ready(package, popen):
     elif package == BIGTABLE:
         wait_ready_prefix(popen, _BT_READY_LINE_PREFIX)
     else:
-        raise KeyError('Package not supported', package)
+        raise KeyError(u'Package not supported', package)
 
 
 def cleanup(pid):
-    """Cleanup a process (including all of its children).
+    u"""Cleanup a process (including all of its children).
 
     :type pid: int
     :param pid: Process ID.
@@ -155,7 +156,7 @@ def cleanup(pid):
 
 
 def run_tests_in_emulator(package):
-    """Spawn an emulator instance and run the system tests.
+    u"""Spawn an emulator instance and run the system tests.
 
     :type package: str
     :param package: The package to run system tests against.
@@ -175,10 +176,10 @@ def run_tests_in_emulator(package):
         env_status = proc_env.wait()
         if env_status != 0:
             raise RuntimeError(env_status, proc_env.stderr.read())
-        env_lines = proc_env.stdout.read().strip().split('\n')
+        env_lines = proc_env.stdout.read().strip().split(u'\n')
         # Set environment variables before running the system tests.
         for env_var in env_vars:
-            line_prefix = 'export ' + env_var + '='
+            line_prefix = u'export ' + env_var + u'='
             value, = [line.split(line_prefix, 1)[1] for line in env_lines
                       if line.startswith(line_prefix)]
             os.environ[env_var] = value
@@ -189,11 +190,11 @@ def run_tests_in_emulator(package):
 
 
 def main():
-    """Main method to run this script."""
+    u"""Main method to run this script."""
     parser = get_parser()
     args = parser.parse_args()
     run_tests_in_emulator(args.package)
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     main()

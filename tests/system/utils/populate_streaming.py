@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Populate spanner databases with data for streaming system tests."""
+u"""Populate spanner databases with data for streaming system tests."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 from google.cloud.spanner_v1 import Client
 from google.cloud.spanner_v1.keyset import KeySet
 from google.cloud.spanner_v1.pool import BurstyPool
@@ -28,7 +30,7 @@ from streaming_utils import INSTANCE_NAME
 from streaming_utils import print_func
 
 
-DDL = """\
+DDL = u"""\
 CREATE TABLE {0.table} (
     pkey INT64,
     chunk_me STRING({0.value_size}) )
@@ -51,7 +53,7 @@ CREATE TABLE {3.table} (
 )
 
 
-DDL_STATEMENTS = [stmt.strip() for stmt in DDL.split(";") if stmt.strip()]
+DDL_STATEMENTS = [stmt.strip() for stmt in DDL.split(u";") if stmt.strip()]
 
 
 def ensure_database(client):
@@ -60,12 +62,12 @@ def ensure_database(client):
     if not instance.exists():
         configs = list(client.list_instance_configs())
         config_name = configs[0].name
-        print_func("Creating instance: {}".format(INSTANCE_NAME))
+        print_func(u"Creating instance: {}".format(INSTANCE_NAME))
         instance = client.instance(INSTANCE_NAME, config_name)
         operation = instance.create()
         operation.result(30)
     else:
-        print_func("Instance exists: {}".format(INSTANCE_NAME))
+        print_func(u"Instance exists: {}".format(INSTANCE_NAME))
         instance.reload()
 
     pool = BurstyPool()
@@ -74,11 +76,11 @@ def ensure_database(client):
     )
 
     if not database.exists():
-        print_func("Creating database: {}".format(DATABASE_NAME))
+        print_func(u"Creating database: {}".format(DATABASE_NAME))
         operation = database.create()
         operation.result(30)
     else:
-        print_func("Database exists: {}".format(DATABASE_NAME))
+        print_func(u"Database exists: {}".format(DATABASE_NAME))
         database.reload()
 
     return database
@@ -86,44 +88,44 @@ def ensure_database(client):
 
 def populate_table(database, table_desc):
     all_ = KeySet(all_=True)
-    columns = ("pkey", "chunk_me")
+    columns = (u"pkey", u"chunk_me")
     with database.snapshot() as snapshot:
         rows = list(
-            snapshot.execute_sql("SELECT COUNT(*) FROM {}".format(table_desc.table))
+            snapshot.execute_sql(u"SELECT COUNT(*) FROM {}".format(table_desc.table))
         )
     assert len(rows) == 1
     count = rows[0][0]
     if count != table_desc.row_count:
-        print_func("Repopulating table: {}".format(table_desc.table))
+        print_func(u"Repopulating table: {}".format(table_desc.table))
         chunk_me = table_desc.value()
-        row_data = [(index, chunk_me) for index in range(table_desc.row_count)]
+        row_data = [(index, chunk_me) for index in xrange(table_desc.row_count)]
         with database.batch() as batch:
             batch.delete(table_desc.table, all_)
             batch.insert(table_desc.table, columns, row_data)
     else:
-        print_func("Leaving table: {}".format(table_desc.table))
+        print_func(u"Leaving table: {}".format(table_desc.table))
 
 
 def populate_table_2_columns(database, table_desc):
     all_ = KeySet(all_=True)
-    columns = ("pkey", "chunk_me", "chunk_me_2")
+    columns = (u"pkey", u"chunk_me", u"chunk_me_2")
     with database.snapshot() as snapshot:
         rows = list(
-            snapshot.execute_sql("SELECT COUNT(*) FROM {}".format(table_desc.table))
+            snapshot.execute_sql(u"SELECT COUNT(*) FROM {}".format(table_desc.table))
         )
     assert len(rows) == 1
     count = rows[0][0]
     if count != table_desc.row_count:
-        print_func("Repopulating table: {}".format(table_desc.table))
+        print_func(u"Repopulating table: {}".format(table_desc.table))
         chunk_me = table_desc.value()
         row_data = [
-            (index, chunk_me, chunk_me) for index in range(table_desc.row_count)
+            (index, chunk_me, chunk_me) for index in xrange(table_desc.row_count)
         ]
         with database.batch() as batch:
             batch.delete(table_desc.table, all_)
             batch.insert(table_desc.table, columns, row_data)
     else:
-        print_func("Leaving table: {}".format(table_desc.table))
+        print_func(u"Leaving table: {}".format(table_desc.table))
 
 
 def populate_streaming(client):
@@ -135,6 +137,6 @@ def populate_streaming(client):
     populate_table_2_columns(database, FOUR_MEG)
 
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     client = Client()
     populate_streaming(client)

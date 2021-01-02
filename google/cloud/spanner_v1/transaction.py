@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Spanner read-write transaction support."""
+u"""Spanner read-write transaction support."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 from google.protobuf.struct_pb2 import Struct
 
 from google.cloud.spanner_v1._helpers import (
@@ -31,7 +33,7 @@ from google.cloud.spanner_v1._opentelemetry_tracing import trace_call
 
 
 class Transaction(_SnapshotBase, _BatchBase):
-    """Implement read-write transaction semantics for a session.
+    u"""Implement read-write transaction semantics for a session.
 
     :type session: :class:`~google.cloud.spanner_v1.session.Session`
     :param session: the session used to perform the commit
@@ -40,34 +42,34 @@ class Transaction(_SnapshotBase, _BatchBase):
     """
 
     committed = None
-    """Timestamp at which the transaction was successfully committed."""
+    u"""Timestamp at which the transaction was successfully committed."""
     rolled_back = False
     _multi_use = True
     _execute_sql_count = 0
 
     def __init__(self, session):
         if session._transaction is not None:
-            raise ValueError("Session has existing transaction.")
+            raise ValueError(u"Session has existing transaction.")
 
         super(Transaction, self).__init__(session)
 
     def _check_state(self):
-        """Helper for :meth:`commit` et al.
+        u"""Helper for :meth:`commit` et al.
 
         :raises: :exc:`ValueError` if the object's state is invalid for making
                  API requests.
         """
         if self._transaction_id is None:
-            raise ValueError("Transaction is not begun")
+            raise ValueError(u"Transaction is not begun")
 
         if self.committed is not None:
-            raise ValueError("Transaction is already committed")
+            raise ValueError(u"Transaction is already committed")
 
         if self.rolled_back:
-            raise ValueError("Transaction is already rolled back")
+            raise ValueError(u"Transaction is already rolled back")
 
     def _make_txn_selector(self):
-        """Helper for :meth:`read`.
+        u"""Helper for :meth:`read`.
 
         :rtype:
             :class:`~.transaction_pb2.TransactionSelector`
@@ -77,7 +79,7 @@ class Transaction(_SnapshotBase, _BatchBase):
         return TransactionSelector(id=self._transaction_id)
 
     def begin(self):
-        """Begin a transaction on the database.
+        u"""Begin a transaction on the database.
 
         :rtype: bytes
         :returns: the ID for the newly-begun transaction.
@@ -85,19 +87,19 @@ class Transaction(_SnapshotBase, _BatchBase):
             if the transaction is already begun, committed, or rolled back.
         """
         if self._transaction_id is not None:
-            raise ValueError("Transaction already begun")
+            raise ValueError(u"Transaction already begun")
 
         if self.committed is not None:
-            raise ValueError("Transaction already committed")
+            raise ValueError(u"Transaction already committed")
 
         if self.rolled_back:
-            raise ValueError("Transaction is already rolled back")
+            raise ValueError(u"Transaction is already rolled back")
 
         database = self._session._database
         api = database.spanner_api
         metadata = _metadata_with_prefix(database.name)
         txn_options = TransactionOptions(read_write=TransactionOptions.ReadWrite())
-        with trace_call("CloudSpanner.BeginTransaction", self._session):
+        with trace_call(u"CloudSpanner.BeginTransaction", self._session):
             response = api.begin_transaction(
                 session=self._session.name, options=txn_options, metadata=metadata
             )
@@ -105,12 +107,12 @@ class Transaction(_SnapshotBase, _BatchBase):
         return self._transaction_id
 
     def rollback(self):
-        """Roll back a transaction on the database."""
+        u"""Roll back a transaction on the database."""
         self._check_state()
         database = self._session._database
         api = database.spanner_api
         metadata = _metadata_with_prefix(database.name)
-        with trace_call("CloudSpanner.Rollback", self._session):
+        with trace_call(u"CloudSpanner.Rollback", self._session):
             api.rollback(
                 session=self._session.name,
                 transaction_id=self._transaction_id,
@@ -120,7 +122,7 @@ class Transaction(_SnapshotBase, _BatchBase):
         del self._session._transaction
 
     def commit(self):
-        """Commit mutations to the database.
+        u"""Commit mutations to the database.
 
         :rtype: datetime
         :returns: timestamp of the committed changes.
@@ -131,8 +133,8 @@ class Transaction(_SnapshotBase, _BatchBase):
         database = self._session._database
         api = database.spanner_api
         metadata = _metadata_with_prefix(database.name)
-        trace_attributes = {"num_mutations": len(self._mutations)}
-        with trace_call("CloudSpanner.Commit", self._session, trace_attributes):
+        trace_attributes = {u"num_mutations": len(self._mutations)}
+        with trace_call(u"CloudSpanner.Commit", self._session, trace_attributes):
             response = api.commit(
                 session=self._session.name,
                 mutations=self._mutations,
@@ -145,7 +147,7 @@ class Transaction(_SnapshotBase, _BatchBase):
 
     @staticmethod
     def _make_params_pb(params, param_types):
-        """Helper for :meth:`execute_update`.
+        u"""Helper for :meth:`execute_update`.
 
         :type params: dict, {str -> column value}
         :param params: values for parameter replacement.  Keys must match
@@ -165,20 +167,20 @@ class Transaction(_SnapshotBase, _BatchBase):
         """
         if params is not None:
             if param_types is None:
-                raise ValueError("Specify 'param_types' when passing 'params'.")
+                raise ValueError(u"Specify 'param_types' when passing 'params'.")
             return Struct(
-                fields={key: _make_value_pb(value) for key, value in params.items()}
+                fields=dict((key, _make_value_pb(value)) for key, value in params.items())
             )
         else:
             if param_types is not None:
-                raise ValueError("Specify 'params' when passing 'param_types'.")
+                raise ValueError(u"Specify 'params' when passing 'param_types'.")
 
         return {}
 
     def execute_update(
         self, dml, params=None, param_types=None, query_mode=None, query_options=None
     ):
-        """Perform an ``ExecuteSql`` API request with DML.
+        u"""Perform an ``ExecuteSql`` API request with DML.
 
         :type dml: str
         :param dml: SQL DML statement
@@ -222,7 +224,7 @@ class Transaction(_SnapshotBase, _BatchBase):
         default_query_options = database._instance._client._query_options
         query_options = _merge_query_options(default_query_options, query_options)
 
-        trace_attributes = {"db.statement": dml}
+        trace_attributes = {u"db.statement": dml}
         request = ExecuteSqlRequest(
             session=self._session.name,
             sql=dml,
@@ -234,13 +236,13 @@ class Transaction(_SnapshotBase, _BatchBase):
             seqno=seqno,
         )
         with trace_call(
-            "CloudSpanner.ReadWriteTransaction", self._session, trace_attributes
+            u"CloudSpanner.ReadWriteTransaction", self._session, trace_attributes
         ):
             response = api.execute_sql(request=request, metadata=metadata)
         return response.stats.row_count_exact
 
     def batch_update(self, statements):
-        """Perform a batch of DML statements via an ``ExecuteBatchDml`` request.
+        u"""Perform a batch of DML statements via an ``ExecuteBatchDml`` request.
 
         :type statements:
             Sequence[Union[ str, Tuple[str, Dict[str, Any], Dict[str, Union[dict, .types.Type]]]]]
@@ -263,7 +265,7 @@ class Transaction(_SnapshotBase, _BatchBase):
         """
         parsed = []
         for statement in statements:
-            if isinstance(statement, str):
+            if isinstance(statement, unicode):
                 parsed.append(ExecuteBatchDmlRequest.Statement(sql=statement))
             else:
                 dml, params, param_types = statement
@@ -286,7 +288,7 @@ class Transaction(_SnapshotBase, _BatchBase):
 
         trace_attributes = {
             # Get just the queries from the DML statement batch
-            "db.statement": ";".join([statement.sql for statement in parsed])
+            u"db.statement": u";".join([statement.sql for statement in parsed])
         }
         request = ExecuteBatchDmlRequest(
             session=self._session.name,
@@ -294,7 +296,7 @@ class Transaction(_SnapshotBase, _BatchBase):
             statements=parsed,
             seqno=seqno,
         )
-        with trace_call("CloudSpanner.DMLTransaction", self._session, trace_attributes):
+        with trace_call(u"CloudSpanner.DMLTransaction", self._session, trace_attributes):
             response = api.execute_batch_dml(request=request, metadata=metadata)
         row_counts = [
             result_set.stats.row_count_exact for result_set in response.result_sets
@@ -302,12 +304,12 @@ class Transaction(_SnapshotBase, _BatchBase):
         return response.status, row_counts
 
     def __enter__(self):
-        """Begin ``with`` block."""
+        u"""Begin ``with`` block."""
         self.begin()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """End ``with`` block."""
+        u"""End ``with`` block."""
         if exc_type is None:
             self.commit()
         else:

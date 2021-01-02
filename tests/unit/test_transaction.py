@@ -13,45 +13,47 @@
 # limitations under the License.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import mock
 from tests._helpers import OpenTelemetryBase, StatusCanonicalCode
 from google.cloud.spanner_v1 import Type
 from google.cloud.spanner_v1 import TypeCode
 
-TABLE_NAME = "citizens"
-COLUMNS = ["email", "first_name", "last_name", "age"]
+TABLE_NAME = u"citizens"
+COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
 VALUES = [
-    ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-    ["bharney@example.com", "Bharney", "Rhubble", 31],
+    [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+    [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
 ]
-DML_QUERY = """\
+DML_QUERY = u"""\
 INSERT INTO citizens(first_name, last_name, age)
 VALUES ("Phred", "Phlyntstone", 32)
 """
-DML_QUERY_WITH_PARAM = """
+DML_QUERY_WITH_PARAM = u"""
 INSERT INTO citizens(first_name, last_name, age)
 VALUES ("Phred", "Phlyntstone", @age)
 """
-PARAMS = {"age": 30}
-PARAM_TYPES = {"age": Type(code=TypeCode.INT64)}
+PARAMS = {u"age": 30}
+PARAM_TYPES = {u"age": Type(code=TypeCode.INT64)}
 
 
 class TestTransaction(OpenTelemetryBase):
 
-    PROJECT_ID = "project-id"
-    INSTANCE_ID = "instance-id"
-    INSTANCE_NAME = "projects/" + PROJECT_ID + "/instances/" + INSTANCE_ID
-    DATABASE_ID = "database-id"
-    DATABASE_NAME = INSTANCE_NAME + "/databases/" + DATABASE_ID
-    SESSION_ID = "session-id"
-    SESSION_NAME = DATABASE_NAME + "/sessions/" + SESSION_ID
-    TRANSACTION_ID = b"DEADBEEF"
+    PROJECT_ID = u"project-id"
+    INSTANCE_ID = u"instance-id"
+    INSTANCE_NAME = u"projects/" + PROJECT_ID + u"/instances/" + INSTANCE_ID
+    DATABASE_ID = u"database-id"
+    DATABASE_NAME = INSTANCE_NAME + u"/databases/" + DATABASE_ID
+    SESSION_ID = u"session-id"
+    SESSION_NAME = DATABASE_NAME + u"/sessions/" + SESSION_ID
+    TRANSACTION_ID = "DEADBEEF"
 
     BASE_ATTRIBUTES = {
-        "db.type": "spanner",
-        "db.url": "spanner.googleapis.com",
-        "db.instance": "testing",
-        "net.host.name": "spanner.googleapis.com",
+        u"db.type": u"spanner",
+        u"db.url": u"spanner.googleapis.com",
+        u"db.instance": u"testing",
+        u"net.host.name": u"spanner.googleapis.com",
     }
 
     def _getTargetClass(self):
@@ -158,7 +160,7 @@ class TestTransaction(OpenTelemetryBase):
             transaction.begin()
 
         self.assertSpanAttributes(
-            "CloudSpanner.BeginTransaction",
+            u"CloudSpanner.BeginTransaction",
             status=StatusCanonicalCode.UNKNOWN,
             attributes=TestTransaction.BASE_ATTRIBUTES,
         )
@@ -181,11 +183,11 @@ class TestTransaction(OpenTelemetryBase):
 
         session_id, txn_options, metadata = api._begun
         self.assertEqual(session_id, session.name)
-        self.assertTrue(type(txn_options).pb(txn_options).HasField("read_write"))
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", database.name)])
+        self.assertTrue(type(txn_options).pb(txn_options).HasField(u"read_write"))
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", database.name)])
 
         self.assertSpanAttributes(
-            "CloudSpanner.BeginTransaction", attributes=TestTransaction.BASE_ATTRIBUTES
+            u"CloudSpanner.BeginTransaction", attributes=TestTransaction.BASE_ATTRIBUTES
         )
 
     def test_rollback_not_begun(self):
@@ -219,7 +221,7 @@ class TestTransaction(OpenTelemetryBase):
     def test_rollback_w_other_error(self):
         database = _Database()
         database.spanner_api = self._make_spanner_api()
-        database.spanner_api.rollback.side_effect = RuntimeError("other error")
+        database.spanner_api.rollback.side_effect = RuntimeError(u"other error")
         session = _Session(database)
         transaction = self._make_one(session)
         transaction._transaction_id = self.TRANSACTION_ID
@@ -231,7 +233,7 @@ class TestTransaction(OpenTelemetryBase):
         self.assertFalse(transaction.rolled_back)
 
         self.assertSpanAttributes(
-            "CloudSpanner.Rollback",
+            u"CloudSpanner.Rollback",
             status=StatusCanonicalCode.UNKNOWN,
             attributes=TestTransaction.BASE_ATTRIBUTES,
         )
@@ -255,10 +257,10 @@ class TestTransaction(OpenTelemetryBase):
         session_id, txn_id, metadata = api._rolled_back
         self.assertEqual(session_id, session.name)
         self.assertEqual(txn_id, self.TRANSACTION_ID)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", database.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", database.name)])
 
         self.assertSpanAttributes(
-            "CloudSpanner.Rollback", attributes=TestTransaction.BASE_ATTRIBUTES
+            u"CloudSpanner.Rollback", attributes=TestTransaction.BASE_ATTRIBUTES
         )
 
     def test_commit_not_begun(self):
@@ -304,7 +306,7 @@ class TestTransaction(OpenTelemetryBase):
         self.assertIsNone(transaction.committed)
 
         self.assertSpanAttributes(
-            "CloudSpanner.Commit",
+            u"CloudSpanner.Commit",
             status=StatusCanonicalCode.UNKNOWN,
             attributes=dict(TestTransaction.BASE_ATTRIBUTES, num_mutations=1),
         )
@@ -337,10 +339,10 @@ class TestTransaction(OpenTelemetryBase):
         self.assertEqual(session_id, session.name)
         self.assertEqual(txn_id, self.TRANSACTION_ID)
         self.assertEqual(mutations, transaction._mutations)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", database.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", database.name)])
 
         self.assertSpanAttributes(
-            "CloudSpanner.Commit",
+            u"CloudSpanner.Commit",
             attributes=dict(
                 TestTransaction.BASE_ATTRIBUTES,
                 num_mutations=len(transaction._mutations),
@@ -377,7 +379,7 @@ class TestTransaction(OpenTelemetryBase):
         params_pb = transaction._make_params_pb(PARAMS, PARAM_TYPES)
 
         expected_params = Struct(
-            fields={key: _make_value_pb(value) for (key, value) in PARAMS.items()}
+            fields=dict((key, _make_value_pb(value)) for (key, value) in PARAMS.items())
         )
         self.assertEqual(params_pb, expected_params)
 
@@ -437,7 +439,7 @@ class TestTransaction(OpenTelemetryBase):
 
         expected_transaction = TransactionSelector(id=self.TRANSACTION_ID)
         expected_params = Struct(
-            fields={key: _make_value_pb(value) for (key, value) in PARAMS.items()}
+            fields=dict((key, _make_value_pb(value)) for (key, value) in PARAMS.items())
         )
 
         expected_query_options = database._instance._client._query_options
@@ -458,7 +460,7 @@ class TestTransaction(OpenTelemetryBase):
         )
         api.execute_sql.assert_called_once_with(
             request=expected_request,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertEqual(transaction._execute_sql_count, count + 1)
@@ -486,7 +488,7 @@ class TestTransaction(OpenTelemetryBase):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
         self._execute_update_helper(
-            query_options=ExecuteSqlRequest.QueryOptions(optimizer_version="3")
+            query_options=ExecuteSqlRequest.QueryOptions(optimizer_version=u"3")
         )
 
     def test_batch_update_other_error(self):
@@ -511,11 +513,11 @@ class TestTransaction(OpenTelemetryBase):
         from google.cloud.spanner_v1 import TransactionSelector
         from google.cloud.spanner_v1._helpers import _make_value_pb
 
-        insert_dml = "INSERT INTO table(pkey, desc) VALUES (%pkey, %desc)"
-        insert_params = {"pkey": 12345, "desc": "DESCRIPTION"}
-        insert_param_types = {"pkey": param_types.INT64, "desc": param_types.STRING}
-        update_dml = 'UPDATE table SET desc = desc + "-amended"'
-        delete_dml = "DELETE FROM table WHERE desc IS NULL"
+        insert_dml = u"INSERT INTO table(pkey, desc) VALUES (%pkey, %desc)"
+        insert_params = {u"pkey": 12345, u"desc": u"DESCRIPTION"}
+        insert_param_types = {u"pkey": param_types.INT64, u"desc": param_types.STRING}
+        update_dml = u'UPDATE table SET desc = desc + "-amended"'
+        delete_dml = u"DELETE FROM table WHERE desc IS NULL"
 
         dml_statements = [
             (insert_dml, insert_params, insert_param_types),
@@ -554,9 +556,8 @@ class TestTransaction(OpenTelemetryBase):
 
         expected_transaction = TransactionSelector(id=self.TRANSACTION_ID)
         expected_insert_params = Struct(
-            fields={
-                key: _make_value_pb(value) for (key, value) in insert_params.items()
-            }
+            fields=dict((
+                key, _make_value_pb(value)) for (key, value) in insert_params.items())
         )
         expected_statements = [
             ExecuteBatchDmlRequest.Statement(
@@ -576,7 +577,7 @@ class TestTransaction(OpenTelemetryBase):
         )
         api.execute_batch_dml.assert_called_once_with(
             request=expected_request,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertEqual(transaction._execute_sql_count, count + 1)
@@ -598,14 +599,14 @@ class TestTransaction(OpenTelemetryBase):
         transaction = self._make_one(session)
         transaction._transaction_id = self.TRANSACTION_ID
 
-        insert_dml = "INSERT INTO table(pkey, desc) VALUES (%pkey, %desc)"
-        insert_params = {"pkey": 12345, "desc": "DESCRIPTION"}
+        insert_dml = u"INSERT INTO table(pkey, desc) VALUES (%pkey, %desc)"
+        insert_params = {u"pkey": 12345, u"desc": u"DESCRIPTION"}
         insert_param_types = {
-            "pkey": Type(code=TypeCode.INT64),
-            "desc": Type(code=TypeCode.STRING),
+            u"pkey": Type(code=TypeCode.INT64),
+            u"desc": Type(code=TypeCode.STRING),
         }
-        update_dml = 'UPDATE table SET desc = desc + "-amended"'
-        delete_dml = "DELETE FROM table WHERE desc IS NULL"
+        update_dml = u'UPDATE table SET desc = desc + "-amended"'
+        delete_dml = u"DELETE FROM table WHERE desc IS NULL"
 
         dml_statements = [
             (insert_dml, insert_params, insert_param_types),
@@ -643,7 +644,7 @@ class TestTransaction(OpenTelemetryBase):
         self.assertEqual(session_id, self.SESSION_NAME)
         self.assertEqual(txn_id, self.TRANSACTION_ID)
         self.assertEqual(mutations, transaction._mutations)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", database.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", database.name)])
 
     def test_context_mgr_failure(self):
         from google.protobuf.empty_pb2 import Empty
@@ -662,7 +663,7 @@ class TestTransaction(OpenTelemetryBase):
         with self.assertRaises(Exception):
             with transaction:
                 transaction.insert(TABLE_NAME, COLUMNS, VALUES)
-                raise Exception("bail out")
+                raise Exception(u"bail out")
 
         self.assertEqual(transaction.committed, None)
         self.assertTrue(transaction.rolled_back)
@@ -673,14 +674,14 @@ class TestTransaction(OpenTelemetryBase):
         session_id, txn_id, metadata = api._rolled_back
         self.assertEqual(session_id, session.name)
         self.assertEqual(txn_id, self.TRANSACTION_ID)
-        self.assertEqual(metadata, [("google-cloud-resource-prefix", database.name)])
+        self.assertEqual(metadata, [(u"google-cloud-resource-prefix", database.name)])
 
 
 class _Client(object):
     def __init__(self):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
-        self._query_options = ExecuteSqlRequest.QueryOptions(optimizer_version="1")
+        self._query_options = ExecuteSqlRequest.QueryOptions(optimizer_version=u"1")
 
 
 class _Instance(object):
@@ -690,7 +691,7 @@ class _Instance(object):
 
 class _Database(object):
     def __init__(self):
-        self.name = "testing"
+        self.name = u"testing"
         self._instance = _Instance()
 
 
@@ -722,7 +723,7 @@ class _FauxSpannerAPI(object):
         self,
         session=None,
         mutations=None,
-        transaction_id="",
+        transaction_id=u"",
         single_use_transaction=None,
         metadata=None,
     ):

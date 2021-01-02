@@ -15,13 +15,14 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from typing import Any, AsyncIterable, Awaitable, Callable, Iterable, Sequence, Tuple
 
 from google.cloud.spanner_v1.types import spanner
 
 
-class ListSessionsPager:
-    """A pager for iterating through ``list_sessions`` requests.
+class ListSessionsPager(object):
+    u"""A pager for iterating through ``list_sessions`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner.ListSessionsResponse` object, and
@@ -40,13 +41,13 @@ class ListSessionsPager:
 
     def __init__(
         self,
-        method: Callable[..., spanner.ListSessionsResponse],
-        request: spanner.ListSessionsRequest,
-        response: spanner.ListSessionsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -63,27 +64,27 @@ class ListSessionsPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    def pages(self) -> Iterable[spanner.ListSessionsResponse]:
+    def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __iter__(self) -> Iterable[spanner.Session]:
+    def __iter__(self):
         for page in self.pages:
             yield from page.sessions
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListSessionsAsyncPager:
-    """A pager for iterating through ``list_sessions`` requests.
+class ListSessionsAsyncPager(object):
+    u"""A pager for iterating through ``list_sessions`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner.ListSessionsResponse` object, and
@@ -102,13 +103,13 @@ class ListSessionsAsyncPager:
 
     def __init__(
         self,
-        method: Callable[..., Awaitable[spanner.ListSessionsResponse]],
-        request: spanner.ListSessionsRequest,
-        response: spanner.ListSessionsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -125,18 +126,18 @@ class ListSessionsAsyncPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    async def pages(self) -> AsyncIterable[spanner.ListSessionsResponse]:
+    async def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = await self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __aiter__(self) -> AsyncIterable[spanner.Session]:
+    def __aiter__(self):
         async def async_generator():
             async for page in self.pages:
                 for response in page.sessions:
@@ -144,5 +145,5 @@ class ListSessionsAsyncPager:
 
         return async_generator()
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)

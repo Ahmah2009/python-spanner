@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -25,13 +26,13 @@ from google.protobuf import struct_pb2 as struct  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.v1",
-    manifest={"ResultSet", "PartialResultSet", "ResultSetMetadata", "ResultSetStats",},
+    package=u"google.spanner.v1",
+    manifest=set([u"ResultSet", u"PartialResultSet", u"ResultSetMetadata", u"ResultSetStats",]),
 )
 
 
 class ResultSet(proto.Message):
-    r"""Results from [Read][google.spanner.v1.Spanner.Read] or
+    ur"""Results from [Read][google.spanner.v1.Spanner.Read] or
     [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql].
 
     Attributes:
@@ -58,15 +59,15 @@ class ResultSet(proto.Message):
             [ExecuteSqlRequest.query_mode][google.spanner.v1.ExecuteSqlRequest.query_mode].
     """
 
-    metadata = proto.Field(proto.MESSAGE, number=1, message="ResultSetMetadata",)
+    metadata = proto.Field(proto.MESSAGE, number=1, message=u"ResultSetMetadata",)
 
     rows = proto.RepeatedField(proto.MESSAGE, number=2, message=struct.ListValue,)
 
-    stats = proto.Field(proto.MESSAGE, number=3, message="ResultSetStats",)
+    stats = proto.Field(proto.MESSAGE, number=3, message=u"ResultSetStats",)
 
 
 class PartialResultSet(proto.Message):
-    r"""Partial results from a streaming read or SQL query. Streaming
+    ur"""Partial results from a streaming read or SQL query. Streaming
     reads and SQL queries better tolerate large result sets, large
     rows, and large values, but are a little trickier to consume.
 
@@ -180,7 +181,7 @@ class PartialResultSet(proto.Message):
             statements.
     """
 
-    metadata = proto.Field(proto.MESSAGE, number=1, message="ResultSetMetadata",)
+    metadata = proto.Field(proto.MESSAGE, number=1, message=u"ResultSetMetadata",)
 
     values = proto.RepeatedField(proto.MESSAGE, number=2, message=struct.Value,)
 
@@ -188,11 +189,11 @@ class PartialResultSet(proto.Message):
 
     resume_token = proto.Field(proto.BYTES, number=4)
 
-    stats = proto.Field(proto.MESSAGE, number=5, message="ResultSetStats",)
+    stats = proto.Field(proto.MESSAGE, number=5, message=u"ResultSetStats",)
 
 
 class ResultSetMetadata(proto.Message):
-    r"""Metadata about a [ResultSet][google.spanner.v1.ResultSet] or
+    ur"""Metadata about a [ResultSet][google.spanner.v1.ResultSet] or
     [PartialResultSet][google.spanner.v1.PartialResultSet].
 
     Attributes:
@@ -222,7 +223,7 @@ class ResultSetMetadata(proto.Message):
 
 
 class ResultSetStats(proto.Message):
-    r"""Additional statistics about a
+    ur"""Additional statistics about a
     [ResultSet][google.spanner.v1.ResultSet] or
     [PartialResultSet][google.spanner.v1.PartialResultSet].
 
@@ -255,9 +256,9 @@ class ResultSetStats(proto.Message):
 
     query_stats = proto.Field(proto.MESSAGE, number=2, message=struct.Struct,)
 
-    row_count_exact = proto.Field(proto.INT64, number=3, oneof="row_count")
+    row_count_exact = proto.Field(proto.INT64, number=3, oneof=u"row_count")
 
-    row_count_lower_bound = proto.Field(proto.INT64, number=4, oneof="row_count")
+    row_count_lower_bound = proto.Field(proto.INT64, number=4, oneof=u"row_count")
 
 
 __all__ = tuple(sorted(__protobuf__.manifest))

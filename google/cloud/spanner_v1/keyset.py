@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Wrap representation of Spanner keys / ranges."""
+u"""Wrap representation of Spanner keys / ranges."""
 
+from __future__ import absolute_import
 from google.cloud.spanner_v1 import KeyRangePB
 from google.cloud.spanner_v1 import KeySetPB
 
@@ -22,7 +23,7 @@ from google.cloud.spanner_v1._helpers import _make_list_value_pbs
 
 
 class KeyRange(object):
-    """Identify range of table rows via start / end points.
+    u"""Identify range of table rows via start / end points.
 
     Specify either a `start_open` or `start_closed` key, or defaults to
     `start_closed = []`.  Specify either an `end_open` or `end_closed` key,
@@ -48,15 +49,15 @@ class KeyRange(object):
         self, start_open=None, start_closed=None, end_open=None, end_closed=None
     ):
         if not any([start_open, start_closed, end_open, end_closed]):
-            raise ValueError("Must specify at least a start or end row.")
+            raise ValueError(u"Must specify at least a start or end row.")
 
         if start_open and start_closed:
-            raise ValueError("Specify one of 'start_open' / 'start_closed'.")
+            raise ValueError(u"Specify one of 'start_open' / 'start_closed'.")
         elif start_open is None and start_closed is None:
             start_closed = []
 
         if end_open and end_closed:
-            raise ValueError("Specify one of 'end_open' / 'end_closed'.")
+            raise ValueError(u"Specify one of 'end_open' / 'end_closed'.")
         elif end_open is None and end_closed is None:
             end_closed = []
 
@@ -66,7 +67,7 @@ class KeyRange(object):
         self.end_closed = end_closed
 
     def _to_pb(self):
-        """Construct a KeyRange protobuf.
+        u"""Construct a KeyRange protobuf.
 
         :rtype: :class:`~google.cloud.spanner_v1.KeyRange`
         :returns: protobuf corresponding to this instance.
@@ -74,21 +75,21 @@ class KeyRange(object):
         kwargs = {}
 
         if self.start_open is not None:
-            kwargs["start_open"] = _make_list_value_pb(self.start_open)
+            kwargs[u"start_open"] = _make_list_value_pb(self.start_open)
 
         if self.start_closed is not None:
-            kwargs["start_closed"] = _make_list_value_pb(self.start_closed)
+            kwargs[u"start_closed"] = _make_list_value_pb(self.start_closed)
 
         if self.end_open is not None:
-            kwargs["end_open"] = _make_list_value_pb(self.end_open)
+            kwargs[u"end_open"] = _make_list_value_pb(self.end_open)
 
         if self.end_closed is not None:
-            kwargs["end_closed"] = _make_list_value_pb(self.end_closed)
+            kwargs[u"end_closed"] = _make_list_value_pb(self.end_closed)
 
         return KeyRangePB(**kwargs)
 
     def _to_dict(self):
-        """Return keyrange's state as a dict.
+        u"""Return keyrange's state as a dict.
 
         :rtype: dict
         :returns: state of this instance.
@@ -96,28 +97,28 @@ class KeyRange(object):
         mapping = {}
 
         if self.start_open:
-            mapping["start_open"] = self.start_open
+            mapping[u"start_open"] = self.start_open
 
         if self.start_closed:
-            mapping["start_closed"] = self.start_closed
+            mapping[u"start_closed"] = self.start_closed
 
         if self.end_open:
-            mapping["end_open"] = self.end_open
+            mapping[u"end_open"] = self.end_open
 
         if self.end_closed:
-            mapping["end_closed"] = self.end_closed
+            mapping[u"end_closed"] = self.end_closed
 
         return mapping
 
     def __eq__(self, other):
-        """Compare by serialized state."""
+        u"""Compare by serialized state."""
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self._to_dict() == other._to_dict()
 
 
 class KeySet(object):
-    """Identify table rows via keys / ranges.
+    u"""Identify table rows via keys / ranges.
 
     :type keys: list of list of scalars
     :param keys: keys identifying individual rows within a table.
@@ -131,13 +132,13 @@ class KeySet(object):
 
     def __init__(self, keys=(), ranges=(), all_=False):
         if all_ and (keys or ranges):
-            raise ValueError("'all_' is exclusive of 'keys' / 'ranges'.")
+            raise ValueError(u"'all_' is exclusive of 'keys' / 'ranges'.")
         self.keys = list(keys)
         self.ranges = list(ranges)
         self.all_ = all_
 
     def _to_pb(self):
-        """Construct a KeySet protobuf.
+        u"""Construct a KeySet protobuf.
 
         :rtype: :class:`~google.cloud.spanner_v1.KeySet`
         :returns: protobuf corresponding to this instance.
@@ -147,15 +148,15 @@ class KeySet(object):
         kwargs = {}
 
         if self.keys:
-            kwargs["keys"] = _make_list_value_pbs(self.keys)
+            kwargs[u"keys"] = _make_list_value_pbs(self.keys)
 
         if self.ranges:
-            kwargs["ranges"] = [krange._to_pb() for krange in self.ranges]
+            kwargs[u"ranges"] = [krange._to_pb() for krange in self.ranges]
 
         return KeySetPB(**kwargs)
 
     def _to_dict(self):
-        """Return keyset's state as a dict.
+        u"""Return keyset's state as a dict.
 
         The result can be used to serialize the instance and reconstitute
         it later using :meth:`_from_dict`.
@@ -164,30 +165,30 @@ class KeySet(object):
         :returns: state of this instance.
         """
         if self.all_:
-            return {"all": True}
+            return {u"all": True}
 
         return {
-            "keys": self.keys,
-            "ranges": [keyrange._to_dict() for keyrange in self.ranges],
+            u"keys": self.keys,
+            u"ranges": [keyrange._to_dict() for keyrange in self.ranges],
         }
 
     def __eq__(self, other):
-        """Compare by serialized state."""
+        u"""Compare by serialized state."""
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self._to_dict() == other._to_dict()
 
     @classmethod
     def _from_dict(cls, mapping):
-        """Create an instance from the corresponding state mapping.
+        u"""Create an instance from the corresponding state mapping.
 
         :type mapping: dict
         :param mapping: the instance state.
         """
-        if mapping.get("all"):
+        if mapping.get(u"all"):
             return cls(all_=True)
 
-        r_mappings = mapping.get("ranges", ())
+        r_mappings = mapping.get(u"ranges", ())
         ranges = [KeyRange(**r_mapping) for r_mapping in r_mappings]
 
-        return cls(keys=mapping.get("keys", ()), ranges=ranges)
+        return cls(keys=mapping.get(u"keys", ()), ranges=ranges)

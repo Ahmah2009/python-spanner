@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from collections import OrderedDict
 from distutils import util
 import os
@@ -46,7 +47,7 @@ from .transports.grpc_asyncio import InstanceAdminGrpcAsyncIOTransport
 
 
 class InstanceAdminClientMeta(type):
-    """Metaclass for the InstanceAdmin client.
+    u"""Metaclass for the InstanceAdmin client.
 
     This provides class-level methods for building and retrieving
     support objects (e.g. transport) without polluting the client instance
@@ -54,11 +55,11 @@ class InstanceAdminClientMeta(type):
     """
 
     _transport_registry = OrderedDict()  # type: Dict[str, Type[InstanceAdminTransport]]
-    _transport_registry["grpc"] = InstanceAdminGrpcTransport
-    _transport_registry["grpc_asyncio"] = InstanceAdminGrpcAsyncIOTransport
+    _transport_registry[u"grpc"] = InstanceAdminGrpcTransport
+    _transport_registry[u"grpc_asyncio"] = InstanceAdminGrpcAsyncIOTransport
 
-    def get_transport_class(cls, label: str = None,) -> Type[InstanceAdminTransport]:
-        """Return an appropriate transport class.
+    def get_transport_class(cls, label = None,):
+        u"""Return an appropriate transport class.
 
         Args:
             label: The name of the desired transport. If none is
@@ -73,11 +74,12 @@ class InstanceAdminClientMeta(type):
 
         # No transport is requested; return the default (that is, the first one
         # in the dictionary).
-        return next(iter(cls._transport_registry.values()))
+        return iter(cls._transport_registry.values()).next()
 
 
-class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
-    """Cloud Spanner Instance Admin API
+class InstanceAdminClient(object):
+    __metaclass__ = InstanceAdminClientMeta
+    u"""Cloud Spanner Instance Admin API
     The Cloud Spanner Instance Admin API can be used to create,
     delete, modify and list instances. Instances are dedicated Cloud
     Spanner serving and storage resources to be used by Cloud
@@ -102,7 +104,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     @staticmethod
     def _get_default_mtls_endpoint(api_endpoint):
-        """Convert api endpoint to mTLS endpoint.
+        u"""Convert api endpoint to mTLS endpoint.
         Convert "*.sandbox.googleapis.com" and "*.googleapis.com" to
         "*.mtls.sandbox.googleapis.com" and "*.mtls.googleapis.com" respectively.
         Args:
@@ -114,7 +116,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
             return api_endpoint
 
         mtls_endpoint_re = re.compile(
-            r"(?P<name>[^.]+)(?P<mtls>\.mtls)?(?P<sandbox>\.sandbox)?(?P<googledomain>\.googleapis\.com)?"
+            ur"(?P<name>[^.]+)(?P<mtls>\.mtls)?(?P<sandbox>\.sandbox)?(?P<googledomain>\.googleapis\.com)?"
         )
 
         m = mtls_endpoint_re.match(api_endpoint)
@@ -124,19 +126,19 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
         if sandbox:
             return api_endpoint.replace(
-                "sandbox.googleapis.com", "mtls.sandbox.googleapis.com"
+                u"sandbox.googleapis.com", u"mtls.sandbox.googleapis.com"
             )
 
-        return api_endpoint.replace(".googleapis.com", ".mtls.googleapis.com")
+        return api_endpoint.replace(u".googleapis.com", u".mtls.googleapis.com")
 
-    DEFAULT_ENDPOINT = "spanner.googleapis.com"
-    DEFAULT_MTLS_ENDPOINT = _get_default_mtls_endpoint.__func__(  # type: ignore
+    DEFAULT_ENDPOINT = u"spanner.googleapis.com"
+    DEFAULT_MTLS_ENDPOINT = _get_default_mtls_endpoint.im_func(  # type: ignore
         DEFAULT_ENDPOINT
     )
 
     @classmethod
-    def from_service_account_file(cls, filename: str, *args, **kwargs):
-        """Creates an instance of this client using the provided credentials
+    def from_service_account_file(cls, filename, *args, **kwargs):
+        u"""Creates an instance of this client using the provided credentials
         file.
 
         Args:
@@ -149,14 +151,14 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
             {@api.name}: The constructed client.
         """
         credentials = service_account.Credentials.from_service_account_file(filename)
-        kwargs["credentials"] = credentials
+        kwargs[u"credentials"] = credentials
         return cls(*args, **kwargs)
 
     from_service_account_json = from_service_account_file
 
     @property
-    def transport(self) -> InstanceAdminTransport:
-        """Return the transport used by the client instance.
+    def transport(self):
+        u"""Return the transport used by the client instance.
 
         Returns:
             InstanceAdminTransport: The transport used by the client instance.
@@ -164,102 +166,105 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         return self._transport
 
     @staticmethod
-    def instance_path(project: str, instance: str,) -> str:
-        """Return a fully-qualified instance string."""
-        return "projects/{project}/instances/{instance}".format(
+    def instance_path(project, instance,):
+        u"""Return a fully-qualified instance string."""
+        return u"projects/{project}/instances/{instance}".format(
             project=project, instance=instance,
         )
 
     @staticmethod
-    def parse_instance_path(path: str) -> Dict[str, str]:
-        """Parse a instance path into its component segments."""
-        m = re.match(r"^projects/(?P<project>.+?)/instances/(?P<instance>.+?)$", path)
+    def parse_instance_path(path):
+        u"""Parse a instance path into its component segments."""
+        m = re.match(ur"^projects/(?P<project>.+?)/instances/(?P<instance>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def instance_config_path(project: str, instance_config: str,) -> str:
-        """Return a fully-qualified instance_config string."""
-        return "projects/{project}/instanceConfigs/{instance_config}".format(
+    def instance_config_path(project, instance_config,):
+        u"""Return a fully-qualified instance_config string."""
+        return u"projects/{project}/instanceConfigs/{instance_config}".format(
             project=project, instance_config=instance_config,
         )
 
     @staticmethod
-    def parse_instance_config_path(path: str) -> Dict[str, str]:
-        """Parse a instance_config path into its component segments."""
+    def parse_instance_config_path(path):
+        u"""Parse a instance_config path into its component segments."""
         m = re.match(
-            r"^projects/(?P<project>.+?)/instanceConfigs/(?P<instance_config>.+?)$",
+            ur"^projects/(?P<project>.+?)/instanceConfigs/(?P<instance_config>.+?)$",
             path,
         )
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_billing_account_path(billing_account: str,) -> str:
-        """Return a fully-qualified billing_account string."""
-        return "billingAccounts/{billing_account}".format(
+    def common_billing_account_path(billing_account,):
+        u"""Return a fully-qualified billing_account string."""
+        return u"billingAccounts/{billing_account}".format(
             billing_account=billing_account,
         )
 
     @staticmethod
-    def parse_common_billing_account_path(path: str) -> Dict[str, str]:
-        """Parse a billing_account path into its component segments."""
-        m = re.match(r"^billingAccounts/(?P<billing_account>.+?)$", path)
+    def parse_common_billing_account_path(path):
+        u"""Parse a billing_account path into its component segments."""
+        m = re.match(ur"^billingAccounts/(?P<billing_account>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_folder_path(folder: str,) -> str:
-        """Return a fully-qualified folder string."""
-        return "folders/{folder}".format(folder=folder,)
+    def common_folder_path(folder,):
+        u"""Return a fully-qualified folder string."""
+        return u"folders/{folder}".format(folder=folder,)
 
     @staticmethod
-    def parse_common_folder_path(path: str) -> Dict[str, str]:
-        """Parse a folder path into its component segments."""
-        m = re.match(r"^folders/(?P<folder>.+?)$", path)
+    def parse_common_folder_path(path):
+        u"""Parse a folder path into its component segments."""
+        m = re.match(ur"^folders/(?P<folder>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_organization_path(organization: str,) -> str:
-        """Return a fully-qualified organization string."""
-        return "organizations/{organization}".format(organization=organization,)
+    def common_organization_path(organization,):
+        u"""Return a fully-qualified organization string."""
+        return u"organizations/{organization}".format(organization=organization,)
 
     @staticmethod
-    def parse_common_organization_path(path: str) -> Dict[str, str]:
-        """Parse a organization path into its component segments."""
-        m = re.match(r"^organizations/(?P<organization>.+?)$", path)
+    def parse_common_organization_path(path):
+        u"""Parse a organization path into its component segments."""
+        m = re.match(ur"^organizations/(?P<organization>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_project_path(project: str,) -> str:
-        """Return a fully-qualified project string."""
-        return "projects/{project}".format(project=project,)
+    def common_project_path(project,):
+        u"""Return a fully-qualified project string."""
+        return u"projects/{project}".format(project=project,)
 
     @staticmethod
-    def parse_common_project_path(path: str) -> Dict[str, str]:
-        """Parse a project path into its component segments."""
-        m = re.match(r"^projects/(?P<project>.+?)$", path)
+    def parse_common_project_path(path):
+        u"""Parse a project path into its component segments."""
+        m = re.match(ur"^projects/(?P<project>.+?)$", path)
         return m.groupdict() if m else {}
 
     @staticmethod
-    def common_location_path(project: str, location: str,) -> str:
-        """Return a fully-qualified location string."""
-        return "projects/{project}/locations/{location}".format(
+    def common_location_path(project, location,):
+        u"""Return a fully-qualified location string."""
+        return u"projects/{project}/locations/{location}".format(
             project=project, location=location,
         )
 
     @staticmethod
-    def parse_common_location_path(path: str) -> Dict[str, str]:
-        """Parse a location path into its component segments."""
-        m = re.match(r"^projects/(?P<project>.+?)/locations/(?P<location>.+?)$", path)
+    def parse_common_location_path(path):
+        u"""Parse a location path into its component segments."""
+        m = re.match(ur"^projects/(?P<project>.+?)/locations/(?P<location>.+?)$", path)
         return m.groupdict() if m else {}
 
     def __init__(
-        self,
-        *,
-        credentials: Optional[credentials.Credentials] = None,
-        transport: Union[str, InstanceAdminTransport, None] = None,
-        client_options: Optional[client_options_lib.ClientOptions] = None,
-        client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
-    ) -> None:
-        """Instantiate the instance admin client.
+        self, **_3to2kwargs
+    ):
+        if 'client_info' in _3to2kwargs: client_info = _3to2kwargs['client_info']; del _3to2kwargs['client_info']
+        else: client_info =  DEFAULT_CLIENT_INFO
+        if 'client_options' in _3to2kwargs: client_options = _3to2kwargs['client_options']; del _3to2kwargs['client_options']
+        else: client_options =  None
+        if 'transport' in _3to2kwargs: transport = _3to2kwargs['transport']; del _3to2kwargs['transport']
+        else: transport =  None
+        if 'credentials' in _3to2kwargs: credentials = _3to2kwargs['credentials']; del _3to2kwargs['credentials']
+        else: credentials =  None
+        u"""Instantiate the instance admin client.
 
         Args:
             credentials (Optional[google.auth.credentials.Credentials]): The
@@ -303,7 +308,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
         # Create SSL credentials for mutual TLS if needed.
         use_client_cert = bool(
-            util.strtobool(os.getenv("GOOGLE_API_USE_CLIENT_CERTIFICATE", "false"))
+            util.strtobool(os.getenv(u"GOOGLE_API_USE_CLIENT_CERTIFICATE", u"false"))
         )
 
         ssl_credentials = None
@@ -326,18 +331,18 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         if client_options.api_endpoint is not None:
             api_endpoint = client_options.api_endpoint
         else:
-            use_mtls_env = os.getenv("GOOGLE_API_USE_MTLS_ENDPOINT", "auto")
-            if use_mtls_env == "never":
+            use_mtls_env = os.getenv(u"GOOGLE_API_USE_MTLS_ENDPOINT", u"auto")
+            if use_mtls_env == u"never":
                 api_endpoint = self.DEFAULT_ENDPOINT
-            elif use_mtls_env == "always":
+            elif use_mtls_env == u"always":
                 api_endpoint = self.DEFAULT_MTLS_ENDPOINT
-            elif use_mtls_env == "auto":
+            elif use_mtls_env == u"auto":
                 api_endpoint = (
                     self.DEFAULT_MTLS_ENDPOINT if is_mtls else self.DEFAULT_ENDPOINT
                 )
             else:
                 raise MutualTLSChannelError(
-                    "Unsupported GOOGLE_API_USE_MTLS_ENDPOINT value. Accepted values: never, auto, always"
+                    u"Unsupported GOOGLE_API_USE_MTLS_ENDPOINT value. Accepted values: never, auto, always"
                 )
 
         # Save or instantiate the transport.
@@ -347,13 +352,13 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
             # transport is a InstanceAdminTransport instance.
             if credentials or client_options.credentials_file:
                 raise ValueError(
-                    "When providing a transport instance, "
-                    "provide its credentials directly."
+                    u"When providing a transport instance, "
+                    u"provide its credentials directly."
                 )
             if client_options.scopes:
                 raise ValueError(
-                    "When providing a transport instance, "
-                    "provide its scopes directly."
+                    u"When providing a transport instance, "
+                    u"provide its scopes directly."
                 )
             self._transport = transport
         else:
@@ -370,14 +375,17 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def list_instance_configs(
         self,
-        request: spanner_instance_admin.ListInstanceConfigsRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListInstanceConfigsPager:
-        r"""Lists the supported instance configurations for a
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
+        ur"""Lists the supported instance configurations for a
         given project.
 
         Args:
@@ -413,8 +421,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([parent])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # Minor optimization to avoid making a copy if the user passes
@@ -437,7 +445,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("parent", request.parent),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"parent", request.parent),)),
         )
 
         # Send the request.
@@ -454,14 +462,17 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def get_instance_config(
         self,
-        request: spanner_instance_admin.GetInstanceConfigRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner_instance_admin.InstanceConfig:
-        r"""Gets information about a particular instance
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
+        ur"""Gets information about a particular instance
         configuration.
 
         Args:
@@ -496,8 +507,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([name])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # Minor optimization to avoid making a copy if the user passes
@@ -520,7 +531,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("name", request.name),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"name", request.name),)),
         )
 
         # Send the request.
@@ -531,14 +542,17 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def list_instances(
         self,
-        request: spanner_instance_admin.ListInstancesRequest = None,
-        *,
-        parent: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> pagers.ListInstancesPager:
-        r"""Lists all instances in the given project.
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
+        ur"""Lists all instances in the given project.
 
         Args:
             request (:class:`~.spanner_instance_admin.ListInstancesRequest`):
@@ -573,8 +587,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([parent])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # Minor optimization to avoid making a copy if the user passes
@@ -597,7 +611,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("parent", request.parent),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"parent", request.parent),)),
         )
 
         # Send the request.
@@ -614,14 +628,17 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def get_instance(
         self,
-        request: spanner_instance_admin.GetInstanceRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> spanner_instance_admin.Instance:
-        r"""Gets information about a particular instance.
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
+        ur"""Gets information about a particular instance.
 
         Args:
             request (:class:`~.spanner_instance_admin.GetInstanceRequest`):
@@ -653,8 +670,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([name])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # Minor optimization to avoid making a copy if the user passes
@@ -677,7 +694,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("name", request.name),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"name", request.name),)),
         )
 
         # Send the request.
@@ -688,16 +705,21 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def create_instance(
         self,
-        request: spanner_instance_admin.CreateInstanceRequest = None,
-        *,
-        parent: str = None,
-        instance_id: str = None,
-        instance: spanner_instance_admin.Instance = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
-        r"""Creates an instance and begins preparing it to begin serving.
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'instance' in _3to2kwargs: instance = _3to2kwargs['instance']; del _3to2kwargs['instance']
+        else: instance =  None
+        if 'instance_id' in _3to2kwargs: instance_id = _3to2kwargs['instance_id']; del _3to2kwargs['instance_id']
+        else: instance_id =  None
+        if 'parent' in _3to2kwargs: parent = _3to2kwargs['parent']; del _3to2kwargs['parent']
+        else: parent =  None
+        ur"""Creates an instance and begins preparing it to begin serving.
         The returned [long-running
         operation][google.longrunning.Operation] can be used to track
         the progress of preparing the new instance. The instance name is
@@ -783,8 +805,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([parent, instance_id, instance])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # Minor optimization to avoid making a copy if the user passes
@@ -811,7 +833,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("parent", request.parent),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"parent", request.parent),)),
         )
 
         # Send the request.
@@ -830,15 +852,19 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def update_instance(
         self,
-        request: spanner_instance_admin.UpdateInstanceRequest = None,
-        *,
-        instance: spanner_instance_admin.Instance = None,
-        field_mask: gp_field_mask.FieldMask = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> operation.Operation:
-        r"""Updates an instance, and begins allocating or releasing
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'field_mask' in _3to2kwargs: field_mask = _3to2kwargs['field_mask']; del _3to2kwargs['field_mask']
+        else: field_mask =  None
+        if 'instance' in _3to2kwargs: instance = _3to2kwargs['instance']; del _3to2kwargs['instance']
+        else: instance =  None
+        ur"""Updates an instance, and begins allocating or releasing
         resources as requested. The returned [long-running
         operation][google.longrunning.Operation] can be used to track
         the progress of updating the instance. If the named instance
@@ -931,8 +957,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([instance, field_mask])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # Minor optimization to avoid making a copy if the user passes
@@ -958,7 +984,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # add these here.
         metadata = tuple(metadata) + (
             gapic_v1.routing_header.to_grpc_metadata(
-                (("instance.name", request.instance.name),)
+                ((u"instance.name", request.instance.name),)
             ),
         )
 
@@ -978,14 +1004,17 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def delete_instance(
         self,
-        request: spanner_instance_admin.DeleteInstanceRequest = None,
-        *,
-        name: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> None:
-        r"""Deletes an instance.
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'name' in _3to2kwargs: name = _3to2kwargs['name']; del _3to2kwargs['name']
+        else: name =  None
+        ur"""Deletes an instance.
 
         Immediately upon completion of the request:
 
@@ -1021,8 +1050,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([name])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # Minor optimization to avoid making a copy if the user passes
@@ -1045,7 +1074,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("name", request.name),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"name", request.name),)),
         )
 
         # Send the request.
@@ -1055,14 +1084,17 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def set_iam_policy(
         self,
-        request: iam_policy.SetIamPolicyRequest = None,
-        *,
-        resource: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> policy.Policy:
-        r"""Sets the access control policy on an instance resource. Replaces
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
+        ur"""Sets the access control policy on an instance resource. Replaces
         any existing policy.
 
         Authorization requires ``spanner.instances.setIamPolicy`` on
@@ -1162,8 +1194,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([resource])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # The request isn't a proto-plus wrapped type,
@@ -1181,7 +1213,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("resource", request.resource),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"resource", request.resource),)),
         )
 
         # Send the request.
@@ -1192,14 +1224,17 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def get_iam_policy(
         self,
-        request: iam_policy.GetIamPolicyRequest = None,
-        *,
-        resource: str = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> policy.Policy:
-        r"""Gets the access control policy for an instance resource. Returns
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
+        ur"""Gets the access control policy for an instance resource. Returns
         an empty policy if an instance exists but does not have a policy
         set.
 
@@ -1300,8 +1335,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([resource])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # The request isn't a proto-plus wrapped type,
@@ -1319,7 +1354,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("resource", request.resource),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"resource", request.resource),)),
         )
 
         # Send the request.
@@ -1330,15 +1365,19 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 
     def test_iam_permissions(
         self,
-        request: iam_policy.TestIamPermissionsRequest = None,
-        *,
-        resource: str = None,
-        permissions: Sequence[str] = None,
-        retry: retries.Retry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> iam_policy.TestIamPermissionsResponse:
-        r"""Returns permissions that the caller has on the specified
+        request = None, **_3to2kwargs
+    ):
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        if 'timeout' in _3to2kwargs: timeout = _3to2kwargs['timeout']; del _3to2kwargs['timeout']
+        else: timeout =  None
+        if 'retry' in _3to2kwargs: retry = _3to2kwargs['retry']; del _3to2kwargs['retry']
+        else: retry =  gapic_v1.method.DEFAULT
+        if 'permissions' in _3to2kwargs: permissions = _3to2kwargs['permissions']; del _3to2kwargs['permissions']
+        else: permissions =  None
+        if 'resource' in _3to2kwargs: resource = _3to2kwargs['resource']; del _3to2kwargs['resource']
+        else: resource =  None
+        ur"""Returns permissions that the caller has on the specified
         instance resource.
 
         Attempting this RPC on a non-existent Cloud Spanner instance
@@ -1383,8 +1422,8 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         has_flattened_params = any([resource, permissions])
         if request is not None and has_flattened_params:
             raise ValueError(
-                "If the `request` argument is set, then none of "
-                "the individual field arguments should be set."
+                u"If the `request` argument is set, then none of "
+                u"the individual field arguments should be set."
             )
 
         # The request isn't a proto-plus wrapped type,
@@ -1404,7 +1443,7 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
         # Certain fields should be provided within the metadata header;
         # add these here.
         metadata = tuple(metadata) + (
-            gapic_v1.routing_header.to_grpc_metadata((("resource", request.resource),)),
+            gapic_v1.routing_header.to_grpc_metadata(((u"resource", request.resource),)),
         )
 
         # Send the request.
@@ -1417,11 +1456,11 @@ class InstanceAdminClient(metaclass=InstanceAdminClientMeta):
 try:
     DEFAULT_CLIENT_INFO = gapic_v1.client_info.ClientInfo(
         gapic_version=pkg_resources.get_distribution(
-            "google-cloud-spanner-admin-instance",
+            u"google-cloud-spanner-admin-instance",
         ).version,
     )
 except pkg_resources.DistributionNotFound:
     DEFAULT_CLIENT_INFO = gapic_v1.client_info.ClientInfo()
 
 
-__all__ = ("InstanceAdminClient",)
+__all__ = (u"InstanceAdminClient",)

@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -22,12 +23,12 @@ from google.protobuf import struct_pb2 as struct  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.v1", manifest={"PlanNode", "QueryPlan",},
+    package=u"google.spanner.v1", manifest=set([u"PlanNode", u"QueryPlan",]),
 )
 
 
 class PlanNode(proto.Message):
-    r"""Node information for nodes appearing in a
+    ur"""Node information for nodes appearing in a
     [QueryPlan.plan_nodes][google.spanner.v1.QueryPlan.plan_nodes].
 
     Attributes:
@@ -70,7 +71,7 @@ class PlanNode(proto.Message):
     """
 
     class Kind(proto.Enum):
-        r"""The kind of [PlanNode][google.spanner.v1.PlanNode]. Distinguishes
+        ur"""The kind of [PlanNode][google.spanner.v1.PlanNode]. Distinguishes
         between the two different kinds of nodes that can appear in a query
         plan.
         """
@@ -79,7 +80,7 @@ class PlanNode(proto.Message):
         SCALAR = 2
 
     class ChildLink(proto.Message):
-        r"""Metadata associated with a parent-child relationship appearing in a
+        ur"""Metadata associated with a parent-child relationship appearing in a
         [PlanNode][google.spanner.v1.PlanNode].
 
         Attributes:
@@ -111,7 +112,7 @@ class PlanNode(proto.Message):
         variable = proto.Field(proto.STRING, number=3)
 
     class ShortRepresentation(proto.Message):
-        r"""Condensed representation of a node and its subtree. Only present for
+        ur"""Condensed representation of a node and its subtree. Only present for
         ``SCALAR`` [PlanNode(s)][google.spanner.v1.PlanNode].
 
         Attributes:
@@ -148,7 +149,7 @@ class PlanNode(proto.Message):
 
 
 class QueryPlan(proto.Message):
-    r"""Contains an ordered list of nodes appearing in the query
+    ur"""Contains an ordered list of nodes appearing in the query
     plan.
 
     Attributes:
@@ -159,7 +160,7 @@ class QueryPlan(proto.Message):
             to its index in ``plan_nodes``.
     """
 
-    plan_nodes = proto.RepeatedField(proto.MESSAGE, number=1, message="PlanNode",)
+    plan_nodes = proto.RepeatedField(proto.MESSAGE, number=1, message=u"PlanNode",)
 
 
 __all__ = tuple(sorted(__protobuf__.manifest))

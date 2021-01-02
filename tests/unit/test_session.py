@@ -13,6 +13,9 @@
 # limitations under the License.
 
 
+from __future__ import division
+from __future__ import with_statement
+from __future__ import absolute_import
 import google.api_core.gapic_v1.method
 import mock
 from tests._helpers import (
@@ -20,6 +23,7 @@ from tests._helpers import (
     StatusCanonicalCode,
     HAS_OPENTELEMETRY_INSTALLED,
 )
+from itertools import imap
 
 
 def _make_rpc_error(error_cls, trailing_metadata=None):
@@ -27,28 +31,28 @@ def _make_rpc_error(error_cls, trailing_metadata=None):
 
     grpc_error = mock.create_autospec(grpc.Call, instance=True)
     grpc_error.trailing_metadata.return_value = trailing_metadata
-    return error_cls("error", errors=(grpc_error,))
+    return error_cls(u"error", errors=(grpc_error,))
 
 
-class _ConstantTime:
+class _ConstantTime(object):
     def time(self):
         return 1
 
 
 class TestSession(OpenTelemetryBase):
 
-    PROJECT_ID = "project-id"
-    INSTANCE_ID = "instance-id"
-    INSTANCE_NAME = "projects/" + PROJECT_ID + "/instances/" + INSTANCE_ID
-    DATABASE_ID = "database-id"
-    DATABASE_NAME = INSTANCE_NAME + "/databases/" + DATABASE_ID
-    SESSION_ID = "session-id"
-    SESSION_NAME = DATABASE_NAME + "/sessions/" + SESSION_ID
+    PROJECT_ID = u"project-id"
+    INSTANCE_ID = u"instance-id"
+    INSTANCE_NAME = u"projects/" + PROJECT_ID + u"/instances/" + INSTANCE_ID
+    DATABASE_ID = u"database-id"
+    DATABASE_NAME = INSTANCE_NAME + u"/databases/" + DATABASE_ID
+    SESSION_ID = u"session-id"
+    SESSION_NAME = DATABASE_NAME + u"/sessions/" + SESSION_ID
     BASE_ATTRIBUTES = {
-        "db.type": "spanner",
-        "db.url": "spanner.googleapis.com",
-        "db.instance": DATABASE_NAME,
-        "net.host.name": "spanner.googleapis.com",
+        u"db.type": u"spanner",
+        u"db.url": u"spanner.googleapis.com",
+        u"db.instance": DATABASE_NAME,
+        u"net.host.name": u"spanner.googleapis.com",
     }
 
     def _getTargetClass(self):
@@ -87,7 +91,7 @@ class TestSession(OpenTelemetryBase):
 
     def test_constructor_w_labels(self):
         database = self._make_database()
-        labels = {"foo": "bar"}
+        labels = {u"foo": u"bar"}
         session = self._make_one(database, labels=labels)
         self.assertIs(session.session_id, None)
         self.assertIs(session._database, database)
@@ -96,9 +100,9 @@ class TestSession(OpenTelemetryBase):
     def test___lt___(self):
         database = self._make_database()
         lhs = self._make_one(database)
-        lhs._session_id = b"123"
+        lhs._session_id = "123"
         rhs = self._make_one(database)
-        rhs._session_id = b"234"
+        rhs._session_id = "234"
         self.assertTrue(lhs < rhs)
 
     def test_name_property_wo_session_id(self):
@@ -141,18 +145,18 @@ class TestSession(OpenTelemetryBase):
         request = CreateSessionRequest(database=database.name,)
 
         gax_api.create_session.assert_called_once_with(
-            request=request, metadata=[("google-cloud-resource-prefix", database.name)]
+            request=request, metadata=[(u"google-cloud-resource-prefix", database.name)]
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.CreateSession", attributes=TestSession.BASE_ATTRIBUTES
+            u"CloudSpanner.CreateSession", attributes=TestSession.BASE_ATTRIBUTES
         )
 
     def test_create_w_labels(self):
         from google.cloud.spanner_v1 import CreateSessionRequest
         from google.cloud.spanner_v1 import Session as SessionPB
 
-        labels = {"foo": "bar"}
+        labels = {u"foo": u"bar"}
         session_pb = self._make_session_pb(self.SESSION_NAME, labels=labels)
         gax_api = self._make_spanner_api()
         gax_api.create_session.return_value = session_pb
@@ -169,19 +173,19 @@ class TestSession(OpenTelemetryBase):
         )
 
         gax_api.create_session.assert_called_once_with(
-            request=request, metadata=[("google-cloud-resource-prefix", database.name)],
+            request=request, metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.CreateSession",
-            attributes=dict(TestSession.BASE_ATTRIBUTES, foo="bar"),
+            u"CloudSpanner.CreateSession",
+            attributes=dict(TestSession.BASE_ATTRIBUTES, foo=u"bar"),
         )
 
     def test_create_error(self):
         from google.api_core.exceptions import Unknown
 
         gax_api = self._make_spanner_api()
-        gax_api.create_session.side_effect = Unknown("error")
+        gax_api.create_session.side_effect = Unknown(u"error")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -190,7 +194,7 @@ class TestSession(OpenTelemetryBase):
             session.create()
 
         self.assertSpanAttributes(
-            "CloudSpanner.CreateSession",
+            u"CloudSpanner.CreateSession",
             status=StatusCanonicalCode.UNKNOWN,
             attributes=TestSession.BASE_ATTRIBUTES,
         )
@@ -215,16 +219,16 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.get_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.GetSession",
+            u"CloudSpanner.GetSession",
             attributes=dict(TestSession.BASE_ATTRIBUTES, session_found=True),
         )
 
     @mock.patch(
-        "google.cloud.spanner_v1._opentelemetry_tracing.HAS_OPENTELEMETRY_INSTALLED",
+        u"google.cloud.spanner_v1._opentelemetry_tracing.HAS_OPENTELEMETRY_INSTALLED",
         False,
     )
     def test_exists_hit_wo_span(self):
@@ -240,7 +244,7 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.get_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertNoSpans()
@@ -249,7 +253,7 @@ class TestSession(OpenTelemetryBase):
         from google.api_core.exceptions import NotFound
 
         gax_api = self._make_spanner_api()
-        gax_api.get_session.side_effect = NotFound("testing")
+        gax_api.get_session.side_effect = NotFound(u"testing")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -259,23 +263,23 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.get_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.GetSession",
+            u"CloudSpanner.GetSession",
             attributes=dict(TestSession.BASE_ATTRIBUTES, session_found=False),
         )
 
     @mock.patch(
-        "google.cloud.spanner_v1._opentelemetry_tracing.HAS_OPENTELEMETRY_INSTALLED",
+        u"google.cloud.spanner_v1._opentelemetry_tracing.HAS_OPENTELEMETRY_INSTALLED",
         False,
     )
     def test_exists_miss_wo_span(self):
         from google.api_core.exceptions import NotFound
 
         gax_api = self._make_spanner_api()
-        gax_api.get_session.side_effect = NotFound("testing")
+        gax_api.get_session.side_effect = NotFound(u"testing")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -285,7 +289,7 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.get_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertNoSpans()
@@ -294,7 +298,7 @@ class TestSession(OpenTelemetryBase):
         from google.api_core.exceptions import Unknown
 
         gax_api = self._make_spanner_api()
-        gax_api.get_session.side_effect = Unknown("testing")
+        gax_api.get_session.side_effect = Unknown(u"testing")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -305,11 +309,11 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.get_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.GetSession",
+            u"CloudSpanner.GetSession",
             status=StatusCanonicalCode.UNKNOWN,
             attributes=TestSession.BASE_ATTRIBUTES,
         )
@@ -324,7 +328,7 @@ class TestSession(OpenTelemetryBase):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
         gax_api = self._make_spanner_api()
-        gax_api.execute_sql.return_value = "1"
+        gax_api.execute_sql.return_value = u"1"
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -332,10 +336,10 @@ class TestSession(OpenTelemetryBase):
 
         session.ping()
 
-        request = ExecuteSqlRequest(session=self.SESSION_NAME, sql="SELECT 1",)
+        request = ExecuteSqlRequest(session=self.SESSION_NAME, sql=u"SELECT 1",)
 
         gax_api.execute_sql.assert_called_once_with(
-            request=request, metadata=[("google-cloud-resource-prefix", database.name)],
+            request=request, metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_ping_miss(self):
@@ -343,7 +347,7 @@ class TestSession(OpenTelemetryBase):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
         gax_api = self._make_spanner_api()
-        gax_api.execute_sql.side_effect = NotFound("testing")
+        gax_api.execute_sql.side_effect = NotFound(u"testing")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -352,10 +356,10 @@ class TestSession(OpenTelemetryBase):
         with self.assertRaises(NotFound):
             session.ping()
 
-        request = ExecuteSqlRequest(session=self.SESSION_NAME, sql="SELECT 1",)
+        request = ExecuteSqlRequest(session=self.SESSION_NAME, sql=u"SELECT 1",)
 
         gax_api.execute_sql.assert_called_once_with(
-            request=request, metadata=[("google-cloud-resource-prefix", database.name)],
+            request=request, metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_ping_error(self):
@@ -363,7 +367,7 @@ class TestSession(OpenTelemetryBase):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
 
         gax_api = self._make_spanner_api()
-        gax_api.execute_sql.side_effect = Unknown("testing")
+        gax_api.execute_sql.side_effect = Unknown(u"testing")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -372,10 +376,10 @@ class TestSession(OpenTelemetryBase):
         with self.assertRaises(Unknown):
             session.ping()
 
-        request = ExecuteSqlRequest(session=self.SESSION_NAME, sql="SELECT 1",)
+        request = ExecuteSqlRequest(session=self.SESSION_NAME, sql=u"SELECT 1",)
 
         gax_api.execute_sql.assert_called_once_with(
-            request=request, metadata=[("google-cloud-resource-prefix", database.name)],
+            request=request, metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_delete_wo_session_id(self):
@@ -399,18 +403,18 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.delete_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.DeleteSession", attributes=TestSession.BASE_ATTRIBUTES
+            u"CloudSpanner.DeleteSession", attributes=TestSession.BASE_ATTRIBUTES
         )
 
     def test_delete_miss(self):
         from google.cloud.exceptions import NotFound
 
         gax_api = self._make_spanner_api()
-        gax_api.delete_session.side_effect = NotFound("testing")
+        gax_api.delete_session.side_effect = NotFound(u"testing")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -421,11 +425,11 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.delete_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.DeleteSession",
+            u"CloudSpanner.DeleteSession",
             status=StatusCanonicalCode.NOT_FOUND,
             attributes=TestSession.BASE_ATTRIBUTES,
         )
@@ -434,7 +438,7 @@ class TestSession(OpenTelemetryBase):
         from google.api_core.exceptions import Unknown
 
         gax_api = self._make_spanner_api()
-        gax_api.delete_session.side_effect = Unknown("testing")
+        gax_api.delete_session.side_effect = Unknown(u"testing")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -445,11 +449,11 @@ class TestSession(OpenTelemetryBase):
 
         gax_api.delete_session.assert_called_once_with(
             name=self.SESSION_NAME,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
         self.assertSpanAttributes(
-            "CloudSpanner.DeleteSession",
+            u"CloudSpanner.DeleteSession",
             status=StatusCanonicalCode.UNKNOWN,
             attributes=TestSession.BASE_ATTRIBUTES,
         )
@@ -466,7 +470,7 @@ class TestSession(OpenTelemetryBase):
 
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"  # emulate 'session.create()'
+        session._session_id = u"DEADBEEF"  # emulate 'session.create()'
 
         snapshot = session.snapshot()
 
@@ -480,7 +484,7 @@ class TestSession(OpenTelemetryBase):
 
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"  # emulate 'session.create()'
+        session._session_id = u"DEADBEEF"  # emulate 'session.create()'
 
         snapshot = session.snapshot(multi_use=True)
 
@@ -492,9 +496,9 @@ class TestSession(OpenTelemetryBase):
     def test_read_not_created(self):
         from google.cloud.spanner_v1.keyset import KeySet
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
-        KEYS = ["bharney@example.com", "phred@example.com"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
+        KEYS = [u"bharney@example.com", u"phred@example.com"]
         KEYSET = KeySet(keys=KEYS)
         database = self._make_database()
         session = self._make_one(database)
@@ -505,17 +509,17 @@ class TestSession(OpenTelemetryBase):
     def test_read(self):
         from google.cloud.spanner_v1.keyset import KeySet
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
-        KEYS = ["bharney@example.com", "phred@example.com"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
+        KEYS = [u"bharney@example.com", u"phred@example.com"]
         KEYSET = KeySet(keys=KEYS)
-        INDEX = "email-address-index"
+        INDEX = u"email-address-index"
         LIMIT = 20
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"
+        session._session_id = u"DEADBEEF"
 
-        with mock.patch("google.cloud.spanner_v1.session.Snapshot") as snapshot:
+        with mock.patch(u"google.cloud.spanner_v1.session.Snapshot") as snapshot:
             found = session.read(TABLE_NAME, COLUMNS, KEYSET, index=INDEX, limit=LIMIT)
 
         self.assertIs(found, snapshot().read.return_value)
@@ -525,7 +529,7 @@ class TestSession(OpenTelemetryBase):
         )
 
     def test_execute_sql_not_created(self):
-        SQL = "SELECT first_name, age FROM citizens"
+        SQL = u"SELECT first_name, age FROM citizens"
         database = self._make_database()
         session = self._make_one(database)
 
@@ -533,12 +537,12 @@ class TestSession(OpenTelemetryBase):
             session.execute_sql(SQL)
 
     def test_execute_sql_defaults(self):
-        SQL = "SELECT first_name, age FROM citizens"
+        SQL = u"SELECT first_name, age FROM citizens"
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"
+        session._session_id = u"DEADBEEF"
 
-        with mock.patch("google.cloud.spanner_v1.session.Snapshot") as snapshot:
+        with mock.patch(u"google.cloud.spanner_v1.session.Snapshot") as snapshot:
             found = session.execute_sql(SQL)
 
         self.assertIs(found, snapshot().execute_sql.return_value)
@@ -557,17 +561,17 @@ class TestSession(OpenTelemetryBase):
         from google.protobuf.struct_pb2 import Struct, Value
         from google.cloud.spanner_v1 import TypeCode
 
-        SQL = "SELECT first_name, age FROM citizens"
+        SQL = u"SELECT first_name, age FROM citizens"
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"
+        session._session_id = u"DEADBEEF"
 
-        params = Struct(fields={"foo": Value(string_value="bar")})
-        param_types = {"foo": TypeCode.STRING}
+        params = Struct(fields={u"foo": Value(string_value=u"bar")})
+        param_types = {u"foo": TypeCode.STRING}
 
-        with mock.patch("google.cloud.spanner_v1.session.Snapshot") as snapshot:
+        with mock.patch(u"google.cloud.spanner_v1.session.Snapshot") as snapshot:
             found = session.execute_sql(
-                SQL, params, param_types, "PLAN", retry=None, timeout=None
+                SQL, params, param_types, u"PLAN", retry=None, timeout=None
             )
 
         self.assertIs(found, snapshot().execute_sql.return_value)
@@ -576,7 +580,7 @@ class TestSession(OpenTelemetryBase):
             SQL,
             params,
             param_types,
-            "PLAN",
+            u"PLAN",
             query_options=None,
             timeout=None,
             retry=None,
@@ -586,16 +590,16 @@ class TestSession(OpenTelemetryBase):
         from google.protobuf.struct_pb2 import Struct, Value
         from google.cloud.spanner_v1 import TypeCode
 
-        SQL = "SELECT first_name, age FROM citizens"
+        SQL = u"SELECT first_name, age FROM citizens"
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"
+        session._session_id = u"DEADBEEF"
 
-        params = Struct(fields={"foo": Value(string_value="bar")})
-        param_types = {"foo": TypeCode.STRING}
+        params = Struct(fields={u"foo": Value(string_value=u"bar")})
+        param_types = {u"foo": TypeCode.STRING}
 
-        with mock.patch("google.cloud.spanner_v1.session.Snapshot") as snapshot:
-            found = session.execute_sql(SQL, params, param_types, "PLAN")
+        with mock.patch(u"google.cloud.spanner_v1.session.Snapshot") as snapshot:
+            found = session.execute_sql(SQL, params, param_types, u"PLAN")
 
         self.assertIs(found, snapshot().execute_sql.return_value)
 
@@ -603,7 +607,7 @@ class TestSession(OpenTelemetryBase):
             SQL,
             params,
             param_types,
-            "PLAN",
+            u"PLAN",
             query_options=None,
             timeout=google.api_core.gapic_v1.method.DEFAULT,
             retry=google.api_core.gapic_v1.method.DEFAULT,
@@ -621,7 +625,7 @@ class TestSession(OpenTelemetryBase):
 
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"
+        session._session_id = u"DEADBEEF"
 
         batch = session.batch()
 
@@ -640,7 +644,7 @@ class TestSession(OpenTelemetryBase):
 
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"
+        session._session_id = u"DEADBEEF"
 
         transaction = session.transaction()
 
@@ -651,7 +655,7 @@ class TestSession(OpenTelemetryBase):
     def test_transaction_w_existing_txn(self):
         database = self._make_database()
         session = self._make_one(database)
-        session._session_id = "DEADBEEF"
+        session._session_id = u"DEADBEEF"
 
         existing = session.transaction()
         another = session.transaction()  # invalidates existing txn
@@ -666,13 +670,13 @@ class TestSession(OpenTelemetryBase):
         )
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
         gax_api = self._make_spanner_api()
         gax_api.begin_transaction.return_value = transaction_pb
@@ -708,12 +712,12 @@ class TestSession(OpenTelemetryBase):
         gax_api.begin_transaction.assert_called_once_with(
             session=self.SESSION_NAME,
             options=expected_options,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
         gax_api.rollback.assert_called_once_with(
             session=self.SESSION_NAME,
             transaction_id=TRANSACTION_ID,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_run_in_transaction_callback_raises_non_abort_rpc_error(self):
@@ -724,13 +728,13 @@ class TestSession(OpenTelemetryBase):
         )
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
         gax_api = self._make_spanner_api()
         gax_api.begin_transaction.return_value = transaction_pb
@@ -745,7 +749,7 @@ class TestSession(OpenTelemetryBase):
         def unit_of_work(txn, *args, **kw):
             called_with.append((txn, args, kw))
             txn.insert(TABLE_NAME, COLUMNS, VALUES)
-            raise Cancelled("error")
+            raise Cancelled(u"error")
 
         with self.assertRaises(Cancelled):
             session.run_in_transaction(unit_of_work)
@@ -763,7 +767,7 @@ class TestSession(OpenTelemetryBase):
         gax_api.begin_transaction.assert_called_once_with(
             session=self.SESSION_NAME,
             options=expected_options,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
         gax_api.rollback.assert_not_called()
 
@@ -778,13 +782,13 @@ class TestSession(OpenTelemetryBase):
         from google.cloud._helpers import _datetime_to_pb_timestamp
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
         now = datetime.datetime.utcnow().replace(tzinfo=UTC)
         now_pb = _datetime_to_pb_timestamp(now)
@@ -804,42 +808,42 @@ class TestSession(OpenTelemetryBase):
             txn.insert(TABLE_NAME, COLUMNS, VALUES)
             return 42
 
-        return_value = session.run_in_transaction(unit_of_work, "abc", some_arg="def")
+        return_value = session.run_in_transaction(unit_of_work, u"abc", some_arg=u"def")
 
         self.assertIsNone(session._transaction)
         self.assertEqual(len(called_with), 1)
         txn, args, kw = called_with[0]
         self.assertIsInstance(txn, Transaction)
         self.assertEqual(return_value, 42)
-        self.assertEqual(args, ("abc",))
-        self.assertEqual(kw, {"some_arg": "def"})
+        self.assertEqual(args, (u"abc",))
+        self.assertEqual(kw, {u"some_arg": u"def"})
 
         expected_options = TransactionOptions(read_write=TransactionOptions.ReadWrite())
         gax_api.begin_transaction.assert_called_once_with(
             session=self.SESSION_NAME,
             options=expected_options,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
         gax_api.commit.assert_called_once_with(
             session=self.SESSION_NAME,
             mutations=txn._mutations,
             transaction_id=TRANSACTION_ID,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_run_in_transaction_w_commit_error(self):
         from google.api_core.exceptions import Unknown
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         gax_api = self._make_spanner_api()
-        gax_api.commit.side_effect = Unknown("error")
+        gax_api.commit.side_effect = Unknown(u"error")
         database = self._make_database()
         database.spanner_api = gax_api
         session = self._make_one(database)
@@ -871,7 +875,7 @@ class TestSession(OpenTelemetryBase):
             session=self.SESSION_NAME,
             mutations=txn._mutations,
             transaction_id=TRANSACTION_ID,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_run_in_transaction_w_abort_no_retry_metadata(self):
@@ -886,13 +890,13 @@ class TestSession(OpenTelemetryBase):
         from google.cloud._helpers import _datetime_to_pb_timestamp
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
         now = datetime.datetime.utcnow().replace(tzinfo=UTC)
         now_pb = _datetime_to_pb_timestamp(now)
@@ -911,16 +915,16 @@ class TestSession(OpenTelemetryBase):
         def unit_of_work(txn, *args, **kw):
             called_with.append((txn, args, kw))
             txn.insert(TABLE_NAME, COLUMNS, VALUES)
-            return "answer"
+            return u"answer"
 
-        return_value = session.run_in_transaction(unit_of_work, "abc", some_arg="def")
+        return_value = session.run_in_transaction(unit_of_work, u"abc", some_arg=u"def")
 
         self.assertEqual(len(called_with), 2)
         for index, (txn, args, kw) in enumerate(called_with):
             self.assertIsInstance(txn, Transaction)
-            self.assertEqual(return_value, "answer")
-            self.assertEqual(args, ("abc",))
-            self.assertEqual(kw, {"some_arg": "def"})
+            self.assertEqual(return_value, u"answer")
+            self.assertEqual(args, (u"abc",))
+            self.assertEqual(kw, {u"some_arg": u"def"})
 
         expected_options = TransactionOptions(read_write=TransactionOptions.ReadWrite())
         self.assertEqual(
@@ -929,7 +933,7 @@ class TestSession(OpenTelemetryBase):
                 mock.call(
                     session=self.SESSION_NAME,
                     options=expected_options,
-                    metadata=[("google-cloud-resource-prefix", database.name)],
+                    metadata=[(u"google-cloud-resource-prefix", database.name)],
                 )
             ]
             * 2,
@@ -941,7 +945,7 @@ class TestSession(OpenTelemetryBase):
                     session=self.SESSION_NAME,
                     mutations=txn._mutations,
                     transaction_id=TRANSACTION_ID,
-                    metadata=[("google-cloud-resource-prefix", database.name)],
+                    metadata=[(u"google-cloud-resource-prefix", database.name)],
                 )
             ]
             * 2,
@@ -961,20 +965,20 @@ class TestSession(OpenTelemetryBase):
         from google.cloud._helpers import _datetime_to_pb_timestamp
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         RETRY_SECONDS = 12
         RETRY_NANOS = 3456
         retry_info = RetryInfo(
             retry_delay=Duration(seconds=RETRY_SECONDS, nanos=RETRY_NANOS)
         )
         trailing_metadata = [
-            ("google.rpc.retryinfo-bin", retry_info.SerializeToString())
+            (u"google.rpc.retryinfo-bin", retry_info.SerializeToString())
         ]
         aborted = _make_rpc_error(Aborted, trailing_metadata=trailing_metadata)
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
@@ -995,8 +999,8 @@ class TestSession(OpenTelemetryBase):
             called_with.append((txn, args, kw))
             txn.insert(TABLE_NAME, COLUMNS, VALUES)
 
-        with mock.patch("time.sleep") as sleep_mock:
-            session.run_in_transaction(unit_of_work, "abc", some_arg="def")
+        with mock.patch(u"time.sleep") as sleep_mock:
+            session.run_in_transaction(unit_of_work, u"abc", some_arg=u"def")
 
         sleep_mock.assert_called_once_with(RETRY_SECONDS + RETRY_NANOS / 1.0e9)
         self.assertEqual(len(called_with), 2)
@@ -1007,8 +1011,8 @@ class TestSession(OpenTelemetryBase):
                 self.assertEqual(txn.committed, now)
             else:
                 self.assertIsNone(txn.committed)
-            self.assertEqual(args, ("abc",))
-            self.assertEqual(kw, {"some_arg": "def"})
+            self.assertEqual(args, (u"abc",))
+            self.assertEqual(kw, {u"some_arg": u"def"})
 
         expected_options = TransactionOptions(read_write=TransactionOptions.ReadWrite())
         self.assertEqual(
@@ -1017,7 +1021,7 @@ class TestSession(OpenTelemetryBase):
                 mock.call(
                     session=self.SESSION_NAME,
                     options=expected_options,
-                    metadata=[("google-cloud-resource-prefix", database.name)],
+                    metadata=[(u"google-cloud-resource-prefix", database.name)],
                 )
             ]
             * 2,
@@ -1029,7 +1033,7 @@ class TestSession(OpenTelemetryBase):
                     session=self.SESSION_NAME,
                     mutations=txn._mutations,
                     transaction_id=TRANSACTION_ID,
-                    metadata=[("google-cloud-resource-prefix", database.name)],
+                    metadata=[(u"google-cloud-resource-prefix", database.name)],
                 )
             ]
             * 2,
@@ -1049,13 +1053,13 @@ class TestSession(OpenTelemetryBase):
         from google.cloud._helpers import _datetime_to_pb_timestamp
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         RETRY_SECONDS = 1
         RETRY_NANOS = 3456
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
@@ -1066,7 +1070,7 @@ class TestSession(OpenTelemetryBase):
             retry_delay=Duration(seconds=RETRY_SECONDS, nanos=RETRY_NANOS)
         )
         trailing_metadata = [
-            ("google.rpc.retryinfo-bin", retry_info.SerializeToString())
+            (u"google.rpc.retryinfo-bin", retry_info.SerializeToString())
         ]
         gax_api = self._make_spanner_api()
         gax_api.begin_transaction.return_value = transaction_pb
@@ -1084,7 +1088,7 @@ class TestSession(OpenTelemetryBase):
                 raise _make_rpc_error(Aborted, trailing_metadata)
             txn.insert(TABLE_NAME, COLUMNS, VALUES)
 
-        with mock.patch("time.sleep") as sleep_mock:
+        with mock.patch(u"time.sleep") as sleep_mock:
             session.run_in_transaction(unit_of_work)
 
         sleep_mock.assert_called_once_with(RETRY_SECONDS + RETRY_NANOS / 1.0e9)
@@ -1105,7 +1109,7 @@ class TestSession(OpenTelemetryBase):
                 mock.call(
                     session=self.SESSION_NAME,
                     options=expected_options,
-                    metadata=[("google-cloud-resource-prefix", database.name)],
+                    metadata=[(u"google-cloud-resource-prefix", database.name)],
                 )
             ]
             * 2,
@@ -1114,7 +1118,7 @@ class TestSession(OpenTelemetryBase):
             session=self.SESSION_NAME,
             mutations=txn._mutations,
             transaction_id=TRANSACTION_ID,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_run_in_transaction_w_abort_w_retry_metadata_deadline(self):
@@ -1131,13 +1135,13 @@ class TestSession(OpenTelemetryBase):
         from google.cloud._helpers import UTC
         from google.cloud._helpers import _datetime_to_pb_timestamp
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         RETRY_SECONDS = 1
         RETRY_NANOS = 3456
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
@@ -1148,7 +1152,7 @@ class TestSession(OpenTelemetryBase):
             retry_delay=Duration(seconds=RETRY_SECONDS, nanos=RETRY_NANOS)
         )
         trailing_metadata = [
-            ("google.rpc.retryinfo-bin", retry_info.SerializeToString())
+            (u"google.rpc.retryinfo-bin", retry_info.SerializeToString())
         ]
         aborted = _make_rpc_error(Aborted, trailing_metadata=trailing_metadata)
         gax_api = self._make_spanner_api()
@@ -1169,18 +1173,18 @@ class TestSession(OpenTelemetryBase):
         def _time(_results=[1, 1.5]):
             return _results.pop(0)
 
-        with mock.patch("time.time", _time):
+        with mock.patch(u"time.time", _time):
             if HAS_OPENTELEMETRY_INSTALLED:
-                with mock.patch("opentelemetry.util.time", _ConstantTime()):
-                    with mock.patch("time.sleep") as sleep_mock:
+                with mock.patch(u"opentelemetry.util.time", _ConstantTime()):
+                    with mock.patch(u"time.sleep") as sleep_mock:
                         with self.assertRaises(Aborted):
                             session.run_in_transaction(
-                                unit_of_work, "abc", timeout_secs=1
+                                unit_of_work, u"abc", timeout_secs=1
                             )
             else:
-                with mock.patch("time.sleep") as sleep_mock:
+                with mock.patch(u"time.sleep") as sleep_mock:
                     with self.assertRaises(Aborted):
-                        session.run_in_transaction(unit_of_work, "abc", timeout_secs=1)
+                        session.run_in_transaction(unit_of_work, u"abc", timeout_secs=1)
 
         sleep_mock.assert_not_called()
 
@@ -1188,20 +1192,20 @@ class TestSession(OpenTelemetryBase):
         txn, args, kw = called_with[0]
         self.assertIsInstance(txn, Transaction)
         self.assertIsNone(txn.committed)
-        self.assertEqual(args, ("abc",))
+        self.assertEqual(args, (u"abc",))
         self.assertEqual(kw, {})
 
         expected_options = TransactionOptions(read_write=TransactionOptions.ReadWrite())
         gax_api.begin_transaction.assert_called_once_with(
             session=self.SESSION_NAME,
             options=expected_options,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
         gax_api.commit.assert_called_once_with(
             session=self.SESSION_NAME,
             mutations=txn._mutations,
             transaction_id=TRANSACTION_ID,
-            metadata=[("google-cloud-resource-prefix", database.name)],
+            metadata=[(u"google-cloud-resource-prefix", database.name)],
         )
 
     def test_run_in_transaction_w_timeout(self):
@@ -1212,13 +1216,13 @@ class TestSession(OpenTelemetryBase):
         )
         from google.cloud.spanner_v1.transaction import Transaction
 
-        TABLE_NAME = "citizens"
-        COLUMNS = ["email", "first_name", "last_name", "age"]
+        TABLE_NAME = u"citizens"
+        COLUMNS = [u"email", u"first_name", u"last_name", u"age"]
         VALUES = [
-            ["phred@exammple.com", "Phred", "Phlyntstone", 32],
-            ["bharney@example.com", "Bharney", "Rhubble", 31],
+            [u"phred@exammple.com", u"Phred", u"Phlyntstone", 32],
+            [u"bharney@example.com", u"Bharney", u"Rhubble", 31],
         ]
-        TRANSACTION_ID = b"FACEDACE"
+        TRANSACTION_ID = "FACEDACE"
         transaction_pb = TransactionPB(id=TRANSACTION_ID)
         aborted = _make_rpc_error(Aborted, trailing_metadata=[])
         gax_api = self._make_spanner_api()
@@ -1239,20 +1243,20 @@ class TestSession(OpenTelemetryBase):
         def _time(_results=[1, 2, 4, 8]):
             return _results.pop(0)
 
-        with mock.patch("time.time", _time):
+        with mock.patch(u"time.time", _time):
             if HAS_OPENTELEMETRY_INSTALLED:
-                with mock.patch("opentelemetry.util.time", _ConstantTime()):
-                    with mock.patch("time.sleep") as sleep_mock:
+                with mock.patch(u"opentelemetry.util.time", _ConstantTime()):
+                    with mock.patch(u"time.sleep") as sleep_mock:
                         with self.assertRaises(Aborted):
                             session.run_in_transaction(unit_of_work, timeout_secs=8)
             else:
-                with mock.patch("time.sleep") as sleep_mock:
+                with mock.patch(u"time.sleep") as sleep_mock:
                     with self.assertRaises(Aborted):
                         session.run_in_transaction(unit_of_work, timeout_secs=8)
 
         # unpacking call args into list
         call_args = [call_[0][0] for call_ in sleep_mock.call_args_list]
-        call_args = list(map(int, call_args))
+        call_args = list(imap(int, call_args))
         assert call_args == [2, 4]
         assert sleep_mock.call_count == 2
 
@@ -1270,7 +1274,7 @@ class TestSession(OpenTelemetryBase):
                 mock.call(
                     session=self.SESSION_NAME,
                     options=expected_options,
-                    metadata=[("google-cloud-resource-prefix", database.name)],
+                    metadata=[(u"google-cloud-resource-prefix", database.name)],
                 )
             ]
             * 3,
@@ -1282,7 +1286,7 @@ class TestSession(OpenTelemetryBase):
                     session=self.SESSION_NAME,
                     mutations=txn._mutations,
                     transaction_id=TRANSACTION_ID,
-                    metadata=[("google-cloud-resource-prefix", database.name)],
+                    metadata=[(u"google-cloud-resource-prefix", database.name)],
                 )
             ]
             * 3,
@@ -1300,15 +1304,15 @@ class TestSession(OpenTelemetryBase):
             return 3
 
         # check if current time > deadline
-        with mock.patch("time.time", _time_func):
+        with mock.patch(u"time.time", _time_func):
             with self.assertRaises(Exception):
                 _delay_until_retry(exc_mock, 2, 1)
 
-        with mock.patch("time.time", _time_func):
+        with mock.patch(u"time.time", _time_func):
             with mock.patch(
-                "google.cloud.spanner_v1.session._get_retry_delay"
+                u"google.cloud.spanner_v1.session._get_retry_delay"
             ) as get_retry_delay_mock:
-                with mock.patch("time.sleep") as sleep_mock:
+                with mock.patch(u"time.sleep") as sleep_mock:
                     get_retry_delay_mock.return_value = None
 
                     _delay_until_retry(exc_mock, 6, 1)

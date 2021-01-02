@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from .services.instance_admin import InstanceAdminClient
 from .types.spanner_instance_admin import CreateInstanceMetadata
 from .types.spanner_instance_admin import CreateInstanceRequest
@@ -33,19 +34,19 @@ from .types.spanner_instance_admin import UpdateInstanceRequest
 
 
 __all__ = (
-    "CreateInstanceMetadata",
-    "CreateInstanceRequest",
-    "DeleteInstanceRequest",
-    "GetInstanceConfigRequest",
-    "GetInstanceRequest",
-    "Instance",
-    "InstanceConfig",
-    "ListInstanceConfigsRequest",
-    "ListInstanceConfigsResponse",
-    "ListInstancesRequest",
-    "ListInstancesResponse",
-    "ReplicaInfo",
-    "UpdateInstanceMetadata",
-    "UpdateInstanceRequest",
-    "InstanceAdminClient",
+    u"CreateInstanceMetadata",
+    u"CreateInstanceRequest",
+    u"DeleteInstanceRequest",
+    u"GetInstanceConfigRequest",
+    u"GetInstanceRequest",
+    u"Instance",
+    u"InstanceConfig",
+    u"ListInstanceConfigsRequest",
+    u"ListInstanceConfigsResponse",
+    u"ListInstancesRequest",
+    u"ListInstancesResponse",
+    u"ReplicaInfo",
+    u"UpdateInstanceMetadata",
+    u"UpdateInstanceRequest",
+    u"InstanceAdminClient",
 )

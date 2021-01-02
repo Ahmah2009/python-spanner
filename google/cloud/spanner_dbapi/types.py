@@ -12,20 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implementation of the type objects and constructors according to the
+u"""Implementation of the type objects and constructors according to the
    PEP-0249 specification.
 
    See
    https://www.python.org/dev/peps/pep-0249/#type-objects-and-constructors
 """
 
+from __future__ import absolute_import
 import datetime
 import time
 from base64 import b64encode
 
 
 def _date_from_ticks(ticks):
-    """Based on PEP-249 Implementation Hints for Module Authors:
+    u"""Based on PEP-249 Implementation Hints for Module Authors:
 
     https://www.python.org/dev/peps/pep-0249/#implementation-hints-for-module-authors
     """
@@ -33,7 +34,7 @@ def _date_from_ticks(ticks):
 
 
 def _time_from_ticks(ticks):
-    """Based on PEP-249 Implementation Hints for Module Authors:
+    u"""Based on PEP-249 Implementation Hints for Module Authors:
 
     https://www.python.org/dev/peps/pep-0249/#implementation-hints-for-module-authors
     """
@@ -41,7 +42,7 @@ def _time_from_ticks(ticks):
 
 
 def _timestamp_from_ticks(ticks):
-    """Based on PEP-249 Implementation Hints for Module Authors:
+    u"""Based on PEP-249 Implementation Hints for Module Authors:
 
     https://www.python.org/dev/peps/pep-0249/#implementation-hints-for-module-authors
     """
@@ -49,7 +50,7 @@ def _timestamp_from_ticks(ticks):
 
 
 class _DBAPITypeObject(object):
-    """Implementation of a helper class used for type comparison among similar
+    u"""Implementation of a helper class used for type comparison among similar
     but possibly different types.
 
     See
@@ -71,15 +72,15 @@ TimeFromTicks = _time_from_ticks
 TimestampFromTicks = _timestamp_from_ticks
 Binary = b64encode
 
-STRING = "STRING"
-BINARY = _DBAPITypeObject("TYPE_CODE_UNSPECIFIED", "BYTES", "ARRAY", "STRUCT")
-NUMBER = _DBAPITypeObject("BOOL", "INT64", "FLOAT64", "NUMERIC")
-DATETIME = _DBAPITypeObject("TIMESTAMP", "DATE")
-ROWID = "STRING"
+STRING = u"STRING"
+BINARY = _DBAPITypeObject(u"TYPE_CODE_UNSPECIFIED", u"BYTES", u"ARRAY", u"STRUCT")
+NUMBER = _DBAPITypeObject(u"BOOL", u"INT64", u"FLOAT64", u"NUMERIC")
+DATETIME = _DBAPITypeObject(u"TIMESTAMP", u"DATE")
+ROWID = u"STRING"
 
 
-class TimestampStr(str):
-    """[inherited from the alpha release]
+class TimestampStr(unicode):
+    u"""[inherited from the alpha release]
 
     TODO: Decide whether this class is necessary
 
@@ -92,8 +93,8 @@ class TimestampStr(str):
     pass
 
 
-class DateStr(str):
-    """[inherited from the alpha release]
+class DateStr(unicode):
+    u"""[inherited from the alpha release]
 
     TODO: Decide whether this class is necessary
 

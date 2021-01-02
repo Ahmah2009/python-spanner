@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Model a set of read-only queries to a database as a snapshot."""
+u"""Model a set of read-only queries to a database as a snapshot."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import functools
 
 from google.protobuf.struct_pb2 import Struct
@@ -36,18 +38,18 @@ from google.cloud.spanner_v1._opentelemetry_tracing import trace_call
 from google.cloud.spanner_v1.streamed import StreamedResultSet
 
 _STREAM_RESUMPTION_INTERNAL_ERROR_MESSAGES = (
-    "RST_STREAM",
-    "Received unexpected EOS on DATA frame from server",
+    u"RST_STREAM",
+    u"Received unexpected EOS on DATA frame from server",
 )
 
 
 def _restart_on_unavailable(restart, trace_name=None, session=None, attributes=None):
-    """Restart iteration after :exc:`.ServiceUnavailable`.
+    u"""Restart iteration after :exc:`.ServiceUnavailable`.
 
     :type restart: callable
     :param restart: curried function returning iterator
     """
-    resume_token = b""
+    resume_token = ""
     item_buffer = []
     with trace_call(trace_name, session, attributes):
         iterator = restart()
@@ -63,7 +65,7 @@ def _restart_on_unavailable(restart, trace_name=None, session=None, attributes=N
             with trace_call(trace_name, session, attributes):
                 iterator = restart(resume_token=resume_token)
             continue
-        except InternalServerError as exc:
+        except InternalServerError, exc:
             resumable_error = any(
                 resumable_message in exc.message
                 for resumable_message in _STREAM_RESUMPTION_INTERNAL_ERROR_MESSAGES
@@ -85,7 +87,7 @@ def _restart_on_unavailable(restart, trace_name=None, session=None, attributes=N
 
 
 class _SnapshotBase(_SessionWrapper):
-    """Base class for Snapshot.
+    u"""Base class for Snapshot.
 
     Allows reuse of API request methods with different transaction selector.
 
@@ -99,7 +101,7 @@ class _SnapshotBase(_SessionWrapper):
     _execute_sql_count = 0
 
     def _make_txn_selector(self):  # pylint: disable=redundant-returns-doc
-        """Helper for :meth:`read` / :meth:`execute_sql`.
+        u"""Helper for :meth:`read` / :meth:`execute_sql`.
 
         Subclasses must override, returning an instance of
         :class:`transaction_pb2.TransactionSelector`
@@ -109,8 +111,8 @@ class _SnapshotBase(_SessionWrapper):
         """
         raise NotImplementedError
 
-    def read(self, table, columns, keyset, index="", limit=0, partition=None):
-        """Perform a ``StreamingRead`` API request for rows in a table.
+    def read(self, table, columns, keyset, index=u"", limit=0, partition=None):
+        u"""Perform a ``StreamingRead`` API request for rows in a table.
 
         :type table: str
         :param table: name of the table from which to fetch data
@@ -143,9 +145,9 @@ class _SnapshotBase(_SessionWrapper):
         """
         if self._read_request_count > 0:
             if not self._multi_use:
-                raise ValueError("Cannot re-use single-use snapshot.")
+                raise ValueError(u"Cannot re-use single-use snapshot.")
             if self._transaction_id is None:
-                raise ValueError("Transaction ID pending.")
+                raise ValueError(u"Transaction ID pending.")
 
         database = self._session._database
         api = database.spanner_api
@@ -166,9 +168,9 @@ class _SnapshotBase(_SessionWrapper):
             api.streaming_read, request=request, metadata=metadata,
         )
 
-        trace_attributes = {"table_id": table, "columns": columns}
+        trace_attributes = {u"table_id": table, u"columns": columns}
         iterator = _restart_on_unavailable(
-            restart, "CloudSpanner.ReadOnlyTransaction", self._session, trace_attributes
+            restart, u"CloudSpanner.ReadOnlyTransaction", self._session, trace_attributes
         )
 
         self._read_request_count += 1
@@ -189,7 +191,7 @@ class _SnapshotBase(_SessionWrapper):
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
     ):
-        """Perform an ``ExecuteStreamingSql`` API request.
+        u"""Perform an ``ExecuteStreamingSql`` API request.
 
         :type sql: str
         :param sql: SQL query statement
@@ -230,15 +232,15 @@ class _SnapshotBase(_SessionWrapper):
         """
         if self._read_request_count > 0:
             if not self._multi_use:
-                raise ValueError("Cannot re-use single-use snapshot.")
+                raise ValueError(u"Cannot re-use single-use snapshot.")
             if self._transaction_id is None:
-                raise ValueError("Transaction ID pending.")
+                raise ValueError(u"Transaction ID pending.")
 
         if params is not None:
             if param_types is None:
-                raise ValueError("Specify 'param_types' when passing 'params'.")
+                raise ValueError(u"Specify 'param_types' when passing 'params'.")
             params_pb = Struct(
-                fields={key: _make_value_pb(value) for key, value in params.items()}
+                fields=dict((key, _make_value_pb(value)) for key, value in params.items())
             )
         else:
             params_pb = {}
@@ -272,10 +274,10 @@ class _SnapshotBase(_SessionWrapper):
             timeout=timeout,
         )
 
-        trace_attributes = {"db.statement": sql}
+        trace_attributes = {u"db.statement": sql}
         iterator = _restart_on_unavailable(
             restart,
-            "CloudSpanner.ReadWriteTransaction",
+            u"CloudSpanner.ReadWriteTransaction",
             self._session,
             trace_attributes,
         )
@@ -293,11 +295,11 @@ class _SnapshotBase(_SessionWrapper):
         table,
         columns,
         keyset,
-        index="",
+        index=u"",
         partition_size_bytes=None,
         max_partitions=None,
     ):
-        """Perform a ``ParitionRead`` API request for rows in a table.
+        u"""Perform a ``ParitionRead`` API request for rows in a table.
 
         :type table: str
         :param table: name of the table from which to fetch data
@@ -331,10 +333,10 @@ class _SnapshotBase(_SessionWrapper):
             already associtated with the snapshot.
         """
         if not self._multi_use:
-            raise ValueError("Cannot use single-use snapshot.")
+            raise ValueError(u"Cannot use single-use snapshot.")
 
         if self._transaction_id is None:
-            raise ValueError("Transaction not started.")
+            raise ValueError(u"Transaction not started.")
 
         database = self._session._database
         api = database.spanner_api
@@ -353,9 +355,9 @@ class _SnapshotBase(_SessionWrapper):
             partition_options=partition_options,
         )
 
-        trace_attributes = {"table_id": table, "columns": columns}
+        trace_attributes = {u"table_id": table, u"columns": columns}
         with trace_call(
-            "CloudSpanner.PartitionReadOnlyTransaction", self._session, trace_attributes
+            u"CloudSpanner.PartitionReadOnlyTransaction", self._session, trace_attributes
         ):
             response = api.partition_read(request=request, metadata=metadata,)
 
@@ -369,7 +371,7 @@ class _SnapshotBase(_SessionWrapper):
         partition_size_bytes=None,
         max_partitions=None,
     ):
-        """Perform a ``ParitionQuery`` API request.
+        u"""Perform a ``ParitionQuery`` API request.
 
         :type sql: str
         :param sql: SQL query statement
@@ -402,16 +404,16 @@ class _SnapshotBase(_SessionWrapper):
             already associtated with the snapshot.
         """
         if not self._multi_use:
-            raise ValueError("Cannot use single-use snapshot.")
+            raise ValueError(u"Cannot use single-use snapshot.")
 
         if self._transaction_id is None:
-            raise ValueError("Transaction not started.")
+            raise ValueError(u"Transaction not started.")
 
         if params is not None:
             if param_types is None:
-                raise ValueError("Specify 'param_types' when passing 'params'.")
+                raise ValueError(u"Specify 'param_types' when passing 'params'.")
             params_pb = Struct(
-                fields={key: _make_value_pb(value) for (key, value) in params.items()}
+                fields=dict((key, _make_value_pb(value)) for (key, value) in params.items())
             )
         else:
             params_pb = Struct()
@@ -432,9 +434,9 @@ class _SnapshotBase(_SessionWrapper):
             partition_options=partition_options,
         )
 
-        trace_attributes = {"db.statement": sql}
+        trace_attributes = {u"db.statement": sql}
         with trace_call(
-            "CloudSpanner.PartitionReadWriteTransaction",
+            u"CloudSpanner.PartitionReadWriteTransaction",
             self._session,
             trace_attributes,
         ):
@@ -444,7 +446,7 @@ class _SnapshotBase(_SessionWrapper):
 
 
 class Snapshot(_SnapshotBase):
-    """Allow a set of reads / SQL statements with shared staleness.
+    u"""Allow a set of reads / SQL statements with shared staleness.
 
     See
     https://cloud.google.com/spanner/reference/rpc/google.spanner.v1#google.spanner.v1.TransactionOptions.ReadOnly
@@ -492,13 +494,13 @@ class Snapshot(_SnapshotBase):
         flagged = [opt for opt in opts if opt is not None]
 
         if len(flagged) > 1:
-            raise ValueError("Supply zero or one options.")
+            raise ValueError(u"Supply zero or one options.")
 
         if multi_use:
             if min_read_timestamp is not None or max_staleness is not None:
                 raise ValueError(
-                    "'multi_use' is incompatible with "
-                    "'min_read_timestamp' / 'max_staleness'"
+                    u"'multi_use' is incompatible with "
+                    u"'min_read_timestamp' / 'max_staleness'"
                 )
 
         self._strong = len(flagged) == 0
@@ -509,24 +511,24 @@ class Snapshot(_SnapshotBase):
         self._multi_use = multi_use
 
     def _make_txn_selector(self):
-        """Helper for :meth:`read`."""
+        u"""Helper for :meth:`read`."""
         if self._transaction_id is not None:
             return TransactionSelector(id=self._transaction_id)
 
         if self._read_timestamp:
-            key = "read_timestamp"
+            key = u"read_timestamp"
             value = self._read_timestamp
         elif self._min_read_timestamp:
-            key = "min_read_timestamp"
+            key = u"min_read_timestamp"
             value = self._min_read_timestamp
         elif self._max_staleness:
-            key = "max_staleness"
+            key = u"max_staleness"
             value = self._max_staleness
         elif self._exact_staleness:
-            key = "exact_staleness"
+            key = u"exact_staleness"
             value = self._exact_staleness
         else:
-            key = "strong"
+            key = u"strong"
             value = True
 
         options = TransactionOptions(
@@ -539,7 +541,7 @@ class Snapshot(_SnapshotBase):
             return TransactionSelector(single_use=options)
 
     def begin(self):
-        """Begin a read-only transaction on the database.
+        u"""Begin a read-only transaction on the database.
 
         :rtype: bytes
         :returns: the ID for the newly-begun transaction.
@@ -548,19 +550,19 @@ class Snapshot(_SnapshotBase):
             if the transaction is already begun, committed, or rolled back.
         """
         if not self._multi_use:
-            raise ValueError("Cannot call 'begin' on single-use snapshots")
+            raise ValueError(u"Cannot call 'begin' on single-use snapshots")
 
         if self._transaction_id is not None:
-            raise ValueError("Read-only transaction already begun")
+            raise ValueError(u"Read-only transaction already begun")
 
         if self._read_request_count > 0:
-            raise ValueError("Read-only transaction already pending")
+            raise ValueError(u"Read-only transaction already pending")
 
         database = self._session._database
         api = database.spanner_api
         metadata = _metadata_with_prefix(database.name)
         txn_selector = self._make_txn_selector()
-        with trace_call("CloudSpanner.BeginTransaction", self._session):
+        with trace_call(u"CloudSpanner.BeginTransaction", self._session):
             response = api.begin_transaction(
                 session=self._session.name,
                 options=txn_selector.begin,

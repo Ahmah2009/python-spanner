@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+from __future__ import absolute_import
 import unittest
 
 
@@ -40,16 +41,16 @@ class Test_Struct(unittest.TestCase):
 
         struct_type = StructType(
             fields=[
-                StructType.Field(name="name", type_=Type(code=TypeCode.STRING)),
-                StructType.Field(name="count", type_=Type(code=TypeCode.INT64)),
+                StructType.Field(name=u"name", type_=Type(code=TypeCode.STRING)),
+                StructType.Field(name=u"count", type_=Type(code=TypeCode.INT64)),
             ]
         )
         expected = Type(code=TypeCode.STRUCT, struct_type=struct_type)
 
         found = param_types.Struct(
             [
-                param_types.StructField("name", param_types.STRING),
-                param_types.StructField("count", param_types.INT64),
+                param_types.StructField(u"name", param_types.STRING),
+                param_types.StructField(u"count", param_types.INT64),
             ]
         )
 

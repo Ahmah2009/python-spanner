@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Connection-based DB API for Cloud Spanner."""
+u"""Connection-based DB API for Cloud Spanner."""
 
+from __future__ import absolute_import
 from google.cloud.spanner_dbapi.connection import Connection
 from google.cloud.spanner_dbapi.connection import connect
 
@@ -48,8 +49,8 @@ from google.cloud.spanner_dbapi.types import TimestampFromTicks
 
 from google.cloud.spanner_dbapi.version import DEFAULT_USER_AGENT
 
-apilevel = "2.0"  # supports DP-API 2.0 level.
-paramstyle = "format"  # ANSI C printf format codes, e.g. ...WHERE name=%s.
+apilevel = u"2.0"  # supports DP-API 2.0 level.
+paramstyle = u"format"  # ANSI C printf format codes, e.g. ...WHERE name=%s.
 
 # Threads may share the module, but not connections. This is a paranoid threadsafety
 # level, but it is necessary for starters to use when debugging failures.
@@ -59,35 +60,35 @@ threadsafety = 1
 
 
 __all__ = [
-    "Connection",
-    "connect",
-    "Cursor",
-    "DatabaseError",
-    "DataError",
-    "Error",
-    "IntegrityError",
-    "InterfaceError",
-    "InternalError",
-    "NotSupportedError",
-    "OperationalError",
-    "ProgrammingError",
-    "Warning",
-    "DEFAULT_USER_AGENT",
-    "apilevel",
-    "paramstyle",
-    "threadsafety",
-    "get_param_types",
-    "Binary",
-    "Date",
-    "DateFromTicks",
-    "Time",
-    "TimeFromTicks",
-    "Timestamp",
-    "TimestampFromTicks",
-    "BINARY",
-    "STRING",
-    "NUMBER",
-    "DATETIME",
-    "ROWID",
-    "TimestampStr",
+    u"Connection",
+    u"connect",
+    u"Cursor",
+    u"DatabaseError",
+    u"DataError",
+    u"Error",
+    u"IntegrityError",
+    u"InterfaceError",
+    u"InternalError",
+    u"NotSupportedError",
+    u"OperationalError",
+    u"ProgrammingError",
+    u"Warning",
+    u"DEFAULT_USER_AGENT",
+    u"apilevel",
+    u"paramstyle",
+    u"threadsafety",
+    u"get_param_types",
+    u"Binary",
+    u"Date",
+    u"DateFromTicks",
+    u"Time",
+    u"TimeFromTicks",
+    u"Timestamp",
+    u"TimestampFromTicks",
+    u"BINARY",
+    u"STRING",
+    u"NUMBER",
+    u"DATETIME",
+    u"ROWID",
+    u"TimestampStr",
 ]

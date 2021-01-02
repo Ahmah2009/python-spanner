@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Manages OpenTelemetry trace creation and handling"""
+u"""Manages OpenTelemetry trace creation and handling"""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 from contextlib import contextmanager
 
 from google.api_core.exceptions import GoogleAPICallError
@@ -40,10 +42,10 @@ def trace_call(name, session, extra_attributes=None):
 
     # Set base attributes that we know for every trace created
     attributes = {
-        "db.type": "spanner",
-        "db.url": SpannerClient.DEFAULT_ENDPOINT,
-        "db.instance": session._database.name,
-        "net.host.name": SpannerClient.DEFAULT_ENDPOINT,
+        u"db.type": u"spanner",
+        u"db.url": SpannerClient.DEFAULT_ENDPOINT,
+        u"db.instance": session._database.name,
+        u"net.host.name": SpannerClient.DEFAULT_ENDPOINT,
     }
 
     if extra_attributes:
@@ -54,7 +56,7 @@ def trace_call(name, session, extra_attributes=None):
     ) as span:
         try:
             yield span
-        except GoogleAPICallError as error:
+        except GoogleAPICallError, error:
             if error.code is not None:
                 span.set_status(Status(http_status_to_canonical_code(error.code)))
             elif error.grpc_status_code is not None:

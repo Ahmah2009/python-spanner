@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from typing import Any, AsyncIterable, Awaitable, Callable, Iterable, Sequence, Tuple
 
 from google.cloud.spanner_admin_database_v1.types import backup
@@ -22,8 +23,8 @@ from google.cloud.spanner_admin_database_v1.types import spanner_database_admin
 from google.longrunning import operations_pb2 as operations  # type: ignore
 
 
-class ListDatabasesPager:
-    """A pager for iterating through ``list_databases`` requests.
+class ListDatabasesPager(object):
+    u"""A pager for iterating through ``list_databases`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_database_admin.ListDatabasesResponse` object, and
@@ -42,13 +43,13 @@ class ListDatabasesPager:
 
     def __init__(
         self,
-        method: Callable[..., spanner_database_admin.ListDatabasesResponse],
-        request: spanner_database_admin.ListDatabasesRequest,
-        response: spanner_database_admin.ListDatabasesResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -65,27 +66,27 @@ class ListDatabasesPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    def pages(self) -> Iterable[spanner_database_admin.ListDatabasesResponse]:
+    def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __iter__(self) -> Iterable[spanner_database_admin.Database]:
+    def __iter__(self):
         for page in self.pages:
             yield from page.databases
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListDatabasesAsyncPager:
-    """A pager for iterating through ``list_databases`` requests.
+class ListDatabasesAsyncPager(object):
+    u"""A pager for iterating through ``list_databases`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_database_admin.ListDatabasesResponse` object, and
@@ -104,13 +105,13 @@ class ListDatabasesAsyncPager:
 
     def __init__(
         self,
-        method: Callable[..., Awaitable[spanner_database_admin.ListDatabasesResponse]],
-        request: spanner_database_admin.ListDatabasesRequest,
-        response: spanner_database_admin.ListDatabasesResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -127,20 +128,20 @@ class ListDatabasesAsyncPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
     async def pages(
         self,
-    ) -> AsyncIterable[spanner_database_admin.ListDatabasesResponse]:
+    ):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = await self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __aiter__(self) -> AsyncIterable[spanner_database_admin.Database]:
+    def __aiter__(self):
         async def async_generator():
             async for page in self.pages:
                 for response in page.databases:
@@ -148,12 +149,12 @@ class ListDatabasesAsyncPager:
 
         return async_generator()
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListBackupsPager:
-    """A pager for iterating through ``list_backups`` requests.
+class ListBackupsPager(object):
+    u"""A pager for iterating through ``list_backups`` requests.
 
     This class thinly wraps an initial
     :class:`~.backup.ListBackupsResponse` object, and
@@ -172,13 +173,13 @@ class ListBackupsPager:
 
     def __init__(
         self,
-        method: Callable[..., backup.ListBackupsResponse],
-        request: backup.ListBackupsRequest,
-        response: backup.ListBackupsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -195,27 +196,27 @@ class ListBackupsPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    def pages(self) -> Iterable[backup.ListBackupsResponse]:
+    def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __iter__(self) -> Iterable[backup.Backup]:
+    def __iter__(self):
         for page in self.pages:
             yield from page.backups
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListBackupsAsyncPager:
-    """A pager for iterating through ``list_backups`` requests.
+class ListBackupsAsyncPager(object):
+    u"""A pager for iterating through ``list_backups`` requests.
 
     This class thinly wraps an initial
     :class:`~.backup.ListBackupsResponse` object, and
@@ -234,13 +235,13 @@ class ListBackupsAsyncPager:
 
     def __init__(
         self,
-        method: Callable[..., Awaitable[backup.ListBackupsResponse]],
-        request: backup.ListBackupsRequest,
-        response: backup.ListBackupsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -257,18 +258,18 @@ class ListBackupsAsyncPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    async def pages(self) -> AsyncIterable[backup.ListBackupsResponse]:
+    async def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = await self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __aiter__(self) -> AsyncIterable[backup.Backup]:
+    def __aiter__(self):
         async def async_generator():
             async for page in self.pages:
                 for response in page.backups:
@@ -276,12 +277,12 @@ class ListBackupsAsyncPager:
 
         return async_generator()
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListDatabaseOperationsPager:
-    """A pager for iterating through ``list_database_operations`` requests.
+class ListDatabaseOperationsPager(object):
+    u"""A pager for iterating through ``list_database_operations`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_database_admin.ListDatabaseOperationsResponse` object, and
@@ -300,13 +301,13 @@ class ListDatabaseOperationsPager:
 
     def __init__(
         self,
-        method: Callable[..., spanner_database_admin.ListDatabaseOperationsResponse],
-        request: spanner_database_admin.ListDatabaseOperationsRequest,
-        response: spanner_database_admin.ListDatabaseOperationsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -323,27 +324,27 @@ class ListDatabaseOperationsPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    def pages(self) -> Iterable[spanner_database_admin.ListDatabaseOperationsResponse]:
+    def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __iter__(self) -> Iterable[operations.Operation]:
+    def __iter__(self):
         for page in self.pages:
             yield from page.operations
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListDatabaseOperationsAsyncPager:
-    """A pager for iterating through ``list_database_operations`` requests.
+class ListDatabaseOperationsAsyncPager(object):
+    u"""A pager for iterating through ``list_database_operations`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_database_admin.ListDatabaseOperationsResponse` object, and
@@ -362,15 +363,13 @@ class ListDatabaseOperationsAsyncPager:
 
     def __init__(
         self,
-        method: Callable[
-            ..., Awaitable[spanner_database_admin.ListDatabaseOperationsResponse]
-        ],
-        request: spanner_database_admin.ListDatabaseOperationsRequest,
-        response: spanner_database_admin.ListDatabaseOperationsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -387,20 +386,20 @@ class ListDatabaseOperationsAsyncPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
     async def pages(
         self,
-    ) -> AsyncIterable[spanner_database_admin.ListDatabaseOperationsResponse]:
+    ):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = await self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __aiter__(self) -> AsyncIterable[operations.Operation]:
+    def __aiter__(self):
         async def async_generator():
             async for page in self.pages:
                 for response in page.operations:
@@ -408,12 +407,12 @@ class ListDatabaseOperationsAsyncPager:
 
         return async_generator()
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListBackupOperationsPager:
-    """A pager for iterating through ``list_backup_operations`` requests.
+class ListBackupOperationsPager(object):
+    u"""A pager for iterating through ``list_backup_operations`` requests.
 
     This class thinly wraps an initial
     :class:`~.backup.ListBackupOperationsResponse` object, and
@@ -432,13 +431,13 @@ class ListBackupOperationsPager:
 
     def __init__(
         self,
-        method: Callable[..., backup.ListBackupOperationsResponse],
-        request: backup.ListBackupOperationsRequest,
-        response: backup.ListBackupOperationsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -455,27 +454,27 @@ class ListBackupOperationsPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    def pages(self) -> Iterable[backup.ListBackupOperationsResponse]:
+    def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __iter__(self) -> Iterable[operations.Operation]:
+    def __iter__(self):
         for page in self.pages:
             yield from page.operations
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListBackupOperationsAsyncPager:
-    """A pager for iterating through ``list_backup_operations`` requests.
+class ListBackupOperationsAsyncPager(object):
+    u"""A pager for iterating through ``list_backup_operations`` requests.
 
     This class thinly wraps an initial
     :class:`~.backup.ListBackupOperationsResponse` object, and
@@ -494,13 +493,13 @@ class ListBackupOperationsAsyncPager:
 
     def __init__(
         self,
-        method: Callable[..., Awaitable[backup.ListBackupOperationsResponse]],
-        request: backup.ListBackupOperationsRequest,
-        response: backup.ListBackupOperationsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -517,18 +516,18 @@ class ListBackupOperationsAsyncPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    async def pages(self) -> AsyncIterable[backup.ListBackupOperationsResponse]:
+    async def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = await self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __aiter__(self) -> AsyncIterable[operations.Operation]:
+    def __aiter__(self):
         async def async_generator():
             async for page in self.pages:
                 for response in page.operations:
@@ -536,5 +535,5 @@ class ListBackupOperationsAsyncPager:
 
         return async_generator()
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)

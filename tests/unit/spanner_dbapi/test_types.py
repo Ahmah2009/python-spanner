@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import unittest
 
 from time import timezone
@@ -54,18 +55,18 @@ class TestTypes(unittest.TestCase):
     def test_type_equal(self):
         from google.cloud.spanner_dbapi import types
 
-        self.assertEqual(types.BINARY, "TYPE_CODE_UNSPECIFIED")
-        self.assertEqual(types.BINARY, "BYTES")
-        self.assertEqual(types.BINARY, "ARRAY")
-        self.assertEqual(types.BINARY, "STRUCT")
-        self.assertNotEqual(types.BINARY, "STRING")
+        self.assertEqual(types.BINARY, u"TYPE_CODE_UNSPECIFIED")
+        self.assertEqual(types.BINARY, u"BYTES")
+        self.assertEqual(types.BINARY, u"ARRAY")
+        self.assertEqual(types.BINARY, u"STRUCT")
+        self.assertNotEqual(types.BINARY, u"STRING")
 
-        self.assertEqual(types.NUMBER, "BOOL")
-        self.assertEqual(types.NUMBER, "INT64")
-        self.assertEqual(types.NUMBER, "FLOAT64")
-        self.assertEqual(types.NUMBER, "NUMERIC")
-        self.assertNotEqual(types.NUMBER, "STRING")
+        self.assertEqual(types.NUMBER, u"BOOL")
+        self.assertEqual(types.NUMBER, u"INT64")
+        self.assertEqual(types.NUMBER, u"FLOAT64")
+        self.assertEqual(types.NUMBER, u"NUMERIC")
+        self.assertNotEqual(types.NUMBER, u"STRING")
 
-        self.assertEqual(types.DATETIME, "TIMESTAMP")
-        self.assertEqual(types.DATETIME, "DATE")
-        self.assertNotEqual(types.DATETIME, "STRING")
+        self.assertEqual(types.DATETIME, u"TIMESTAMP")
+        self.assertEqual(types.DATETIME, u"DATE")
+        self.assertNotEqual(types.DATETIME, u"STRING")

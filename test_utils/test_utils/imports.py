@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import mock
 import six
 
 
 def maybe_fail_import(predicate):
-    """Create and return a patcher that conditionally makes an import fail.
+    u"""Create and return a patcher that conditionally makes an import fail.
 
     Args:
         predicate (Callable[[...], bool]): A callable that, if it returns `True`,
@@ -35,4 +36,4 @@ def maybe_fail_import(predicate):
             raise ImportError
         return orig_import(name, globals, locals, fromlist, level)
 
-    return mock.patch.object(six.moves.builtins, "__import__", new=custom_import)
+    return mock.patch.object(six.moves.builtins, u"__import__", new=custom_import)

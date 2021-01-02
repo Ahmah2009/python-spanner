@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Depopulate spanner databases with data for streaming system tests."""
+u"""Depopulate spanner databases with data for streaming system tests."""
 
+from __future__ import absolute_import
 from google.cloud.spanner import Client
 
 # Import relative to the script's directory
@@ -26,21 +27,21 @@ def remove_database(client):
     instance = client.instance(INSTANCE_NAME)
 
     if not instance.exists():
-        print_func("Instance does not exist: {}".format(INSTANCE_NAME))
+        print_func(u"Instance does not exist: {}".format(INSTANCE_NAME))
         return
 
-    print_func("Instance exists: {}".format(INSTANCE_NAME))
+    print_func(u"Instance exists: {}".format(INSTANCE_NAME))
     instance.reload()
 
     database = instance.database(DATABASE_NAME)
 
     if not database.exists():
-        print_func("Database does not exist: {}".format(DATABASE_NAME))
+        print_func(u"Database does not exist: {}".format(DATABASE_NAME))
         return
-    print_func("Dropping database: {}".format(DATABASE_NAME))
+    print_func(u"Dropping database: {}".format(DATABASE_NAME))
     database.drop()
 
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     client = Client()
     remove_database(client)

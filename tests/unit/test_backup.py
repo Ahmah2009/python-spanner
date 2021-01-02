@@ -13,20 +13,22 @@
 # limitations under the License.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import unittest
 
 import mock
 
 
 class _BaseTest(unittest.TestCase):
-    PROJECT_ID = "project-id"
-    PARENT = "projects/" + PROJECT_ID
-    INSTANCE_ID = "instance-id"
-    INSTANCE_NAME = PARENT + "/instances/" + INSTANCE_ID
-    DATABASE_ID = "database_id"
-    DATABASE_NAME = INSTANCE_NAME + "/databases/" + DATABASE_ID
-    BACKUP_ID = "backup_id"
-    BACKUP_NAME = INSTANCE_NAME + "/backups/" + BACKUP_ID
+    PROJECT_ID = u"project-id"
+    PARENT = u"projects/" + PROJECT_ID
+    INSTANCE_ID = u"instance-id"
+    INSTANCE_NAME = PARENT + u"/instances/" + INSTANCE_ID
+    DATABASE_ID = u"database_id"
+    DATABASE_NAME = INSTANCE_NAME + u"/databases/" + DATABASE_ID
+    BACKUP_ID = u"backup_id"
+    BACKUP_NAME = INSTANCE_NAME + u"/backups/" + BACKUP_ID
 
     def _make_one(self, *args, **kwargs):
         return self._get_target_class()(*args, **kwargs)
@@ -58,7 +60,7 @@ class TestBackup(_BaseTest):
 
         self.assertEqual(backup.backup_id, self.BACKUP_ID)
         self.assertIs(backup._instance, instance)
-        self.assertEqual(backup._database, "")
+        self.assertEqual(backup._database, u"")
         self.assertIsNone(backup._expire_time)
 
     def test_ctor_non_defaults(self):
@@ -78,7 +80,7 @@ class TestBackup(_BaseTest):
     def test_from_pb_project_mismatch(self):
         from google.cloud.spanner_admin_database_v1 import Backup
 
-        ALT_PROJECT = "ALT_PROJECT"
+        ALT_PROJECT = u"ALT_PROJECT"
         client = _Client(project=ALT_PROJECT)
         instance = _Instance(self.INSTANCE_NAME, client)
         backup_pb = Backup(name=self.BACKUP_NAME)
@@ -90,7 +92,7 @@ class TestBackup(_BaseTest):
     def test_from_pb_instance_mismatch(self):
         from google.cloud.spanner_admin_database_v1 import Backup
 
-        ALT_INSTANCE = "/projects/%s/instances/ALT-INSTANCE" % (self.PROJECT_ID,)
+        ALT_INSTANCE = u"/projects/%s/instances/ALT-INSTANCE" % (self.PROJECT_ID,)
         client = _Client()
         instance = _Instance(ALT_INSTANCE, client)
         backup_pb = Backup(name=self.BACKUP_NAME)
@@ -104,7 +106,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         instance = _Instance(self.INSTANCE_NAME, client)
-        backup_pb = Backup(name="invalid_format")
+        backup_pb = Backup(name=u"invalid_format")
         backup_class = self._get_target_class()
 
         with self.assertRaises(ValueError):
@@ -123,7 +125,7 @@ class TestBackup(_BaseTest):
         self.assertIsInstance(backup, backup_class)
         self.assertEqual(backup._instance, instance)
         self.assertEqual(backup.backup_id, self.BACKUP_ID)
-        self.assertEqual(backup._database, "")
+        self.assertEqual(backup._database, u"")
         self.assertIsNone(backup._expire_time)
 
     def test_name_property(self):
@@ -177,7 +179,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.create_backup.side_effect = Unknown("testing")
+        api.create_backup.side_effect = Unknown(u"testing")
 
         instance = _Instance(self.INSTANCE_NAME, client=client)
         timestamp = self._make_timestamp()
@@ -194,7 +196,7 @@ class TestBackup(_BaseTest):
             parent=self.INSTANCE_NAME,
             backup_id=self.BACKUP_ID,
             backup=backup_pb,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_create_already_exists(self):
@@ -203,7 +205,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.create_backup.side_effect = Conflict("testing")
+        api.create_backup.side_effect = Conflict(u"testing")
 
         instance = _Instance(self.INSTANCE_NAME, client=client)
         timestamp = self._make_timestamp()
@@ -220,7 +222,7 @@ class TestBackup(_BaseTest):
             parent=self.INSTANCE_NAME,
             backup_id=self.BACKUP_ID,
             backup=backup_pb,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_create_instance_not_found(self):
@@ -229,7 +231,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.create_backup.side_effect = NotFound("testing")
+        api.create_backup.side_effect = NotFound(u"testing")
 
         instance = _Instance(self.INSTANCE_NAME, client=client)
         timestamp = self._make_timestamp()
@@ -246,7 +248,7 @@ class TestBackup(_BaseTest):
             parent=self.INSTANCE_NAME,
             backup_id=self.BACKUP_ID,
             backup=backup_pb,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_create_expire_time_not_set(self):
@@ -287,7 +289,7 @@ class TestBackup(_BaseTest):
             parent=self.INSTANCE_NAME,
             backup_id=self.BACKUP_ID,
             backup=backup_pb,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_exists_grpc_error(self):
@@ -295,7 +297,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.get_backup.side_effect = Unknown("testing")
+        api.get_backup.side_effect = Unknown(u"testing")
 
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
@@ -305,7 +307,7 @@ class TestBackup(_BaseTest):
 
         api.get_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_exists_not_found(self):
@@ -313,7 +315,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.get_backup.side_effect = NotFound("testing")
+        api.get_backup.side_effect = NotFound(u"testing")
 
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
@@ -322,7 +324,7 @@ class TestBackup(_BaseTest):
 
         api.get_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_exists_success(self):
@@ -340,7 +342,7 @@ class TestBackup(_BaseTest):
 
         api.get_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_delete_grpc_error(self):
@@ -348,7 +350,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.delete_backup.side_effect = Unknown("testing")
+        api.delete_backup.side_effect = Unknown(u"testing")
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
 
@@ -357,7 +359,7 @@ class TestBackup(_BaseTest):
 
         api.delete_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_delete_not_found(self):
@@ -365,7 +367,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.delete_backup.side_effect = NotFound("testing")
+        api.delete_backup.side_effect = NotFound(u"testing")
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
 
@@ -374,7 +376,7 @@ class TestBackup(_BaseTest):
 
         api.delete_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_delete_success(self):
@@ -390,7 +392,7 @@ class TestBackup(_BaseTest):
 
         api.delete_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_reload_grpc_error(self):
@@ -398,7 +400,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.get_backup.side_effect = Unknown("testing")
+        api.get_backup.side_effect = Unknown(u"testing")
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
 
@@ -407,7 +409,7 @@ class TestBackup(_BaseTest):
 
         api.get_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_reload_not_found(self):
@@ -415,7 +417,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.get_backup.side_effect = NotFound("testing")
+        api.get_backup.side_effect = NotFound(u"testing")
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
 
@@ -424,7 +426,7 @@ class TestBackup(_BaseTest):
 
         api.get_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_reload_success(self):
@@ -458,7 +460,7 @@ class TestBackup(_BaseTest):
 
         api.get_backup.assert_called_once_with(
             name=self.BACKUP_NAME,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_update_expire_time_grpc_error(self):
@@ -467,7 +469,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.update_backup.side_effect = Unknown("testing")
+        api.update_backup.side_effect = Unknown(u"testing")
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
         expire_time = self._make_timestamp()
@@ -476,11 +478,11 @@ class TestBackup(_BaseTest):
             backup.update_expire_time(expire_time)
 
         backup_update = Backup(name=self.BACKUP_NAME, expire_time=expire_time,)
-        update_mask = {"paths": ["expire_time"]}
+        update_mask = {u"paths": [u"expire_time"]}
         api.update_backup.assert_called_once_with(
             backup=backup_update,
             update_mask=update_mask,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_update_expire_time_not_found(self):
@@ -489,7 +491,7 @@ class TestBackup(_BaseTest):
 
         client = _Client()
         api = client.database_admin_api = self._make_database_admin_api()
-        api.update_backup.side_effect = NotFound("testing")
+        api.update_backup.side_effect = NotFound(u"testing")
         instance = _Instance(self.INSTANCE_NAME, client=client)
         backup = self._make_one(self.BACKUP_ID, instance)
         expire_time = self._make_timestamp()
@@ -498,11 +500,11 @@ class TestBackup(_BaseTest):
             backup.update_expire_time(expire_time)
 
         backup_update = Backup(name=self.BACKUP_NAME, expire_time=expire_time,)
-        update_mask = {"paths": ["expire_time"]}
+        update_mask = {u"paths": [u"expire_time"]}
         api.update_backup.assert_called_once_with(
             backup=backup_update,
             update_mask=update_mask,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_update_expire_time_success(self):
@@ -518,11 +520,11 @@ class TestBackup(_BaseTest):
         backup.update_expire_time(expire_time)
 
         backup_update = Backup(name=self.BACKUP_NAME, expire_time=expire_time,)
-        update_mask = {"paths": ["expire_time"]}
+        update_mask = {u"paths": [u"expire_time"]}
         api.update_backup.assert_called_once_with(
             backup=backup_update,
             update_mask=update_mask,
-            metadata=[("google-cloud-resource-prefix", backup.name)],
+            metadata=[(u"google-cloud-resource-prefix", backup.name)],
         )
 
     def test_is_ready(self):
@@ -540,11 +542,11 @@ class TestBackup(_BaseTest):
 class _Client(object):
     def __init__(self, project=TestBackup.PROJECT_ID):
         self.project = project
-        self.project_name = "projects/" + self.project
+        self.project_name = u"projects/" + self.project
 
 
 class _Instance(object):
     def __init__(self, name, client=None):
         self.name = name
-        self.instance_id = name.rsplit("/", 1)[1]
+        self.instance_id = name.rsplit(u"/", 1)[1]
         self._client = client

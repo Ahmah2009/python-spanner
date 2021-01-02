@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Wrapper for streaming results."""
+u"""Wrapper for streaming results."""
 
+from __future__ import absolute_import
 from google.cloud import exceptions
 from google.cloud.spanner_v1 import TypeCode
 import six
@@ -25,7 +26,7 @@ from google.cloud.spanner_v1._helpers import _parse_value
 
 
 class StreamedResultSet(object):
-    """Process a sequence of partial result sets into a single set of row data.
+    u"""Process a sequence of partial result sets into a single set of row data.
 
     :type response_iterator:
     :param response_iterator:
@@ -48,7 +49,7 @@ class StreamedResultSet(object):
 
     @property
     def fields(self):
-        """Field descriptors for result set columns.
+        u"""Field descriptors for result set columns.
 
         :rtype: list of :class:`~google.cloud.spanner_v1.StructType.Field`
         :returns: list of fields describing column names / types.
@@ -57,7 +58,7 @@ class StreamedResultSet(object):
 
     @property
     def metadata(self):
-        """Result set metadata
+        u"""Result set metadata
 
         :rtype: :class:`~google.cloud.spanner_v1.ResultSetMetadata`
         :returns: structure describing the results
@@ -66,7 +67,7 @@ class StreamedResultSet(object):
 
     @property
     def stats(self):
-        """Result set statistics
+        u"""Result set statistics
 
         :rtype:
            :class:`~google.cloud.spanner_v1.ResultSetStats`
@@ -75,7 +76,7 @@ class StreamedResultSet(object):
         return self._stats
 
     def _merge_chunk(self, value):
-        """Merge pending chunk with next value.
+        u"""Merge pending chunk with next value.
 
         :type value: :class:`~google.protobuf.struct_pb2.Value`
         :param value: continuation of chunked value from previous
@@ -91,7 +92,7 @@ class StreamedResultSet(object):
         return _parse_value(merged, field.type_)
 
     def _merge_values(self, values):
-        """Merge values into rows.
+        u"""Merge values into rows.
 
         :type values: list of :class:`~google.protobuf.struct_pb2.Value`
         :param values: non-chunked values from partial result set.
@@ -106,7 +107,7 @@ class StreamedResultSet(object):
                 self._current_row = []
 
     def _consume_next(self):
-        """Consume the next partial result set from the stream.
+        u"""Consume the next partial result set from the stream.
 
         Parse the result set into new/existing rows in :attr:`_rows`
         """
@@ -119,7 +120,7 @@ class StreamedResultSet(object):
             if source is not None and source._transaction_id is None:
                 source._transaction_id = metadata.transaction.id
 
-        if "stats" in response:  # last response
+        if u"stats" in response:  # last response
             self._stats = response.stats
 
         values = list(response.values)
@@ -144,7 +145,7 @@ class StreamedResultSet(object):
                 yield iter_rows.pop(0)
 
     def one(self):
-        """Return exactly one result, or raise an exception.
+        u"""Return exactly one result, or raise an exception.
 
         :raises: :exc:`NotFound`: If there are no results.
         :raises: :exc:`ValueError`: If there are multiple results.
@@ -153,11 +154,11 @@ class StreamedResultSet(object):
         """
         answer = self.one_or_none()
         if answer is None:
-            raise exceptions.NotFound("No rows matched the given query.")
+            raise exceptions.NotFound(u"No rows matched the given query.")
         return answer
 
     def one_or_none(self):
-        """Return exactly one result, or None if there are no results.
+        u"""Return exactly one result, or None if there are no results.
 
         :raises: :exc:`ValueError`: If there are multiple results.
         :raises: :exc:`RuntimeError`: If consumption has already occurred,
@@ -167,29 +168,29 @@ class StreamedResultSet(object):
         # If it has, then this is an exception.
         if self._metadata is not None:
             raise RuntimeError(
-                "Can not call `.one` or `.one_or_none` after "
-                "stream consumption has already started."
+                u"Can not call `.one` or `.one_or_none` after "
+                u"stream consumption has already started."
             )
 
         # Consume the first result of the stream.
         # If there is no first result, then return None.
         iterator = iter(self)
         try:
-            answer = next(iterator)
+            answer = iterator.next()
         except StopIteration:
             return None
 
         # Attempt to consume more. This should no-op; if we get additional
         # rows, then this is an error case.
         try:
-            next(iterator)
-            raise ValueError("Expected one result; got more.")
+            iterator.next()
+            raise ValueError(u"Expected one result; got more.")
         except StopIteration:
             return answer
 
 
 class Unmergeable(ValueError):
-    """Unable to merge two values.
+    u"""Unable to merge two values.
 
     :type lhs: :class:`~google.protobuf.struct_pb2.Value`
     :param lhs: pending value to be merged
@@ -202,35 +203,35 @@ class Unmergeable(ValueError):
     """
 
     def __init__(self, lhs, rhs, type_):
-        message = "Cannot merge %s values: %s %s" % (TypeCode(type_.code), lhs, rhs,)
+        message = u"Cannot merge %s values: %s %s" % (TypeCode(type_.code), lhs, rhs,)
         super(Unmergeable, self).__init__(message)
 
 
 def _unmergeable(lhs, rhs, type_):
-    """Helper for '_merge_by_type'."""
+    u"""Helper for '_merge_by_type'."""
     raise Unmergeable(lhs, rhs, type_)
 
 
 def _merge_float64(lhs, rhs, type_):  # pylint: disable=unused-argument
-    """Helper for '_merge_by_type'."""
-    if type(lhs) == str:
+    u"""Helper for '_merge_by_type'."""
+    if type(lhs) == unicode:
         return float(lhs + rhs)
-    array_continuation = type(lhs) == float and type(rhs) == str and rhs == ""
+    array_continuation = type(lhs) == float and type(rhs) == unicode and rhs == u""
     if array_continuation:
         return lhs
     raise Unmergeable(lhs, rhs, type_)
 
 
 def _merge_string(lhs, rhs, type_):  # pylint: disable=unused-argument
-    """Helper for '_merge_by_type'."""
-    return str(lhs) + str(rhs)
+    u"""Helper for '_merge_by_type'."""
+    return unicode(lhs) + unicode(rhs)
 
 
 _UNMERGEABLE_TYPES = (TypeCode.BOOL,)
 
 
 def _merge_array(lhs, rhs, type_):
-    """Helper for '_merge_by_type'."""
+    u"""Helper for '_merge_by_type'."""
     element_type = type_.array_element_type
     if element_type.code in _UNMERGEABLE_TYPES:
         # Individual values cannot be merged, just concatenate
@@ -260,7 +261,7 @@ def _merge_array(lhs, rhs, type_):
 
 
 def _merge_struct(lhs, rhs, type_):
-    """Helper for '_merge_by_type'."""
+    u"""Helper for '_merge_by_type'."""
     fields = type_.struct_type.fields
 
     # Sanity check: If either list is empty, short-circuit.
@@ -300,6 +301,6 @@ _MERGE_BY_TYPE = {
 
 
 def _merge_by_type(lhs, rhs, type_):
-    """Helper for '_merge_chunk'."""
+    u"""Helper for '_merge_chunk'."""
     merger = _MERGE_BY_TYPE[type_.code]
     return merger(lhs, rhs, type_)

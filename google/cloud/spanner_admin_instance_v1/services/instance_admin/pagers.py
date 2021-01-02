@@ -15,13 +15,14 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from typing import Any, AsyncIterable, Awaitable, Callable, Iterable, Sequence, Tuple
 
 from google.cloud.spanner_admin_instance_v1.types import spanner_instance_admin
 
 
-class ListInstanceConfigsPager:
-    """A pager for iterating through ``list_instance_configs`` requests.
+class ListInstanceConfigsPager(object):
+    u"""A pager for iterating through ``list_instance_configs`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_instance_admin.ListInstanceConfigsResponse` object, and
@@ -40,13 +41,13 @@ class ListInstanceConfigsPager:
 
     def __init__(
         self,
-        method: Callable[..., spanner_instance_admin.ListInstanceConfigsResponse],
-        request: spanner_instance_admin.ListInstanceConfigsRequest,
-        response: spanner_instance_admin.ListInstanceConfigsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -63,27 +64,27 @@ class ListInstanceConfigsPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    def pages(self) -> Iterable[spanner_instance_admin.ListInstanceConfigsResponse]:
+    def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __iter__(self) -> Iterable[spanner_instance_admin.InstanceConfig]:
+    def __iter__(self):
         for page in self.pages:
             yield from page.instance_configs
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListInstanceConfigsAsyncPager:
-    """A pager for iterating through ``list_instance_configs`` requests.
+class ListInstanceConfigsAsyncPager(object):
+    u"""A pager for iterating through ``list_instance_configs`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_instance_admin.ListInstanceConfigsResponse` object, and
@@ -102,15 +103,13 @@ class ListInstanceConfigsAsyncPager:
 
     def __init__(
         self,
-        method: Callable[
-            ..., Awaitable[spanner_instance_admin.ListInstanceConfigsResponse]
-        ],
-        request: spanner_instance_admin.ListInstanceConfigsRequest,
-        response: spanner_instance_admin.ListInstanceConfigsResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -127,20 +126,20 @@ class ListInstanceConfigsAsyncPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
     async def pages(
         self,
-    ) -> AsyncIterable[spanner_instance_admin.ListInstanceConfigsResponse]:
+    ):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = await self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __aiter__(self) -> AsyncIterable[spanner_instance_admin.InstanceConfig]:
+    def __aiter__(self):
         async def async_generator():
             async for page in self.pages:
                 for response in page.instance_configs:
@@ -148,12 +147,12 @@ class ListInstanceConfigsAsyncPager:
 
         return async_generator()
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListInstancesPager:
-    """A pager for iterating through ``list_instances`` requests.
+class ListInstancesPager(object):
+    u"""A pager for iterating through ``list_instances`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_instance_admin.ListInstancesResponse` object, and
@@ -172,13 +171,13 @@ class ListInstancesPager:
 
     def __init__(
         self,
-        method: Callable[..., spanner_instance_admin.ListInstancesResponse],
-        request: spanner_instance_admin.ListInstancesRequest,
-        response: spanner_instance_admin.ListInstancesResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -195,27 +194,27 @@ class ListInstancesPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
-    def pages(self) -> Iterable[spanner_instance_admin.ListInstancesResponse]:
+    def pages(self):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __iter__(self) -> Iterable[spanner_instance_admin.Instance]:
+    def __iter__(self):
         for page in self.pages:
             yield from page.instances
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)
 
 
-class ListInstancesAsyncPager:
-    """A pager for iterating through ``list_instances`` requests.
+class ListInstancesAsyncPager(object):
+    u"""A pager for iterating through ``list_instances`` requests.
 
     This class thinly wraps an initial
     :class:`~.spanner_instance_admin.ListInstancesResponse` object, and
@@ -234,13 +233,13 @@ class ListInstancesAsyncPager:
 
     def __init__(
         self,
-        method: Callable[..., Awaitable[spanner_instance_admin.ListInstancesResponse]],
-        request: spanner_instance_admin.ListInstancesRequest,
-        response: spanner_instance_admin.ListInstancesResponse,
-        *,
-        metadata: Sequence[Tuple[str, str]] = ()
+        method,
+        request,
+        response, **_3to2kwargs
     ):
-        """Instantiate the pager.
+        if 'metadata' in _3to2kwargs: metadata = _3to2kwargs['metadata']; del _3to2kwargs['metadata']
+        else: metadata =  ()
+        u"""Instantiate the pager.
 
         Args:
             method (Callable): The method that was originally called, and
@@ -257,20 +256,20 @@ class ListInstancesAsyncPager:
         self._response = response
         self._metadata = metadata
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         return getattr(self._response, name)
 
     @property
     async def pages(
         self,
-    ) -> AsyncIterable[spanner_instance_admin.ListInstancesResponse]:
+    ):
         yield self._response
         while self._response.next_page_token:
             self._request.page_token = self._response.next_page_token
             self._response = await self._method(self._request, metadata=self._metadata)
             yield self._response
 
-    def __aiter__(self) -> AsyncIterable[spanner_instance_admin.Instance]:
+    def __aiter__(self):
         async def async_generator():
             async for page in self.pages:
                 for response in page.instances:
@@ -278,5 +277,5 @@ class ListInstancesAsyncPager:
 
         return async_generator()
 
-    def __repr__(self) -> str:
-        return "{0}<{1!r}>".format(self.__class__.__name__, self._response)
+    def __repr__(self):
+        return u"{0}<{1!r}>".format(self.__class__.__name__, self._response)

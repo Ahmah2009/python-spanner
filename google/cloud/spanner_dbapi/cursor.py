@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Database cursor for Google Cloud Spanner DB-API."""
+u"""Database cursor for Google Cloud Spanner DB-API."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 from google.api_core.exceptions import AlreadyExists
 from google.api_core.exceptions import FailedPrecondition
 from google.api_core.exceptions import InternalServerError
@@ -38,11 +40,11 @@ from google.cloud.spanner_dbapi.utils import PeekIterator
 
 _UNSET_COUNT = -1
 
-ColumnDetails = namedtuple("column_details", ["null_ok", "spanner_type"])
+ColumnDetails = namedtuple(u"column_details", [u"null_ok", u"spanner_type"])
 
 
 class Cursor(object):
-    """Database cursor to manage the context of a fetch operation.
+    u"""Database cursor to manage the context of a fetch operation.
 
     :type connection: :class:`~google.cloud.spanner_dbapi.connection.Connection`
     :param connection: A DB-API connection to Google Cloud Spanner.
@@ -60,7 +62,7 @@ class Cursor(object):
 
     @property
     def is_closed(self):
-        """The cursor close indicator.
+        u"""The cursor close indicator.
 
         :rtype: bool
         :returns: True if the cursor or the parent connection is closed,
@@ -70,7 +72,7 @@ class Cursor(object):
 
     @property
     def description(self):
-        """Read-only attribute containing a sequence of the following items:
+        u"""Read-only attribute containing a sequence of the following items:
 
         -   ``name``
         -   ``type_code``
@@ -101,11 +103,11 @@ class Cursor(object):
 
     @property
     def rowcount(self):
-        """The number of rows produced by the last `.execute()`."""
+        u"""The number of rows produced by the last `.execute()`."""
         return self._row_count
 
     def _raise_if_closed(self):
-        """Raise an exception if this cursor is closed.
+        u"""Raise an exception if this cursor is closed.
 
         Helper to check this cursor's state before running a
         SQL/DDL/DML query. If the parent connection is
@@ -114,14 +116,14 @@ class Cursor(object):
         :raises: :class:`InterfaceError` if this cursor is closed.
         """
         if self.is_closed:
-            raise InterfaceError("Cursor and/or connection is already closed.")
+            raise InterfaceError(u"Cursor and/or connection is already closed.")
 
     def callproc(self, procname, args=None):
-        """A no-op, raising an error if the cursor or connection is closed."""
+        u"""A no-op, raising an error if the cursor or connection is closed."""
         self._raise_if_closed()
 
     def close(self):
-        """Closes this Cursor, making it unusable from this point forward."""
+        u"""Closes this Cursor, making it unusable from this point forward."""
         self._is_closed = True
 
     def _do_execute_update(self, transaction, sql, params, param_types=None):
@@ -138,7 +140,7 @@ class Cursor(object):
         return result
 
     def execute(self, sql, args=None):
-        """Prepares and executes a Spanner database operation.
+        u"""Prepares and executes a Spanner database operation.
 
         :type sql: str
         :param sql: A SQL query statement.
@@ -147,7 +149,7 @@ class Cursor(object):
         :param args: Additional parameters to supplement the SQL query.
         """
         if not self.connection:
-            raise ProgrammingError("Cursor is not connected to the database")
+            raise ProgrammingError(u"Cursor is not connected to the database")
 
         self._raise_if_closed()
 
@@ -184,15 +186,15 @@ class Cursor(object):
                 self.connection.database.run_in_transaction(
                     self._do_execute_update, sql, args or None
                 )
-        except (AlreadyExists, FailedPrecondition) as e:
-            raise IntegrityError(e.details if hasattr(e, "details") else e)
-        except InvalidArgument as e:
-            raise ProgrammingError(e.details if hasattr(e, "details") else e)
-        except InternalServerError as e:
-            raise OperationalError(e.details if hasattr(e, "details") else e)
+        except (AlreadyExists, FailedPrecondition), e:
+            raise IntegrityError(e.details if hasattr(e, u"details") else e)
+        except InvalidArgument, e:
+            raise ProgrammingError(e.details if hasattr(e, u"details") else e)
+        except InternalServerError, e:
+            raise OperationalError(e.details if hasattr(e, u"details") else e)
 
     def executemany(self, operation, seq_of_params):
-        """Execute the given SQL with every parameters set
+        u"""Execute the given SQL with every parameters set
         from the given sequence of parameters.
 
         :type operation: str
@@ -208,17 +210,17 @@ class Cursor(object):
             self.execute(operation, params)
 
     def fetchone(self):
-        """Fetch the next row of a query result set, returning a single
+        u"""Fetch the next row of a query result set, returning a single
         sequence, or None when no more data is available."""
         self._raise_if_closed()
 
         try:
-            return next(self)
+            return self.next()
         except StopIteration:
             return None
 
     def fetchmany(self, size=None):
-        """Fetch the next set of rows of a query result, returning a sequence
+        u"""Fetch the next set of rows of a query result, returning a sequence
         of sequences. An empty sequence is returned when no more rows are available.
 
         :type size: int
@@ -234,16 +236,16 @@ class Cursor(object):
             size = self.arraysize
 
         items = []
-        for i in range(size):
+        for i in xrange(size):
             try:
-                items.append(tuple(self.__next__()))
+                items.append(tuple(self.next()))
             except StopIteration:
                 break
 
         return items
 
     def fetchall(self):
-        """Fetch all (remaining) rows of a query result, returning them as
+        u"""Fetch all (remaining) rows of a query result, returning them as
         a sequence of sequences.
         """
         self._raise_if_closed()
@@ -251,15 +253,15 @@ class Cursor(object):
         return list(self.__iter__())
 
     def nextset(self):
-        """A no-op, raising an error if the cursor or connection is closed."""
+        u"""A no-op, raising an error if the cursor or connection is closed."""
         self._raise_if_closed()
 
     def setinputsizes(self, sizes):
-        """A no-op, raising an error if the cursor or connection is closed."""
+        u"""A no-op, raising an error if the cursor or connection is closed."""
         self._raise_if_closed()
 
     def setoutputsize(self, size, column=None):
-        """A no-op, raising an error if the cursor or connection is closed."""
+        u"""A no-op, raising an error if the cursor or connection is closed."""
         self._raise_if_closed()
 
     def _handle_DQL(self, sql, params):
@@ -296,14 +298,14 @@ class Cursor(object):
     def __exit__(self, etype, value, traceback):
         self.close()
 
-    def __next__(self):
+    def next(self):
         if self._itr is None:
-            raise ProgrammingError("no results to return")
-        return next(self._itr)
+            raise ProgrammingError(u"no results to return")
+        return self._itr.next()
 
     def __iter__(self):
         if self._itr is None:
-            raise ProgrammingError("no results to return")
+            raise ProgrammingError(u"no results to return")
         return self._itr
 
     def list_tables(self):
@@ -321,13 +323,13 @@ class Cursor(object):
     def get_table_column_schema(self, table_name):
         rows = self.run_sql_in_snapshot(
             sql=_helpers.SQL_GET_TABLE_COLUMN_SCHEMA,
-            params={"table_name": table_name},
-            param_types={"table_name": spanner.param_types.STRING},
+            params={u"table_name": table_name},
+            param_types={u"table_name": spanner.param_types.STRING},
         )
 
         column_details = {}
         for column_name, is_nullable, spanner_type in rows:
             column_details[column_name] = ColumnDetails(
-                null_ok=is_nullable == "YES", spanner_type=spanner_type
+                null_ok=is_nullable == u"YES", spanner_type=spanner_type
             )
         return column_details

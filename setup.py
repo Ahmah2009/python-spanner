@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import io
 import os
 
@@ -20,26 +22,25 @@ import setuptools
 
 # Package metadata.
 
-name = "google-cloud-spanner"
-description = "Cloud Spanner API client library"
-version = "2.0.0"
+name = u"google-cloud-spanner"
+description = u"Cloud Spanner API client library"
+version = u"2.0.0"
 # Should be one of:
 # 'Development Status :: 3 - Alpha'
 # 'Development Status :: 4 - Beta'
 # 'Development Status :: 5 - Production/Stable'
-release_status = "Development Status :: 5 - Production/Stable"
+release_status = u"Development Status :: 5 - Production/Stable"
 dependencies = [
-    "google-api-core[grpc] >= 1.22.0, < 2.0.0dev",
-    "google-cloud-core >= 1.4.1, < 2.0dev",
-    "grpc-google-iam-v1 >= 0.12.3, < 0.13dev",
-    "proto-plus==1.11.0",
-    "libcst >= 0.2.5",
+    u"google-api-core[grpc] >= 1.22.0, < 2.0.0dev",
+    u"google-cloud-core >= 1.4.1, < 2.0dev",
+    u"grpc-google-iam-v1 >= 0.12.3, < 0.13dev",
+    u"proto-plus==1.11.0"
 ]
 extras = {
-    "tracing": [
-        "opentelemetry-api==0.11b0",
-        "opentelemetry-sdk==0.11b0",
-        "opentelemetry-instrumentation==0.11b0",
+    u"tracing": [
+        u"opentelemetry-api==0.11b0",
+        u"opentelemetry-sdk==0.11b0",
+        u"opentelemetry-instrumentation==0.11b0",
     ]
 }
 
@@ -48,8 +49,8 @@ extras = {
 
 package_root = os.path.abspath(os.path.dirname(__file__))
 
-readme_filename = os.path.join(package_root, "README.rst")
-with io.open(readme_filename, encoding="utf-8") as readme_file:
+readme_filename = os.path.join(package_root, u"README.rst")
+with io.open(readme_filename, encoding=u"utf-8") as readme_file:
     readme = readme_file.read()
 
 # Only include packages under the 'google' namespace. Do not include tests,
@@ -57,13 +58,13 @@ with io.open(readme_filename, encoding="utf-8") as readme_file:
 packages = [
     package
     for package in setuptools.PEP420PackageFinder.find()
-    if package.startswith("google")
+    if package.startswith(u"google")
 ]
 
 # Determine which namespaces are needed.
-namespaces = ["google"]
-if "google.cloud" in packages:
-    namespaces.append("google.cloud")
+namespaces = [u"google"]
+if u"google.cloud" in packages:
+    namespaces.append(u"google.cloud")
 
 
 setuptools.setup(
@@ -71,28 +72,28 @@ setuptools.setup(
     version=version,
     description=description,
     long_description=readme,
-    author="Google LLC",
-    author_email="googleapis-packages@google.com",
-    license="Apache 2.0",
-    url="https://github.com/googleapis/python-spanner",
+    author=u"Google LLC",
+    author_email=u"googleapis-packages@google.com",
+    license=u"Apache 2.0",
+    url=u"https://github.com/googleapis/python-spanner",
     classifiers=[
         release_status,
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Operating System :: OS Independent",
-        "Topic :: Internet",
+        u"Intended Audience :: Developers",
+        u"License :: OSI Approved :: Apache Software License",
+        u"Programming Language :: Python",
+        u"Programming Language :: Python :: 3",
+        u"Programming Language :: Python :: 3.6",
+        u"Programming Language :: Python :: 3.7",
+        u"Programming Language :: Python :: 3.8",
+        u"Operating System :: OS Independent",
+        u"Topic :: Internet",
     ],
-    platforms="Posix; MacOS X; Windows",
+    platforms=u"Posix; MacOS X; Windows",
     packages=packages,
     namespace_packages=namespaces,
     install_requires=dependencies,
     extras_require=extras,
-    python_requires=">=3.6",
+    python_requires=u">=2.7",
     include_package_data=True,
     zip_safe=False,
 )

@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Generates READMEs using configuration defined in yaml."""
+u"""Generates READMEs using configuration defined in yaml."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import argparse
 import io
 import os
@@ -28,19 +30,19 @@ import yaml
 jinja_env = jinja2.Environment(
     trim_blocks=True,
     loader=jinja2.FileSystemLoader(
-        os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))))
+        os.path.abspath(os.path.join(os.path.dirname(__file__), u'templates'))))
 
-README_TMPL = jinja_env.get_template('README.tmpl.rst')
+README_TMPL = jinja_env.get_template(u'README.tmpl.rst')
 
 
 def get_help(file):
-    return subprocess.check_output(['python', file, '--help']).decode()
+    return subprocess.check_output([u'python', file, u'--help']).decode()
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('source')
-    parser.add_argument('--destination', default='README.rst')
+    parser.add_argument(u'source')
+    parser.add_argument(u'--destination', default=u'README.rst')
 
     args = parser.parse_args()
 
@@ -48,9 +50,9 @@ def main():
     root = os.path.dirname(source)
     destination = os.path.join(root, args.destination)
 
-    jinja_env.globals['get_help'] = get_help
+    jinja_env.globals[u'get_help'] = get_help
 
-    with io.open(source, 'r') as f:
+    with io.open(source, u'r') as f:
         config = yaml.load(f)
 
     # This allows get_help to execute in the right directory.
@@ -58,9 +60,9 @@ def main():
 
     output = README_TMPL.render(config)
 
-    with io.open(destination, 'w') as f:
+    with io.open(destination, u'w') as f:
         f.write(output)
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     main()

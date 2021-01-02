@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This application demonstrates how to create and restore from backups
+u"""This application demonstrates how to create and restore from backups
 using Cloud Spanner.
 
 For more information, see the README.rst under /spanner.
 """
 
+from __future__ import absolute_import
 import argparse
 from datetime import datetime, timedelta
 import time
@@ -27,7 +28,7 @@ from google.cloud import spanner
 
 # [START spanner_create_backup]
 def create_backup(instance_id, database_id, backup_id):
-    """Creates a backup for a database."""
+    u"""Creates a backup for a database."""
     spanner_client = spanner.Client()
     instance = spanner_client.instance(instance_id)
     database = instance.database(database_id)
@@ -46,11 +47,9 @@ def create_backup(instance_id, database_id, backup_id):
 
     # Get the name, create time and backup size.
     backup.reload()
-    print(
-        "Backup {} of size {} bytes was created at {}".format(
+    print u"Backup {} of size {} bytes was created at {}".format(
             backup.name, backup.size_bytes, backup.create_time
         )
-    )
 
 
 # [END spanner_create_backup]
@@ -58,7 +57,7 @@ def create_backup(instance_id, database_id, backup_id):
 
 # [START spanner_restore_database]
 def restore_database(instance_id, new_database_id, backup_id):
-    """Restores a database from a backup."""
+    u"""Restores a database from a backup."""
     spanner_client = spanner.Client()
     instance = spanner_client.instance(instance_id)
     # Create a backup on database_id.
@@ -74,13 +73,11 @@ def restore_database(instance_id, new_database_id, backup_id):
     # Newly created database has restore information.
     new_database.reload()
     restore_info = new_database.restore_info
-    print(
-        "Database {} restored to {} from backup {}.".format(
+    print u"Database {} restored to {} from backup {}.".format(
             restore_info.backup_info.source_database,
             new_database_id,
             restore_info.backup_info.backup,
         )
-    )
 
 
 # [END spanner_restore_database]
@@ -108,11 +105,11 @@ def cancel_backup(instance_id, database_id, backup_id):
 
     # Deal with resource if the operation succeeded.
     if backup.exists():
-        print("Backup was created before the cancel completed.")
+        print u"Backup was created before the cancel completed."
         backup.delete()
-        print("Backup deleted.")
+        print u"Backup deleted."
     else:
-        print("Backup creation was successfully cancelled.")
+        print u"Backup creation was successfully cancelled."
 
 
 # [END spanner_cancel_backup]
@@ -125,18 +122,16 @@ def list_backup_operations(instance_id, database_id):
 
     # List the CreateBackup operations.
     filter_ = (
-        "(metadata.database:{}) AND "
-        "(metadata.@type:type.googleapis.com/"
-        "google.spanner.admin.database.v1.CreateBackupMetadata)"
+        u"(metadata.database:{}) AND "
+        u"(metadata.@type:type.googleapis.com/"
+        u"google.spanner.admin.database.v1.CreateBackupMetadata)"
     ).format(database_id)
     operations = instance.list_backup_operations(filter_=filter_)
     for op in operations:
         metadata = op.metadata
-        print(
-            "Backup {} on database {}: {}% complete.".format(
+        print u"Backup {} on database {}: {}% complete.".format(
                 metadata.name, metadata.database, metadata.progress.progress_percent
             )
-        )
 
 
 # [END spanner_list_backup_operations]
@@ -149,16 +144,14 @@ def list_database_operations(instance_id):
 
     # List the progress of restore.
     filter_ = (
-        "(metadata.@type:type.googleapis.com/"
-        "google.spanner.admin.database.v1.OptimizeRestoredDatabaseMetadata)"
+        u"(metadata.@type:type.googleapis.com/"
+        u"google.spanner.admin.database.v1.OptimizeRestoredDatabaseMetadata)"
     )
     operations = instance.list_database_operations(filter_=filter_)
     for op in operations:
-        print(
-            "Database {} restored from backup is {}% optimized.".format(
+        print u"Database {} restored from backup is {}% optimized.".format(
                 op.metadata.name, op.metadata.progress.progress_percent
             )
-        )
 
 
 # [END spanner_list_database_operations]
@@ -170,56 +163,52 @@ def list_backups(instance_id, database_id, backup_id):
     instance = spanner_client.instance(instance_id)
 
     # List all backups.
-    print("All backups:")
+    print u"All backups:"
     for backup in instance.list_backups():
-        print(backup.name)
+        print backup.name
 
     # List all backups that contain a name.
-    print('All backups with backup name containing "{}":'.format(backup_id))
-    for backup in instance.list_backups(filter_="name:{}".format(backup_id)):
-        print(backup.name)
+    print u'All backups with backup name containing "{}":'.format(backup_id)
+    for backup in instance.list_backups(filter_=u"name:{}".format(backup_id)):
+        print backup.name
 
     # List all backups for a database that contains a name.
-    print('All backups with database name containing "{}":'.format(database_id))
-    for backup in instance.list_backups(filter_="database:{}".format(database_id)):
-        print(backup.name)
+    print u'All backups with database name containing "{}":'.format(database_id)
+    for backup in instance.list_backups(filter_=u"database:{}".format(database_id)):
+        print backup.name
 
     # List all backups that expire before a timestamp.
     expire_time = datetime.utcnow().replace(microsecond=0) + timedelta(days=30)
-    print(
-        'All backups with expire_time before "{}-{}-{}T{}:{}:{}Z":'.format(
+    print u'All backups with expire_time before "{}-{}-{}T{}:{}:{}Z":'.format(
             *expire_time.timetuple()
         )
-    )
     for backup in instance.list_backups(
-        filter_='expire_time < "{}-{}-{}T{}:{}:{}Z"'.format(*expire_time.timetuple())
+        filter_=u'expire_time < "{}-{}-{}T{}:{}:{}Z"'.format(*expire_time.timetuple())
     ):
-        print(backup.name)
+        print backup.name
 
     # List all backups with a size greater than some bytes.
-    print("All backups with backup size more than 100 bytes:")
-    for backup in instance.list_backups(filter_="size_bytes > 100"):
-        print(backup.name)
+    print u"All backups with backup size more than 100 bytes:"
+    for backup in instance.list_backups(filter_=u"size_bytes > 100"):
+        print backup.name
 
     # List backups that were created after a timestamp that are also ready.
     create_time = datetime.utcnow().replace(microsecond=0) - timedelta(days=1)
-    print(
-        'All backups created after "{}-{}-{}T{}:{}:{}Z" and are READY:'.format(
+    print u'All backups created after "{}-{}-{}T{}:{}:{}Z" and are READY:'.format(
             *create_time.timetuple()
         )
-    )
     for backup in instance.list_backups(
-        filter_='create_time >= "{}-{}-{}T{}:{}:{}Z" AND state:READY'.format(
+        filter_=u'create_time >= "{}-{}-{}T{}:{}:{}Z" AND state:READY'.format(
             *create_time.timetuple()
         )
     ):
-        print(backup.name)
+        print backup.name
 
-    print("All backups with pagination")
+    print u"All backups with pagination"
     # If there are multiple pages, additional ``ListBackup``
     # requests will be made as needed while iterating.
     for backup in instance.list_backups(page_size=2):
-        print(backup.name)
+        print backup.name
 
 
 # [END spanner_list_backups]
@@ -242,7 +231,7 @@ def delete_backup(instance_id, backup_id):
 
     # Verify that the backup is deleted.
     assert backup.exists() is False
-    print("Backup {} has been deleted.".format(backup.name))
+    print u"Backup {} has been deleted.".format(backup.name)
 
 
 # [END spanner_delete_backup]
@@ -259,57 +248,55 @@ def update_backup(instance_id, backup_id):
     old_expire_time = backup.expire_time
     new_expire_time = old_expire_time + timedelta(days=30)
     backup.update_expire_time(new_expire_time)
-    print(
-        "Backup {} expire time was updated from {} to {}.".format(
+    print u"Backup {} expire time was updated from {} to {}.".format(
             backup.name, old_expire_time, new_expire_time
         )
-    )
 
 
 # [END spanner_update_backup]
 
 
-if __name__ == "__main__":  # noqa: C901
+if __name__ == u"__main__":  # noqa: C901
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("instance_id", help="Your Cloud Spanner instance ID.")
+    parser.add_argument(u"instance_id", help=u"Your Cloud Spanner instance ID.")
     parser.add_argument(
-        "--database-id", help="Your Cloud Spanner database ID.", default="example_db"
+        u"--database-id", help=u"Your Cloud Spanner database ID.", default=u"example_db"
     )
     parser.add_argument(
-        "--backup-id", help="Your Cloud Spanner backup ID.", default="example_backup"
+        u"--backup-id", help=u"Your Cloud Spanner backup ID.", default=u"example_backup"
     )
 
-    subparsers = parser.add_subparsers(dest="command")
-    subparsers.add_parser("create_backup", help=create_backup.__doc__)
-    subparsers.add_parser("cancel_backup", help=cancel_backup.__doc__)
-    subparsers.add_parser("update_backup", help=update_backup.__doc__)
-    subparsers.add_parser("restore_database", help=restore_database.__doc__)
-    subparsers.add_parser("list_backups", help=list_backups.__doc__)
-    subparsers.add_parser("list_backup_operations", help=list_backup_operations.__doc__)
+    subparsers = parser.add_subparsers(dest=u"command")
+    subparsers.add_parser(u"create_backup", help=create_backup.__doc__)
+    subparsers.add_parser(u"cancel_backup", help=cancel_backup.__doc__)
+    subparsers.add_parser(u"update_backup", help=update_backup.__doc__)
+    subparsers.add_parser(u"restore_database", help=restore_database.__doc__)
+    subparsers.add_parser(u"list_backups", help=list_backups.__doc__)
+    subparsers.add_parser(u"list_backup_operations", help=list_backup_operations.__doc__)
     subparsers.add_parser(
-        "list_database_operations", help=list_database_operations.__doc__
+        u"list_database_operations", help=list_database_operations.__doc__
     )
-    subparsers.add_parser("delete_backup", help=delete_backup.__doc__)
+    subparsers.add_parser(u"delete_backup", help=delete_backup.__doc__)
 
     args = parser.parse_args()
 
-    if args.command == "create_backup":
+    if args.command == u"create_backup":
         create_backup(args.instance_id, args.database_id, args.backup_id)
-    elif args.command == "cancel_backup":
+    elif args.command == u"cancel_backup":
         cancel_backup(args.instance_id, args.database_id, args.backup_id)
-    elif args.command == "update_backup":
+    elif args.command == u"update_backup":
         update_backup(args.instance_id, args.backup_id)
-    elif args.command == "restore_database":
+    elif args.command == u"restore_database":
         restore_database(args.instance_id, args.database_id, args.backup_id)
-    elif args.command == "list_backups":
+    elif args.command == u"list_backups":
         list_backups(args.instance_id, args.database_id, args.backup_id)
-    elif args.command == "list_backup_operations":
+    elif args.command == u"list_backup_operations":
         list_backup_operations(args.instance_id, args.database_id)
-    elif args.command == "list_database_operations":
+    elif args.command == u"list_database_operations":
         list_database_operations(args.instance_id)
-    elif args.command == "delete_backup":
+    elif args.command == u"delete_backup":
         delete_backup(args.instance_id, args.backup_id)
     else:
-        print("Command {} did not match expected commands.".format(args.command))
+        print u"Command {} did not match expected commands.".format(args.command)

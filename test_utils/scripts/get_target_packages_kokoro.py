@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Print a list of packages which require testing."""
+u"""Print a list of packages which require testing."""
 
+from __future__ import absolute_import
 import pathlib
 import subprocess
 
@@ -22,13 +23,13 @@ import requests
 
 
 def print_environment(environment):
-    print("-> CI environment:")
-    print('Branch', environment.branch)
-    print('PR', environment.pr)
-    print('In PR', environment.in_pr)
-    print('Repo URL', environment.repo_url)
+    print u"-> CI environment:"
+    print u'Branch', environment.branch
+    print u'PR', environment.pr
+    print u'In PR', environment.in_pr
+    print u'Repo URL', environment.repo_url
     if environment.in_pr:
-        print('PR Base', environment.base)
+        print u'PR Base', environment.base
 
 
 def get_base(environment):
@@ -37,18 +38,18 @@ def get_base(environment):
     else:
         # If we're not in a PR, just calculate the changes between this commit
         # and its parent.
-        return 'HEAD~1'
+        return u'HEAD~1'
 
 
 def get_changed_files_from_base(base):
     return subprocess.check_output([
-        'git', 'diff', '--name-only', f'{base}..HEAD',
-    ], stderr=subprocess.DEVNULL).decode('utf8').strip().split('\n')
+        u'git', u'diff', u'--name-only', f'{base}..HEAD',
+    ], stderr=subprocess.DEVNULL).decode(u'utf8').strip().split(u'\n')
 
 
 _URL_TEMPLATE = (
-    'https://api.github.com/repos/googleapis/google-cloud-python/pulls/'
-    '{}/files'
+    u'https://api.github.com/repos/googleapis/google-cloud-python/pulls/'
+    u'{}/files'
 )
 
 
@@ -57,13 +58,13 @@ def get_changed_files_from_pr(pr):
     while url is not None:
         response = requests.get(url)
         for info in response.json():
-            yield info['filename']
-        url = response.links.get('next', {}).get('url')
+            yield info[u'filename']
+        url = response.links.get(u'next', {}).get(u'url')
 
 
 def determine_changed_packages(changed_files):
     packages = [
-        path.parent for path in pathlib.Path('.').glob('*/noxfile.py')
+        path.parent for path in pathlib.Path(u'.').glob(u'*/noxfile.py')
     ]
 
     changed_packages = set()
@@ -88,11 +89,11 @@ def main():
 
     packages = determine_changed_packages(changed_files)
 
-    print(f"Comparing against {base}.")
-    print("-> Changed packages:")
+    print f"Comparing against {base}."
+    print u"-> Changed packages:"
 
     for package in packages:
-        print(package)
+        print package
 
 
 main()

@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import platform
 
 PY_VERSION = platform.python_version()
-VERSION = "2.2.0a1"
-DEFAULT_USER_AGENT = "django_spanner/" + VERSION
+VERSION = u"2.2.0a1"
+DEFAULT_USER_AGENT = u"django_spanner/" + VERSION

@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import re
 
 
-class PeekIterator:
-    """
+class PeekIterator(object):
+    u"""
     PeekIterator peeks at the first element out of an iterator
     for the sake of operations like auto-population of fields on reading
     the first element.
@@ -31,23 +32,23 @@ class PeekIterator:
         self.__index = 0
 
         try:
-            head = next(itr_src)
+            head = itr_src.next()
             # Restitch and prepare to read from multiple iterators.
             self.__iters = [iter(itr) for itr in [[head], itr_src]]
         except StopIteration:
             pass
 
-    def __next__(self):
+    def next(self):
         if self.__index >= len(self.__iters):
             raise StopIteration
 
         iterator = self.__iters[self.__index]
         try:
-            head = next(iterator)
+            head = iterator.next()
         except StopIteration:
             # That iterator has been exhausted, try with the next one.
             self.__index += 1
-            return self.__next__()
+            return self.next()
         else:
             return tuple(head) if isinstance(head, list) else head
 
@@ -55,7 +56,7 @@ class PeekIterator:
         return self
 
 
-re_UNICODE_POINTS = re.compile(r"([^\s]*[\u0080-\uFFFF]+[^\s]*)")
+re_UNICODE_POINTS = re.compile(ur"([^\s]*[\u0080-\uFFFF]+[^\s]*)")
 
 
 def backtick_unicode(sql):
@@ -68,22 +69,22 @@ def backtick_unicode(sql):
     last_end = 0
     for match in matches:
         start, end = match.span()
-        if sql[start] != "`" and sql[end - 1] != "`":
-            segments.append(sql[last_end:start] + "`" + sql[start:end] + "`")
+        if sql[start] != u"`" and sql[end - 1] != u"`":
+            segments.append(sql[last_end:start] + u"`" + sql[start:end] + u"`")
         else:
             segments.append(sql[last_end:end])
 
         last_end = end
 
-    return "".join(segments)
+    return u"".join(segments)
 
 
 def sanitize_literals_for_upload(s):
-    """
+    u"""
     Convert literals in s, to be fit for consumption by Cloud Spanner.
     1. Convert %% (escaped percent literals) to %. Percent signs must be escaped when
     values like %s are used as SQL parameter placeholders but Spanner's query language
     uses placeholders like @a0 and doesn't expect percent signs to be escaped.
     2. Quote words containing non-ASCII, with backticks, for example föö to `föö`.
     """
-    return backtick_unicode(s.replace("%%", "%"))
+    return backtick_unicode(s.replace(u"%%", u"%"))

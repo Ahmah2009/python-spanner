@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""DB-API Connection for the Google Cloud Spanner."""
+u"""DB-API Connection for the Google Cloud Spanner."""
 
+from __future__ import absolute_import
 import warnings
 
 from google.api_core.gapic_v1.client_info import ClientInfo
@@ -25,11 +26,11 @@ from google.cloud.spanner_dbapi.version import DEFAULT_USER_AGENT
 from google.cloud.spanner_dbapi.version import PY_VERSION
 
 
-AUTOCOMMIT_MODE_WARNING = "This method is non-operational in autocommit mode"
+AUTOCOMMIT_MODE_WARNING = u"This method is non-operational in autocommit mode"
 
 
-class Connection:
-    """Representation of a DB-API connection to a Cloud Spanner database.
+class Connection(object):
+    u"""Representation of a DB-API connection to a Cloud Spanner database.
 
     You most likely don't need to instantiate `Connection` objects
     directly, use the `connect` module function instead.
@@ -54,7 +55,7 @@ class Connection:
 
     @property
     def autocommit(self):
-        """Autocommit mode flag for this connection.
+        u"""Autocommit mode flag for this connection.
 
         :rtype: bool
         :returns: Autocommit mode flag value.
@@ -63,7 +64,7 @@ class Connection:
 
     @autocommit.setter
     def autocommit(self, value):
-        """Change this connection autocommit mode. Setting this value to True
+        u"""Change this connection autocommit mode. Setting this value to True
         while a transaction is active will commit the current transaction.
 
         :type value: bool
@@ -76,7 +77,7 @@ class Connection:
 
     @property
     def database(self):
-        """Database to which this connection relates.
+        u"""Database to which this connection relates.
 
         :rtype: :class:`~google.cloud.spanner_v1.database.Database`
         :returns: The related database object.
@@ -85,7 +86,7 @@ class Connection:
 
     @property
     def instance(self):
-        """Instance to which this connection relates.
+        u"""Instance to which this connection relates.
 
         :rtype: :class:`~google.cloud.spanner_v1.instance.Instance`
         :returns: The related instance object.
@@ -93,7 +94,7 @@ class Connection:
         return self._instance
 
     def _session_checkout(self):
-        """Get a Cloud Spanner session from the pool.
+        u"""Get a Cloud Spanner session from the pool.
 
         If there is already a session associated with
         this connection, it'll be used instead.
@@ -107,7 +108,7 @@ class Connection:
         return self._session
 
     def _release_session(self):
-        """Release the currently used Spanner session.
+        u"""Release the currently used Spanner session.
 
         The session will be returned into the sessions pool.
         """
@@ -115,7 +116,7 @@ class Connection:
         self._session = None
 
     def transaction_checkout(self):
-        """Get a Cloud Spanner transaction.
+        u"""Get a Cloud Spanner transaction.
 
         Begin a new transaction, if there is no transaction in
         this connection yet. Return the begun one otherwise.
@@ -137,16 +138,16 @@ class Connection:
             return self._transaction
 
     def _raise_if_closed(self):
-        """Helper to check the connection state before running a query.
+        u"""Helper to check the connection state before running a query.
         Raises an exception if this connection is closed.
 
         :raises: :class:`InterfaceError`: if this connection is closed.
         """
         if self.is_closed:
-            raise InterfaceError("connection is already closed")
+            raise InterfaceError(u"connection is already closed")
 
     def close(self):
-        """Closes this connection.
+        u"""Closes this connection.
 
         The connection will be unusable from this point forward. If the
         connection has an active transaction, it will be rolled back.
@@ -161,7 +162,7 @@ class Connection:
         self.is_closed = True
 
     def commit(self):
-        """Commits any pending transaction to the database.
+        u"""Commits any pending transaction to the database.
 
         This method is non-operational in autocommit mode.
         """
@@ -172,7 +173,7 @@ class Connection:
             self._release_session()
 
     def rollback(self):
-        """Rolls back any pending transaction.
+        u"""Rolls back any pending transaction.
 
         This is a no-op if there is no active transaction or if the connection
         is in autocommit mode.
@@ -184,7 +185,7 @@ class Connection:
             self._release_session()
 
     def cursor(self):
-        """Factory to create a DB-API Cursor."""
+        u"""Factory to create a DB-API Cursor."""
         self._raise_if_closed()
 
         return Cursor(self)
@@ -209,7 +210,7 @@ class Connection:
 def connect(
     instance_id, database_id, project=None, credentials=None, pool=None, user_agent=None
 ):
-    """Creates a connection to a Google Cloud Spanner database.
+    u"""Creates a connection to a Google Cloud Spanner database.
 
     :type instance_id: str
     :param instance_id: The ID of the instance to connect to.
@@ -255,10 +256,10 @@ def connect(
 
     instance = client.instance(instance_id)
     if not instance.exists():
-        raise ValueError("instance '%s' does not exist." % instance_id)
+        raise ValueError(u"instance '%s' does not exist." % instance_id)
 
     database = instance.database(database_id, pool=pool)
     if not database.exists():
-        raise ValueError("database '%s' does not exist." % database_id)
+        raise ValueError(u"database '%s' does not exist." % database_id)
 
     return Connection(instance, database)

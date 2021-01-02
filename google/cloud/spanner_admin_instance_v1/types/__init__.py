@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from .spanner_instance_admin import (
     ReplicaInfo,
     InstanceConfig,
@@ -34,18 +35,18 @@ from .spanner_instance_admin import (
 
 
 __all__ = (
-    "ReplicaInfo",
-    "InstanceConfig",
-    "Instance",
-    "ListInstanceConfigsRequest",
-    "ListInstanceConfigsResponse",
-    "GetInstanceConfigRequest",
-    "GetInstanceRequest",
-    "CreateInstanceRequest",
-    "ListInstancesRequest",
-    "ListInstancesResponse",
-    "UpdateInstanceRequest",
-    "DeleteInstanceRequest",
-    "CreateInstanceMetadata",
-    "UpdateInstanceMetadata",
+    u"ReplicaInfo",
+    u"InstanceConfig",
+    u"Instance",
+    u"ListInstanceConfigsRequest",
+    u"ListInstanceConfigsResponse",
+    u"GetInstanceConfigRequest",
+    u"GetInstanceRequest",
+    u"CreateInstanceRequest",
+    u"ListInstancesRequest",
+    u"ListInstancesResponse",
+    u"UpdateInstanceRequest",
+    u"DeleteInstanceRequest",
+    u"CreateInstanceMetadata",
+    u"UpdateInstanceMetadata",
 )

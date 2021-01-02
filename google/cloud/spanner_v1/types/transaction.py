@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -23,13 +24,13 @@ from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.v1",
-    manifest={"TransactionOptions", "Transaction", "TransactionSelector",},
+    package=u"google.spanner.v1",
+    manifest=set([u"TransactionOptions", u"Transaction", u"TransactionSelector",]),
 )
 
 
 class TransactionOptions(proto.Message):
-    r"""TransactionOptions are used to specify different types of transactions.
+    ur"""TransactionOptions are used to specify different types of transactions.
 
     For more info, see: https://cloud.google.com/spanner/docs/reference/rest/v1/Transaction
 
@@ -56,15 +57,15 @@ class TransactionOptions(proto.Message):
     """
 
     class ReadWrite(proto.Message):
-        r"""Message type to initiate a read-write transaction. Currently
+        ur"""Message type to initiate a read-write transaction. Currently
         this transaction type has no options.
         """
 
     class PartitionedDml(proto.Message):
-        r"""Message type to initiate a Partitioned DML transaction."""
+        ur"""Message type to initiate a Partitioned DML transaction."""
 
     class ReadOnly(proto.Message):
-        r"""Message type to initiate a read-only transaction.
+        ur"""Message type to initiate a read-only transaction.
 
         Attributes:
             strong (bool):
@@ -130,43 +131,43 @@ class TransactionOptions(proto.Message):
                 message that describes the transaction.
         """
 
-        strong = proto.Field(proto.BOOL, number=1, oneof="timestamp_bound")
+        strong = proto.Field(proto.BOOL, number=1, oneof=u"timestamp_bound")
 
         min_read_timestamp = proto.Field(
             proto.MESSAGE,
             number=2,
-            oneof="timestamp_bound",
+            oneof=u"timestamp_bound",
             message=timestamp.Timestamp,
         )
 
         max_staleness = proto.Field(
-            proto.MESSAGE, number=3, oneof="timestamp_bound", message=duration.Duration,
+            proto.MESSAGE, number=3, oneof=u"timestamp_bound", message=duration.Duration,
         )
 
         read_timestamp = proto.Field(
             proto.MESSAGE,
             number=4,
-            oneof="timestamp_bound",
+            oneof=u"timestamp_bound",
             message=timestamp.Timestamp,
         )
 
         exact_staleness = proto.Field(
-            proto.MESSAGE, number=5, oneof="timestamp_bound", message=duration.Duration,
+            proto.MESSAGE, number=5, oneof=u"timestamp_bound", message=duration.Duration,
         )
 
         return_read_timestamp = proto.Field(proto.BOOL, number=6)
 
-    read_write = proto.Field(proto.MESSAGE, number=1, oneof="mode", message=ReadWrite,)
+    read_write = proto.Field(proto.MESSAGE, number=1, oneof=u"mode", message=ReadWrite,)
 
     partitioned_dml = proto.Field(
-        proto.MESSAGE, number=3, oneof="mode", message=PartitionedDml,
+        proto.MESSAGE, number=3, oneof=u"mode", message=PartitionedDml,
     )
 
-    read_only = proto.Field(proto.MESSAGE, number=2, oneof="mode", message=ReadOnly,)
+    read_only = proto.Field(proto.MESSAGE, number=2, oneof=u"mode", message=ReadOnly,)
 
 
 class Transaction(proto.Message):
-    r"""A transaction.
+    ur"""A transaction.
 
     Attributes:
         id (bytes):
@@ -193,7 +194,7 @@ class Transaction(proto.Message):
 
 
 class TransactionSelector(proto.Message):
-    r"""This message is used to select the transaction in which a
+    ur"""This message is used to select the transaction in which a
     [Read][google.spanner.v1.Spanner.Read] or
     [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] call runs.
 
@@ -218,13 +219,13 @@ class TransactionSelector(proto.Message):
     """
 
     single_use = proto.Field(
-        proto.MESSAGE, number=1, oneof="selector", message="TransactionOptions",
+        proto.MESSAGE, number=1, oneof=u"selector", message=u"TransactionOptions",
     )
 
-    id = proto.Field(proto.BYTES, number=2, oneof="selector")
+    id = proto.Field(proto.BYTES, number=2, oneof=u"selector")
 
     begin = proto.Field(
-        proto.MESSAGE, number=3, oneof="selector", message="TransactionOptions",
+        proto.MESSAGE, number=3, oneof=u"selector", message=u"TransactionOptions",
     )
 
 

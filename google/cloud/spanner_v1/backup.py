@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""User friendly container for Cloud Spanner Backup."""
+u"""User friendly container for Cloud Spanner Backup."""
 
+from __future__ import absolute_import
 import re
 
 from google.cloud.exceptions import NotFound
@@ -22,14 +23,14 @@ from google.cloud.spanner_admin_database_v1 import Backup as BackupPB
 from google.cloud.spanner_v1._helpers import _metadata_with_prefix
 
 _BACKUP_NAME_RE = re.compile(
-    r"^projects/(?P<project>[^/]+)/"
-    r"instances/(?P<instance_id>[a-z][-a-z0-9]*)/"
-    r"backups/(?P<backup_id>[a-z][a-z0-9_\-]*[a-z0-9])$"
+    ur"^projects/(?P<project>[^/]+)/"
+    ur"instances/(?P<instance_id>[a-z][-a-z0-9]*)/"
+    ur"backups/(?P<backup_id>[a-z][a-z0-9_\-]*[a-z0-9])$"
 )
 
 
 class Backup(object):
-    """Representation of a Cloud Spanner Backup.
+    u"""Representation of a Cloud Spanner Backup.
 
     We can use a :class`Backup` to:
 
@@ -53,7 +54,7 @@ class Backup(object):
                         needs to be called.
     """
 
-    def __init__(self, backup_id, instance, database="", expire_time=None):
+    def __init__(self, backup_id, instance, database=u"", expire_time=None):
         self.backup_id = backup_id
         self._instance = instance
         self._database = database
@@ -65,7 +66,7 @@ class Backup(object):
 
     @property
     def name(self):
-        """Backup name used in requests.
+        u"""Backup name used in requests.
 
         The backup name is of the form
 
@@ -74,11 +75,11 @@ class Backup(object):
         :rtype: str
         :returns: The backup name.
         """
-        return self._instance.name + "/backups/" + self.backup_id
+        return self._instance.name + u"/backups/" + self.backup_id
 
     @property
     def database(self):
-        """Database name used in requests.
+        u"""Database name used in requests.
 
         The database name is of the form
 
@@ -91,7 +92,7 @@ class Backup(object):
 
     @property
     def expire_time(self):
-        """Expire time used in creation requests.
+        u"""Expire time used in creation requests.
 
         :rtype: :class:`datetime.datetime`
         :returns: a datetime object representing the expire time of
@@ -101,7 +102,7 @@ class Backup(object):
 
     @property
     def create_time(self):
-        """Create time of this backup.
+        u"""Create time of this backup.
 
         :rtype: :class:`datetime.datetime`
         :returns: a datetime object representing the create time of
@@ -111,7 +112,7 @@ class Backup(object):
 
     @property
     def size_bytes(self):
-        """Size of this backup in bytes.
+        u"""Size of this backup in bytes.
 
         :rtype: int
         :returns: the number size of this backup measured in bytes
@@ -120,7 +121,7 @@ class Backup(object):
 
     @property
     def state(self):
-        """State of this backup.
+        u"""State of this backup.
 
         :rtype: :class:`~google.cloud.spanner_admin_database_v1.Backup.State`
         :returns: an enum describing the state of the backup
@@ -129,7 +130,7 @@ class Backup(object):
 
     @property
     def referencing_databases(self):
-        """List of databases referencing this backup.
+        u"""List of databases referencing this backup.
 
         :rtype: list of strings
         :returns: a list of database path strings which specify the databases still
@@ -139,7 +140,7 @@ class Backup(object):
 
     @classmethod
     def from_pb(cls, backup_pb, instance):
-        """Create an instance of this class from a protobuf message.
+        u"""Create an instance of this class from a protobuf message.
 
         :type backup_pb: :class:`~google.spanner.admin.database.v1.Backup`
         :param backup_pb: A backup protobuf object.
@@ -158,24 +159,24 @@ class Backup(object):
         match = _BACKUP_NAME_RE.match(backup_pb.name)
         if match is None:
             raise ValueError(
-                "Backup protobuf name was not in the expected format.", backup_pb.name
+                u"Backup protobuf name was not in the expected format.", backup_pb.name
             )
-        if match.group("project") != instance._client.project:
+        if match.group(u"project") != instance._client.project:
             raise ValueError(
-                "Project ID on backup does not match the project ID"
-                "on the instance's client"
+                u"Project ID on backup does not match the project ID"
+                u"on the instance's client"
             )
-        instance_id = match.group("instance_id")
+        instance_id = match.group(u"instance_id")
         if instance_id != instance.instance_id:
             raise ValueError(
-                "Instance ID on database does not match the instance ID"
-                "on the instance"
+                u"Instance ID on database does not match the instance ID"
+                u"on the instance"
             )
-        backup_id = match.group("backup_id")
+        backup_id = match.group(u"backup_id")
         return cls(backup_id, instance)
 
     def create(self):
-        """Create this backup within its instance.
+        u"""Create this backup within its instance.
 
         :rtype: :class:`~google.api_core.operation.Operation`
         :returns: a future used to poll the status of the create request
@@ -185,9 +186,9 @@ class Backup(object):
                             or expire_time is not set
         """
         if not self._expire_time:
-            raise ValueError("expire_time not set")
+            raise ValueError(u"expire_time not set")
         if not self._database:
-            raise ValueError("database not set")
+            raise ValueError(u"database not set")
         api = self._instance._client.database_admin_api
         metadata = _metadata_with_prefix(self.name)
         backup = BackupPB(database=self._database, expire_time=self.expire_time,)
@@ -201,7 +202,7 @@ class Backup(object):
         return future
 
     def exists(self):
-        """Test whether this backup exists.
+        u"""Test whether this backup exists.
 
         :rtype: bool
         :returns: True if the backup exists, else False.
@@ -216,7 +217,7 @@ class Backup(object):
         return True
 
     def reload(self):
-        """Reload this backup.
+        u"""Reload this backup.
 
         Refresh the stored backup properties.
 
@@ -233,7 +234,7 @@ class Backup(object):
         self._referencing_databases = pb.referencing_databases
 
     def update_expire_time(self, new_expire_time):
-        """Update the expire time of this backup.
+        u"""Update the expire time of this backup.
 
         :type new_expire_time: :class:`datetime.datetime`
         :param new_expire_time: the new expire time timestamp
@@ -241,14 +242,14 @@ class Backup(object):
         api = self._instance._client.database_admin_api
         metadata = _metadata_with_prefix(self.name)
         backup_update = BackupPB(name=self.name, expire_time=new_expire_time,)
-        update_mask = {"paths": ["expire_time"]}
+        update_mask = {u"paths": [u"expire_time"]}
         api.update_backup(
             backup=backup_update, update_mask=update_mask, metadata=metadata
         )
         self._expire_time = new_expire_time
 
     def is_ready(self):
-        """Test whether this backup is ready for use.
+        u"""Test whether this backup is ready for use.
 
         :rtype: bool
         :returns: True if the backup state is READY, else False.
@@ -256,7 +257,7 @@ class Backup(object):
         return self.state == BackupPB.State.READY
 
     def delete(self):
-        """Delete this backup."""
+        u"""Delete this backup."""
         api = self._instance._client.database_admin_api
         metadata = _metadata_with_prefix(self.name)
         api.delete_backup(name=self.name, metadata=metadata)

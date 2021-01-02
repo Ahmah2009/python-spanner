@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -22,12 +23,12 @@ from google.protobuf import struct_pb2 as struct  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.v1", manifest={"KeyRange", "KeySet",},
+    package=u"google.spanner.v1", manifest=set([u"KeyRange", u"KeySet",]),
 )
 
 
 class KeyRange(proto.Message):
-    r"""KeyRange represents a range of rows in a table or index.
+    ur"""KeyRange represents a range of rows in a table or index.
 
     A range has a start key and an end key. These keys can be open or
     closed, indicating if the range includes rows with that key.
@@ -157,24 +158,24 @@ class KeyRange(proto.Message):
     """
 
     start_closed = proto.Field(
-        proto.MESSAGE, number=1, oneof="start_key_type", message=struct.ListValue,
+        proto.MESSAGE, number=1, oneof=u"start_key_type", message=struct.ListValue,
     )
 
     start_open = proto.Field(
-        proto.MESSAGE, number=2, oneof="start_key_type", message=struct.ListValue,
+        proto.MESSAGE, number=2, oneof=u"start_key_type", message=struct.ListValue,
     )
 
     end_closed = proto.Field(
-        proto.MESSAGE, number=3, oneof="end_key_type", message=struct.ListValue,
+        proto.MESSAGE, number=3, oneof=u"end_key_type", message=struct.ListValue,
     )
 
     end_open = proto.Field(
-        proto.MESSAGE, number=4, oneof="end_key_type", message=struct.ListValue,
+        proto.MESSAGE, number=4, oneof=u"end_key_type", message=struct.ListValue,
     )
 
 
 class KeySet(proto.Message):
-    r"""``KeySet`` defines a collection of Cloud Spanner keys and/or key
+    ur"""``KeySet`` defines a collection of Cloud Spanner keys and/or key
     ranges. All the keys are expected to be in the same table or index.
     The keys need not be sorted in any particular way.
 
@@ -202,7 +203,7 @@ class KeySet(proto.Message):
 
     keys = proto.RepeatedField(proto.MESSAGE, number=1, message=struct.ListValue,)
 
-    ranges = proto.RepeatedField(proto.MESSAGE, number=2, message="KeyRange",)
+    ranges = proto.RepeatedField(proto.MESSAGE, number=2, message=u"KeyRange",)
 
     all_ = proto.Field(proto.BOOL, number=3)
 

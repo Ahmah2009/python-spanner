@@ -13,7 +13,10 @@
 # limitations under the License.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import unittest
+from itertools import izip
 
 
 class TestKeyRange(unittest.TestCase):
@@ -147,20 +150,20 @@ class TestKeyRange(unittest.TestCase):
         key1 = u"key_1"
         key2 = u"key_2"
         key_range = self._make_one(start_closed=[key1], end_open=[key2])
-        expected = {"start_closed": [key1], "end_open": [key2]}
+        expected = {u"start_closed": [key1], u"end_open": [key2]}
         self.assertEqual(key_range._to_dict(), expected)
 
     def test_to_dict_w_start_open_and_end_closed(self):
         key1 = u"key_1"
         key2 = u"key_2"
         key_range = self._make_one(start_open=[key1], end_closed=[key2])
-        expected = {"start_open": [key1], "end_closed": [key2]}
+        expected = {u"start_open": [key1], u"end_closed": [key2]}
         self.assertEqual(key_range._to_dict(), expected)
 
     def test_to_dict_w_end_closed(self):
         key = u"key"
         key_range = self._make_one(end_closed=[key])
-        expected = {"end_closed": [key]}
+        expected = {u"end_closed": [key]}
         self.assertEqual(key_range._to_dict(), expected)
 
 
@@ -204,7 +207,7 @@ class TestKeySet(unittest.TestCase):
     def test_ctor_w_all_and_keys(self):
 
         with self.assertRaises(ValueError):
-            self._make_one(all_=True, keys=[["key1"], ["key2"]])
+            self._make_one(all_=True, keys=[[u"key1"], [u"key2"]])
 
     def test_ctor_w_all_and_ranges(self):
         from google.cloud.spanner_v1.keyset import KeyRange
@@ -296,7 +299,7 @@ class TestKeySet(unittest.TestCase):
         self.assertFalse(result.all_)
         self.assertEqual(len(result.keys), len(KEYS))
 
-        for found, expected in zip(result.keys, KEYS):
+        for found, expected in izip(result.keys, KEYS):
             self.assertEqual(len(found), len(expected))
             self.assertEqual(found[0], expected[0])
 
@@ -328,19 +331,19 @@ class TestKeySet(unittest.TestCase):
             KeyRangePB(start_open=KEY_1, end_closed=KEY_2),
             KeyRangePB(start_closed=KEY_3, end_open=KEY_4),
         ]
-        for found, expected in zip(result.ranges, expected_ranges):
+        for found, expected in izip(result.ranges, expected_ranges):
             self.assertEqual(found, expected)
 
     def test_to_dict_w_all(self):
         keyset = self._make_one(all_=True)
-        expected = {"all": True}
+        expected = {u"all": True}
         self.assertEqual(keyset._to_dict(), expected)
 
     def test_to_dict_w_only_keys(self):
         KEYS = [[u"key1"], [u"key2"]]
         keyset = self._make_one(keys=KEYS)
 
-        expected = {"keys": KEYS, "ranges": []}
+        expected = {u"keys": KEYS, u"ranges": []}
         self.assertEqual(keyset._to_dict(), expected)
 
     def test_to_dict_w_only_ranges(self):
@@ -357,17 +360,17 @@ class TestKeySet(unittest.TestCase):
         keyset = self._make_one(ranges=ranges)
 
         expected = {
-            "keys": [],
-            "ranges": [
-                {"start_open": [key_1], "end_closed": [key_2]},
-                {"start_closed": [key_3], "end_open": [key_4]},
+            u"keys": [],
+            u"ranges": [
+                {u"start_open": [key_1], u"end_closed": [key_2]},
+                {u"start_closed": [key_3], u"end_open": [key_4]},
             ],
         }
         self.assertEqual(keyset._to_dict(), expected)
 
     def test_from_dict_w_all(self):
         klass = self._get_target_class()
-        mapping = {"all": True}
+        mapping = {u"all": True}
 
         keyset = klass._from_dict(mapping)
 
@@ -378,7 +381,7 @@ class TestKeySet(unittest.TestCase):
     def test_from_dict_w_keys(self):
         klass = self._get_target_class()
         keys = [[u"key1"], [u"key2"]]
-        mapping = {"keys": keys}
+        mapping = {u"keys": keys}
 
         keyset = klass._from_dict(mapping)
 
@@ -395,9 +398,9 @@ class TestKeySet(unittest.TestCase):
         key_3 = u"KEY_3"
         key_4 = u"KEY_4"
         mapping = {
-            "ranges": [
-                {"start_open": [key_1], "end_closed": [key_2]},
-                {"start_closed": [key_3], "end_open": [key_4]},
+            u"ranges": [
+                {u"start_open": [key_1], u"end_closed": [key_2]},
+                {u"start_closed": [key_3], u"end_open": [key_4]},
             ]
         }
 

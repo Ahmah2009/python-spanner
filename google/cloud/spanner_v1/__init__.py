@@ -18,7 +18,7 @@ from __future__ import absolute_import
 
 import pkg_resources
 
-__version__ = pkg_resources.get_distribution("google-cloud-spanner").version
+__version__ = pkg_resources.get_distribution(u"google-cloud-spanner").version
 
 from .services.spanner import SpannerClient
 from .types.keys import KeyRange as KeyRangePB
@@ -69,8 +69,8 @@ from google.cloud.spanner_v1.pool import PingingPool
 from google.cloud.spanner_v1.pool import TransactionPingingPool
 
 
-COMMIT_TIMESTAMP = "spanner.commit_timestamp()"
-"""Placeholder be used to store commit timestamp of a transaction in a column.
+COMMIT_TIMESTAMP = u"spanner.commit_timestamp()"
+u"""Placeholder be used to store commit timestamp of a transaction in a column.
 This value can only be used for timestamp columns that have set the option
 ``(allow_commit_timestamp=true)`` in the schema.
 """
@@ -78,58 +78,58 @@ This value can only be used for timestamp columns that have set the option
 
 __all__ = (
     # google.cloud.spanner_v1
-    "__version__",
-    "param_types",
+    u"__version__",
+    u"param_types",
     # google.cloud.spanner_v1.client
-    "Client",
+    u"Client",
     # google.cloud.spanner_v1.keyset
-    "KeyRange",
-    "KeySet",
+    u"KeyRange",
+    u"KeySet",
     # google.cloud.spanner_v1.pool
-    "AbstractSessionPool",
-    "BurstyPool",
-    "FixedSizePool",
-    "PingingPool",
-    "TransactionPingingPool",
+    u"AbstractSessionPool",
+    u"BurstyPool",
+    u"FixedSizePool",
+    u"PingingPool",
+    u"TransactionPingingPool",
     # local
-    "COMMIT_TIMESTAMP",
+    u"COMMIT_TIMESTAMP",
     # google.cloud.spanner_v1.types
-    "BatchCreateSessionsRequest",
-    "BatchCreateSessionsResponse",
-    "BeginTransactionRequest",
-    "CommitRequest",
-    "CommitResponse",
-    "CreateSessionRequest",
-    "DeleteSessionRequest",
-    "ExecuteBatchDmlRequest",
-    "ExecuteBatchDmlResponse",
-    "ExecuteSqlRequest",
-    "GetSessionRequest",
-    "KeyRangePB",
-    "KeySetPB",
-    "ListSessionsRequest",
-    "ListSessionsResponse",
-    "Mutation",
-    "PartialResultSet",
-    "Partition",
-    "PartitionOptions",
-    "PartitionQueryRequest",
-    "PartitionReadRequest",
-    "PartitionResponse",
-    "PlanNode",
-    "QueryPlan",
-    "ReadRequest",
-    "ResultSet",
-    "ResultSetMetadata",
-    "ResultSetStats",
-    "RollbackRequest",
-    "Session",
-    "StructType",
-    "Transaction",
-    "TransactionOptions",
-    "TransactionSelector",
-    "Type",
-    "TypeCode",
+    u"BatchCreateSessionsRequest",
+    u"BatchCreateSessionsResponse",
+    u"BeginTransactionRequest",
+    u"CommitRequest",
+    u"CommitResponse",
+    u"CreateSessionRequest",
+    u"DeleteSessionRequest",
+    u"ExecuteBatchDmlRequest",
+    u"ExecuteBatchDmlResponse",
+    u"ExecuteSqlRequest",
+    u"GetSessionRequest",
+    u"KeyRangePB",
+    u"KeySetPB",
+    u"ListSessionsRequest",
+    u"ListSessionsResponse",
+    u"Mutation",
+    u"PartialResultSet",
+    u"Partition",
+    u"PartitionOptions",
+    u"PartitionQueryRequest",
+    u"PartitionReadRequest",
+    u"PartitionResponse",
+    u"PlanNode",
+    u"QueryPlan",
+    u"ReadRequest",
+    u"ResultSet",
+    u"ResultSetMetadata",
+    u"ResultSetStats",
+    u"RollbackRequest",
+    u"Session",
+    u"StructType",
+    u"Transaction",
+    u"TransactionOptions",
+    u"TransactionSelector",
+    u"Type",
+    u"TypeCode",
     # google.cloud.spanner_v1.services
-    "SpannerClient",
+    u"SpannerClient",
 )

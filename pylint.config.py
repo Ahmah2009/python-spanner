@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module is used to configure gcp-devrel-py-tools run-pylint."""
+u"""This module is used to configure gcp-devrel-py-tools run-pylint."""
 
+from __future__ import absolute_import
 import copy
 
 from gcp_devrel.tools import pylint
@@ -23,9 +24,9 @@ from gcp_devrel.tools import pylint
 # library_additions = {}
 # Ignore generated code
 library_replacements = copy.deepcopy(pylint.DEFAULT_LIBRARY_RC_REPLACEMENTS)
-library_replacements['MASTER']['ignore'].append('spanner_v1')
-library_replacements['MASTER']['ignore'].append('spanner_admin_instance_v1')
-library_replacements['MASTER']['ignore'].append('spanner_admin_database_v1')
+library_replacements[u'MASTER'][u'ignore'].append(u'spanner_v1')
+library_replacements[u'MASTER'][u'ignore'].append(u'spanner_admin_instance_v1')
+library_replacements[u'MASTER'][u'ignore'].append(u'spanner_admin_database_v1')
 
 # Test configuration
 

@@ -15,6 +15,8 @@
 # limitations under the License.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 def run_quickstart():
     # [START spanner_quickstart]
     # Imports the Google Cloud Client Library.
@@ -24,25 +26,25 @@ def run_quickstart():
     spanner_client = spanner.Client()
 
     # Your Cloud Spanner instance ID.
-    instance_id = "my-instance-id"
+    instance_id = u"my-instance-id"
 
     # Get a Cloud Spanner instance by ID.
     instance = spanner_client.instance(instance_id)
 
     # Your Cloud Spanner database ID.
-    database_id = "my-database-id"
+    database_id = u"my-database-id"
 
     # Get a Cloud Spanner database by ID.
     database = instance.database(database_id)
 
     # Execute a simple SQL statement.
     with database.snapshot() as snapshot:
-        results = snapshot.execute_sql("SELECT 1")
+        results = snapshot.execute_sql(u"SELECT 1")
 
         for row in results:
-            print(row)
+            print row
     # [END spanner_quickstart]
 
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     run_quickstart()

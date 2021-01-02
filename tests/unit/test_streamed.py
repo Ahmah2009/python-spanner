@@ -13,9 +13,13 @@
 # limitations under the License.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import unittest
 
 import mock
+from itertools import izip
+from io import open
 
 
 class TestStreamedResultSet(unittest.TestCase):
@@ -108,7 +112,7 @@ class TestStreamedResultSet(unittest.TestCase):
         from google.cloud.spanner_v1._helpers import _make_value_pb
 
         query_stats = Struct(
-            fields={key: _make_value_pb(value) for key, value in kw.items()}
+            fields=dict((key, _make_value_pb(value)) for key, value in kw.items())
         )
         return ResultSetStats(query_plan=query_plan, query_stats=query_stats)
 
@@ -131,8 +135,8 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
         ]
         metadata = streamed._metadata = self._make_result_set_metadata(FIELDS)
         stats = streamed._stats = self._make_result_set_stats()
@@ -146,7 +150,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_scalar_field("registered_voter", TypeCode.BOOL)]
+        FIELDS = [self._make_scalar_field(u"registered_voter", TypeCode.BOOL)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = True
         chunk = False
@@ -159,7 +163,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_scalar_field("age", TypeCode.INT64)]
+        FIELDS = [self._make_scalar_field(u"age", TypeCode.INT64)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = 42
         chunk = 13
@@ -174,7 +178,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_scalar_field("weight", TypeCode.FLOAT64)]
+        FIELDS = [self._make_scalar_field(u"weight", TypeCode.FLOAT64)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = u"Na"
         chunk = u"N"
@@ -187,10 +191,10 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_scalar_field("weight", TypeCode.FLOAT64)]
+        FIELDS = [self._make_scalar_field(u"weight", TypeCode.FLOAT64)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = 3.14159
-        chunk = ""
+        chunk = u""
 
         merged = streamed._merge_chunk(chunk)
         self.assertEqual(merged, 3.14159)
@@ -201,7 +205,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_scalar_field("weight", TypeCode.FLOAT64)]
+        FIELDS = [self._make_scalar_field(u"weight", TypeCode.FLOAT64)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = 3.14159
         chunk = 2.71828
@@ -214,7 +218,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_scalar_field("name", TypeCode.STRING)]
+        FIELDS = [self._make_scalar_field(u"name", TypeCode.STRING)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = u"phred"
         chunk = u"wylma"
@@ -229,7 +233,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_scalar_field("image", TypeCode.BYTES)]
+        FIELDS = [self._make_scalar_field(u"image", TypeCode.BYTES)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = (
             u"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA"
@@ -244,9 +248,9 @@ class TestStreamedResultSet(unittest.TestCase):
 
         self.assertEqual(
             merged,
-            b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACXBIWXMAAAsTAAAL"
-            b"EwEAmpwYAAAA\nB3RJTUUH4QQGFwsBTL3HMwAAABJpVFh0Q29tbWVudAAAAAAAU0"
-            b"FNUExFMG3E+AAAAApJREFUCNdj\nYAAAAAIAAeIhvDMAAAAASUVORK5CYII=\n",
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACXBIWXMAAAsTAAAL"
+            "EwEAmpwYAAAA\nB3RJTUUH4QQGFwsBTL3HMwAAABJpVFh0Q29tbWVudAAAAAAAU0"
+            "FNUExFMG3E+AAAAApJREFUCNdj\nYAAAAAIAAeIhvDMAAAAASUVORK5CYII=\n",
         )
         self.assertIsNone(streamed._pending_chunk)
 
@@ -255,7 +259,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_array_field("name", element_type_code=TypeCode.BOOL)]
+        FIELDS = [self._make_array_field(u"name", element_type_code=TypeCode.BOOL)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [True, True]
         chunk = [False, False, False]
@@ -271,7 +275,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_array_field("name", element_type_code=TypeCode.INT64)]
+        FIELDS = [self._make_array_field(u"name", element_type_code=TypeCode.INT64)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [0, 1, 2]
         chunk = [3, 4, 5]
@@ -292,10 +296,10 @@ class TestStreamedResultSet(unittest.TestCase):
         LOG_10 = math.log(10)
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_array_field("name", element_type_code=TypeCode.FLOAT64)]
+        FIELDS = [self._make_array_field(u"name", element_type_code=TypeCode.FLOAT64)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [PI, SQRT_2]
-        chunk = ["", EULER, LOG_10]
+        chunk = [u"", EULER, LOG_10]
 
         merged = streamed._merge_chunk(chunk)
 
@@ -308,7 +312,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_array_field("name", element_type_code=TypeCode.STRING)]
+        FIELDS = [self._make_array_field(u"name", element_type_code=TypeCode.STRING)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [u"A", u"B", u"C"]
         chunk = []
@@ -324,7 +328,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_array_field("name", element_type_code=TypeCode.STRING)]
+        FIELDS = [self._make_array_field(u"name", element_type_code=TypeCode.STRING)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [u"A", u"B", u"C"]
         chunk = [None, u"D", u"E"]
@@ -340,7 +344,7 @@ class TestStreamedResultSet(unittest.TestCase):
 
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [self._make_array_field("name", element_type_code=TypeCode.STRING)]
+        FIELDS = [self._make_array_field(u"name", element_type_code=TypeCode.STRING)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [u"A", u"B", u"C"]
         chunk = [u"D", u"E"]
@@ -362,7 +366,7 @@ class TestStreamedResultSet(unittest.TestCase):
         array_type = Type(code=TypeCode.ARRAY, array_element_type=subarray_type)
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [StructType.Field(name="loloi", type_=array_type)]
+        FIELDS = [StructType.Field(name=u"loloi", type_=array_type)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [[0, 1], [2]]
         chunk = [[3], [4, 5]]
@@ -389,7 +393,7 @@ class TestStreamedResultSet(unittest.TestCase):
         array_type = Type(code=TypeCode.ARRAY, array_element_type=subarray_type)
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
-        FIELDS = [StructType.Field(name="lolos", type_=array_type)]
+        FIELDS = [StructType.Field(name=u"lolos", type_=array_type)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._pending_chunk = [
             [u"A", u"B"],
@@ -417,9 +421,9 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         struct_type = self._make_struct_type(
-            [("name", TypeCode.STRING), ("age", TypeCode.INT64)]
+            [(u"name", TypeCode.STRING), (u"age", TypeCode.INT64)]
         )
-        FIELDS = [self._make_array_field("test", element_type=struct_type)]
+        FIELDS = [self._make_array_field(u"test", element_type=struct_type)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         partial = [u"Phred "]
         streamed._pending_chunk = [partial]
@@ -439,9 +443,9 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         struct_type = self._make_struct_type(
-            [("name", TypeCode.STRING), ("age", TypeCode.INT64)]
+            [(u"name", TypeCode.STRING), (u"age", TypeCode.INT64)]
         )
-        FIELDS = [self._make_array_field("test", element_type=struct_type)]
+        FIELDS = [self._make_array_field(u"test", element_type=struct_type)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         partial = [u"Phred "]
         streamed._pending_chunk = [partial]
@@ -461,12 +465,12 @@ class TestStreamedResultSet(unittest.TestCase):
         streamed = self._make_one(iterator)
         struct_type = self._make_struct_type(
             [
-                ("name", TypeCode.STRING),
-                ("registered", TypeCode.BOOL),
-                ("voted", TypeCode.BOOL),
+                (u"name", TypeCode.STRING),
+                (u"registered", TypeCode.BOOL),
+                (u"voted", TypeCode.BOOL),
             ]
         )
-        FIELDS = [self._make_array_field("test", element_type=struct_type)]
+        FIELDS = [self._make_array_field(u"test", element_type=struct_type)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         partial = [u"Phred Phlyntstone", True]
         streamed._pending_chunk = [partial]
@@ -484,18 +488,18 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         struct_type = self._make_struct_type(
-            [("name", "STRING"), ("height", "FLOAT64"), ("eye_color", "STRING")]
+            [(u"name", u"STRING"), (u"height", u"FLOAT64"), (u"eye_color", u"STRING")]
         )
-        FIELDS = [self._make_array_field("test", element_type=struct_type)]
+        FIELDS = [self._make_array_field(u"test", element_type=struct_type)]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         partial = [u"Phred Phlyntstone", 1.65]
         streamed._pending_chunk = [partial]
-        rest = ["brown"]
+        rest = [u"brown"]
         chunk = [rest]
 
         merged = streamed._merge_chunk(chunk)
 
-        struct = [u"Phred Phlyntstone", 1.65, "brown"]
+        struct = [u"Phred Phlyntstone", 1.65, u"brown"]
         expected = [struct]
         self.assertEqual(merged, expected)
         self.assertIsNone(streamed._pending_chunk)
@@ -506,9 +510,9 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         streamed._current_row = []
@@ -522,12 +526,12 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
-        VALUES = [u"Phred Phlyntstone", "42"]
+        VALUES = [u"Phred Phlyntstone", u"42"]
         BARE = [u"Phred Phlyntstone", 42]
         streamed._current_row = []
         streamed._merge_values(VALUES)
@@ -540,12 +544,12 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
-        VALUES = [u"Phred Phlyntstone", "42", True]
+        VALUES = [u"Phred Phlyntstone", u"42", True]
         BARE = [u"Phred Phlyntstone", 42, True]
         streamed._current_row = []
         streamed._merge_values(VALUES)
@@ -558,17 +562,17 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         VALUES = [
             u"Phred Phlyntstone",
-            "42",
+            u"42",
             True,
             u"Bharney Rhubble",
-            "39",
+            u"39",
             True,
             u"Wylma Phlyntstone",
         ]
@@ -592,9 +596,9 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         BEFORE = [u"Phred Phlyntstone"]
@@ -609,14 +613,14 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         BEFORE = [u"Phred Phlyntstone"]
         streamed._current_row[:] = BEFORE
-        TO_MERGE = ["42"]
+        TO_MERGE = [u"42"]
         MERGED = [42]
         streamed._merge_values(TO_MERGE)
         self.assertEqual(list(streamed), [])
@@ -628,14 +632,14 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         BEFORE = [u"Phred Phlyntstone"]
         streamed._current_row[:] = BEFORE
-        TO_MERGE = ["42", True]
+        TO_MERGE = [u"42", True]
         MERGED = [42, True]
         streamed._merge_values(TO_MERGE)
         self.assertEqual(list(streamed), [BEFORE + MERGED])
@@ -647,14 +651,14 @@ class TestStreamedResultSet(unittest.TestCase):
         iterator = _MockCancellableIterator()
         streamed = self._make_one(iterator)
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         streamed._metadata = self._make_result_set_metadata(FIELDS)
         BEFORE = [self._make_value(u"Phred Phlyntstone")]
         streamed._current_row[:] = BEFORE
-        TO_MERGE = ["42", True, u"Bharney Rhubble", "39", True, u"Wylma Phlyntstone"]
+        TO_MERGE = [u"42", True, u"Bharney Rhubble", u"39", True, u"Wylma Phlyntstone"]
         MERGED = [42, True, u"Bharney Rhubble", 39, True, u"Wylma Phlyntstone"]
         VALUES = BEFORE + MERGED
         streamed._merge_values(TO_MERGE)
@@ -663,20 +667,20 @@ class TestStreamedResultSet(unittest.TestCase):
 
     def test_one_or_none_no_value(self):
         streamed = self._make_one(_MockCancellableIterator())
-        with mock.patch.object(streamed, "_consume_next") as consume_next:
+        with mock.patch.object(streamed, u"_consume_next") as consume_next:
             consume_next.side_effect = StopIteration
             self.assertIsNone(streamed.one_or_none())
 
     def test_one_or_none_single_value(self):
         streamed = self._make_one(_MockCancellableIterator())
-        streamed._rows = ["foo"]
-        with mock.patch.object(streamed, "_consume_next") as consume_next:
+        streamed._rows = [u"foo"]
+        with mock.patch.object(streamed, u"_consume_next") as consume_next:
             consume_next.side_effect = StopIteration
-            self.assertEqual(streamed.one_or_none(), "foo")
+            self.assertEqual(streamed.one_or_none(), u"foo")
 
     def test_one_or_none_multiple_values(self):
         streamed = self._make_one(_MockCancellableIterator())
-        streamed._rows = ["foo", "bar"]
+        streamed._rows = [u"foo", u"bar"]
         with self.assertRaises(ValueError):
             streamed.one_or_none()
 
@@ -688,17 +692,17 @@ class TestStreamedResultSet(unittest.TestCase):
 
     def test_one_single_value(self):
         streamed = self._make_one(_MockCancellableIterator())
-        streamed._rows = ["foo"]
-        with mock.patch.object(streamed, "_consume_next") as consume_next:
+        streamed._rows = [u"foo"]
+        with mock.patch.object(streamed, u"_consume_next") as consume_next:
             consume_next.side_effect = StopIteration
-            self.assertEqual(streamed.one(), "foo")
+            self.assertEqual(streamed.one(), u"foo")
 
     def test_one_no_value(self):
         from google.cloud import exceptions
 
-        iterator = _MockCancellableIterator(["foo"])
+        iterator = _MockCancellableIterator([u"foo"])
         streamed = self._make_one(iterator)
-        with mock.patch.object(streamed, "_consume_next") as consume_next:
+        with mock.patch.object(streamed, u"_consume_next") as consume_next:
             consume_next.side_effect = StopIteration
             with self.assertRaises(exceptions.NotFound):
                 streamed.one()
@@ -712,17 +716,17 @@ class TestStreamedResultSet(unittest.TestCase):
     def test_consume_next_first_set_partial(self):
         from google.cloud.spanner_v1 import TypeCode
 
-        TXN_ID = b"DEADBEEF"
+        TXN_ID = "DEADBEEF"
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         metadata = self._make_result_set_metadata(FIELDS, transaction_id=TXN_ID)
         BARE = [u"Phred Phlyntstone", 42]
         result_set = self._make_partial_result_set(BARE, metadata=metadata)
         iterator = _MockCancellableIterator(result_set)
-        source = mock.Mock(_transaction_id=None, spec=["_transaction_id"])
+        source = mock.Mock(_transaction_id=None, spec=[u"_transaction_id"])
         streamed = self._make_one(iterator, source=source)
         streamed._consume_next()
         self.assertEqual(list(streamed), [])
@@ -733,18 +737,18 @@ class TestStreamedResultSet(unittest.TestCase):
     def test_consume_next_first_set_partial_existing_txn_id(self):
         from google.cloud.spanner_v1 import TypeCode
 
-        TXN_ID = b"DEADBEEF"
+        TXN_ID = "DEADBEEF"
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
-        metadata = self._make_result_set_metadata(FIELDS, transaction_id=b"")
+        metadata = self._make_result_set_metadata(FIELDS, transaction_id="")
         BARE = [u"Phred Phlyntstone", 42]
         VALUES = [self._make_value(bare) for bare in BARE]
         result_set = self._make_partial_result_set(VALUES, metadata=metadata)
         iterator = _MockCancellableIterator(result_set)
-        source = mock.Mock(_transaction_id=TXN_ID, spec=["_transaction_id"])
+        source = mock.Mock(_transaction_id=TXN_ID, spec=[u"_transaction_id"])
         streamed = self._make_one(iterator, source=source)
         streamed._consume_next()
         self.assertEqual(list(streamed), [])
@@ -756,9 +760,9 @@ class TestStreamedResultSet(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         VALUES = [self._make_value(u"Phred ")]
         result_set = self._make_partial_result_set(VALUES, chunked_value=True)
@@ -774,9 +778,9 @@ class TestStreamedResultSet(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         BARE = [
             u"Phlyntstone",
@@ -805,13 +809,13 @@ class TestStreamedResultSet(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         metadata = self._make_result_set_metadata(FIELDS)
         stats = self._make_result_set_stats(
-            rows_returned="1", elapsed_time="1.23 secs", cpu_time="0.98 secs"
+            rows_returned=u"1", elapsed_time=u"1.23 secs", cpu_time=u"0.98 secs"
         )
         BARE = [u"Phred Phlyntstone", 42, True]
         VALUES = [self._make_value(bare) for bare in BARE]
@@ -835,9 +839,9 @@ class TestStreamedResultSet(unittest.TestCase):
         from google.protobuf.struct_pb2 import Value
 
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         metadata = self._make_result_set_metadata(FIELDS)
         BARE = [u"Phred Phlyntstone", 42]
@@ -857,9 +861,9 @@ class TestStreamedResultSet(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         metadata = self._make_result_set_metadata(FIELDS)
         BARE = [
@@ -895,9 +899,9 @@ class TestStreamedResultSet(unittest.TestCase):
         from google.cloud.spanner_v1 import TypeCode
 
         FIELDS = [
-            self._make_scalar_field("full_name", TypeCode.STRING),
-            self._make_scalar_field("age", TypeCode.INT64),
-            self._make_scalar_field("married", TypeCode.BOOL),
+            self._make_scalar_field(u"full_name", TypeCode.STRING),
+            self._make_scalar_field(u"age", TypeCode.INT64),
+            self._make_scalar_field(u"married", TypeCode.BOOL),
         ]
         metadata = self._make_result_set_metadata(FIELDS)
         ALREADY = [[u"Pebbylz Phlyntstone", 4, False], [u"Dino Rhubble", 4, False]]
@@ -941,9 +945,9 @@ class _MockCancellableIterator(object):
         self.iter_values = iter(values)
 
     def next(self):
-        return next(self.iter_values)
+        return self.iter_values.next()
 
-    def __next__(self):  # pragma: NO COVER Py3k
+    def next(self):  # pragma: NO COVER Py3k
         return self.next()
 
 
@@ -964,7 +968,7 @@ class TestStreamedResultSet_JSON_acceptance_tests(unittest.TestCase):
 
         if self.__class__._json_tests is None:
             dirname = os.path.dirname(__file__)
-            filename = os.path.join(dirname, "streaming-read-acceptance-test.json")
+            filename = os.path.join(dirname, u"streaming-read-acceptance-test.json")
             raw = _parse_streaming_read_acceptance_tests(filename)
             tests = self.__class__._json_tests = {}
             for (name, partial_result_sets, results) in raw:
@@ -983,25 +987,25 @@ class TestStreamedResultSet_JSON_acceptance_tests(unittest.TestCase):
             self.assertEqual(list(partial), expected)
 
     def test_basic(self):
-        self._match_results("Basic Test")
+        self._match_results(u"Basic Test")
 
     def test_string_chunking(self):
-        self._match_results("String Chunking Test")
+        self._match_results(u"String Chunking Test")
 
     def test_string_array_chunking(self):
-        self._match_results("String Array Chunking Test")
+        self._match_results(u"String Array Chunking Test")
 
     def test_string_array_chunking_with_nulls(self):
-        self._match_results("String Array Chunking Test With Nulls")
+        self._match_results(u"String Array Chunking Test With Nulls")
 
     def test_string_array_chunking_with_empty_strings(self):
-        self._match_results("String Array Chunking Test With Empty Strings")
+        self._match_results(u"String Array Chunking Test With Empty Strings")
 
     def test_string_array_chunking_with_one_large_string(self):
-        self._match_results("String Array Chunking Test With One Large String")
+        self._match_results(u"String Array Chunking Test With One Large String")
 
     def test_int64_array_chunking(self):
-        self._match_results("INT64 Array Chunking Test")
+        self._match_results(u"INT64 Array Chunking Test")
 
     def test_float64_array_chunking(self):
         import math
@@ -1021,35 +1025,35 @@ class TestStreamedResultSet_JSON_acceptance_tests(unittest.TestCase):
 
         def assert_rows_equality(lhs, rhs):
             self.assertEqual(len(lhs), len(rhs))
-            for l_rows, r_rows in zip(lhs, rhs):
+            for l_rows, r_rows in izip(lhs, rhs):
                 self.assertEqual(len(l_rows), len(r_rows))
-                for l_row, r_row in zip(l_rows, r_rows):
+                for l_row, r_row in izip(l_rows, r_rows):
                     self.assertEqual(len(l_row), len(r_row))
-                    for l_cell, r_cell in zip(l_row, r_row):
+                    for l_cell, r_cell in izip(l_row, r_row):
                         assert_float_equality(l_cell, r_cell)
 
-        self._match_results("FLOAT64 Array Chunking Test", assert_rows_equality)
+        self._match_results(u"FLOAT64 Array Chunking Test", assert_rows_equality)
 
     def test_struct_array_chunking(self):
-        self._match_results("Struct Array Chunking Test")
+        self._match_results(u"Struct Array Chunking Test")
 
     def test_nested_struct_array(self):
-        self._match_results("Nested Struct Array Test")
+        self._match_results(u"Nested Struct Array Test")
 
     def test_nested_struct_array_chunking(self):
-        self._match_results("Nested Struct Array Chunking Test")
+        self._match_results(u"Nested Struct Array Chunking Test")
 
     def test_struct_array_and_string_chunking(self):
-        self._match_results("Struct Array And String Chunking Test")
+        self._match_results(u"Struct Array And String Chunking Test")
 
     def test_multiple_row_single_chunk(self):
-        self._match_results("Multiple Row Single Chunk")
+        self._match_results(u"Multiple Row Single Chunk")
 
     def test_multiple_row_multiple_chunks(self):
-        self._match_results("Multiple Row Multiple Chunks")
+        self._match_results(u"Multiple Row Multiple Chunks")
 
     def test_multiple_row_chunks_non_chunks_interleaved(self):
-        self._match_results("Multiple Row Chunks/Non Chunks Interleaved")
+        self._match_results(u"Multiple Row Chunks/Non Chunks Interleaved")
 
 
 def _generate_partial_result_sets(prs_text_pbs):
@@ -1075,30 +1079,30 @@ def _normalize_int_array(cell):
 
 def _normalize_float(cell):
     if cell == u"Infinity":
-        return float("inf")
+        return float(u"inf")
     if cell == u"-Infinity":
-        return float("-inf")
+        return float(u"-inf")
     if cell == u"NaN":
-        return float("nan")
+        return float(u"nan")
     if cell is not None:
         return float(cell)
 
 
 def _normalize_results(rows_data, fields):
-    """Helper for _parse_streaming_read_acceptance_tests"""
+    u"""Helper for _parse_streaming_read_acceptance_tests"""
     from google.cloud.spanner_v1 import TypeCode
 
     normalized = []
     for row_data in rows_data:
         row = []
         assert len(row_data) == len(fields)
-        for cell, field in zip(row_data, fields):
+        for cell, field in izip(row_data, fields):
             if field.type_.code == TypeCode.INT64:
                 cell = int(cell)
             if field.type_.code == TypeCode.FLOAT64:
                 cell = _normalize_float(cell)
             elif field.type_.code == TypeCode.BYTES:
-                cell = cell.encode("utf8")
+                cell = cell.encode(u"utf8")
             elif field.type_.code == TypeCode.ARRAY:
                 if field.type_.array_element_type.code == TypeCode.INT64:
                     cell = _normalize_int_array(cell)
@@ -1110,7 +1114,7 @@ def _normalize_results(rows_data, fields):
 
 
 def _parse_streaming_read_acceptance_tests(filename):
-    """Parse acceptance tests from JSON
+    u"""Parse acceptance tests from JSON
 
     See streaming-read-acceptance-test.json
     """
@@ -1119,9 +1123,9 @@ def _parse_streaming_read_acceptance_tests(filename):
     with open(filename) as json_file:
         test_json = json.load(json_file)
 
-    for test in test_json["tests"]:
-        name = test["name"]
-        partial_result_sets = _generate_partial_result_sets(test["chunks"])
+    for test in test_json[u"tests"]:
+        name = test[u"name"]
+        partial_result_sets = _generate_partial_result_sets(test[u"chunks"])
         fields = partial_result_sets[0].metadata.row_type.fields
-        result = _normalize_results(test["result"]["value"], fields)
+        result = _normalize_results(test[u"result"][u"value"], fields)
         yield name, partial_result_sets, result

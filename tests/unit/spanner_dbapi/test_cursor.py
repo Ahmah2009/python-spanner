@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Cursor() class unit tests."""
+u"""Cursor() class unit tests."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import mock
 import sys
 import unittest
@@ -21,8 +23,8 @@ import unittest
 
 class TestCursor(unittest.TestCase):
 
-    INSTANCE = "test-instance"
-    DATABASE = "test-database"
+    INSTANCE = u"test-instance"
+    DATABASE = u"test-database"
 
     def _get_target_class(self):
         from google.cloud.spanner_dbapi import Cursor
@@ -74,10 +76,10 @@ class TestCursor(unittest.TestCase):
         from google.cloud.spanner_dbapi import connect, InterfaceError
 
         with mock.patch(
-            "google.cloud.spanner_v1.instance.Instance.exists", return_value=True
+            u"google.cloud.spanner_v1.instance.Instance.exists", return_value=True
         ):
             with mock.patch(
-                "google.cloud.spanner_v1.database.Database.exists", return_value=True
+                u"google.cloud.spanner_v1.database.Database.exists", return_value=True
             ):
                 connection = connect(self.INSTANCE, self.DATABASE)
 
@@ -88,7 +90,7 @@ class TestCursor(unittest.TestCase):
 
         self.assertTrue(cursor.is_closed)
         with self.assertRaises(InterfaceError):
-            cursor.execute("SELECT * FROM database")
+            cursor.execute(u"SELECT * FROM database")
 
     def test_do_execute_update(self):
         from google.cloud.spanner_dbapi.cursor import _UNSET_COUNT
@@ -100,11 +102,11 @@ class TestCursor(unittest.TestCase):
         def run_helper(ret_value):
             transaction.execute_update.return_value = ret_value
             res = cursor._do_execute_update(
-                transaction=transaction, sql="sql", params=None
+                transaction=transaction, sql=u"sql", params=None
             )
             return res
 
-        expected = "good"
+        expected = u"good"
         self.assertEqual(run_helper(expected), expected)
         self.assertEqual(cursor._row_count, _UNSET_COUNT)
 
@@ -119,14 +121,14 @@ class TestCursor(unittest.TestCase):
         cursor = self._make_one(connection)
         cursor.connection = None
         with self.assertRaises(ProgrammingError):
-            cursor.execute(sql="")
+            cursor.execute(sql=u"")
 
     def test_execute_attribute_error(self):
         connection = self._make_connection(self.INSTANCE, self.DATABASE)
         cursor = self._make_one(connection)
 
         with self.assertRaises(AttributeError):
-            cursor.execute(sql="")
+            cursor.execute(sql=u"")
 
     def test_execute_autocommit_off(self):
         from google.cloud.spanner_dbapi.utils import PeekIterator
@@ -136,7 +138,7 @@ class TestCursor(unittest.TestCase):
         cursor.connection._autocommit = False
         cursor.connection.transaction_checkout = mock.MagicMock(autospec=True)
 
-        cursor.execute("sql")
+        cursor.execute(u"sql")
         self.assertIsInstance(cursor._result_set, mock.MagicMock)
         self.assertIsInstance(cursor._itr, PeekIterator)
 
@@ -147,46 +149,46 @@ class TestCursor(unittest.TestCase):
         cursor = self._make_one(connection)
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
             return_value=parse_utils.STMT_DDL,
         ) as mock_classify_stmt:
-            sql = "sql"
+            sql = u"sql"
             cursor.execute(sql=sql)
             mock_classify_stmt.assert_called_once_with(sql)
             self.assertEqual(cursor.connection._ddl_statements, [sql])
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
             return_value=parse_utils.STMT_NON_UPDATING,
         ):
             with mock.patch(
-                "google.cloud.spanner_dbapi.cursor.Cursor._handle_DQL",
+                u"google.cloud.spanner_dbapi.cursor.Cursor._handle_DQL",
                 return_value=parse_utils.STMT_NON_UPDATING,
             ) as mock_handle_ddl:
                 connection.autocommit = True
-                sql = "sql"
+                sql = u"sql"
                 cursor.execute(sql=sql)
                 mock_handle_ddl.assert_called_once_with(sql, None)
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
             return_value=parse_utils.STMT_INSERT,
         ):
             with mock.patch(
-                "google.cloud.spanner_dbapi._helpers.handle_insert",
+                u"google.cloud.spanner_dbapi._helpers.handle_insert",
                 return_value=parse_utils.STMT_INSERT,
             ) as mock_handle_insert:
-                sql = "sql"
+                sql = u"sql"
                 cursor.execute(sql=sql)
                 mock_handle_insert.assert_called_once_with(connection, sql, None)
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
-            return_value="other_statement",
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            return_value=u"other_statement",
         ):
             cursor.connection._database = mock_db = mock.MagicMock()
             mock_db.run_in_transaction = mock_run_in = mock.MagicMock()
-            sql = "sql"
+            sql = u"sql"
             cursor.execute(sql=sql)
             mock_run_in.assert_called_once_with(cursor._do_execute_update, sql, None)
 
@@ -198,18 +200,18 @@ class TestCursor(unittest.TestCase):
         cursor = self._make_one(connection)
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
-            side_effect=exceptions.AlreadyExists("message"),
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            side_effect=exceptions.AlreadyExists(u"message"),
         ):
             with self.assertRaises(IntegrityError):
-                cursor.execute(sql="sql")
+                cursor.execute(sql=u"sql")
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
-            side_effect=exceptions.FailedPrecondition("message"),
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            side_effect=exceptions.FailedPrecondition(u"message"),
         ):
             with self.assertRaises(IntegrityError):
-                cursor.execute(sql="sql")
+                cursor.execute(sql=u"sql")
 
     def test_execute_invalid_argument(self):
         from google.api_core import exceptions
@@ -219,11 +221,11 @@ class TestCursor(unittest.TestCase):
         cursor = self._make_one(connection)
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
-            side_effect=exceptions.InvalidArgument("message"),
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            side_effect=exceptions.InvalidArgument(u"message"),
         ):
             with self.assertRaises(ProgrammingError):
-                cursor.execute(sql="sql")
+                cursor.execute(sql=u"sql")
 
     def test_execute_internal_server_error(self):
         from google.api_core import exceptions
@@ -233,47 +235,47 @@ class TestCursor(unittest.TestCase):
         cursor = self._make_one(connection)
 
         with mock.patch(
-            "google.cloud.spanner_dbapi.parse_utils.classify_stmt",
-            side_effect=exceptions.InternalServerError("message"),
+            u"google.cloud.spanner_dbapi.parse_utils.classify_stmt",
+            side_effect=exceptions.InternalServerError(u"message"),
         ):
             with self.assertRaises(OperationalError):
-                cursor.execute(sql="sql")
+                cursor.execute(sql=u"sql")
 
     def test_executemany_on_closed_cursor(self):
         from google.cloud.spanner_dbapi import InterfaceError
         from google.cloud.spanner_dbapi import connect
 
         with mock.patch(
-            "google.cloud.spanner_v1.instance.Instance.exists", return_value=True
+            u"google.cloud.spanner_v1.instance.Instance.exists", return_value=True
         ):
             with mock.patch(
-                "google.cloud.spanner_v1.database.Database.exists", return_value=True
+                u"google.cloud.spanner_v1.database.Database.exists", return_value=True
             ):
-                connection = connect("test-instance", "test-database")
+                connection = connect(u"test-instance", u"test-database")
 
         cursor = connection.cursor()
         cursor.close()
 
         with self.assertRaises(InterfaceError):
-            cursor.executemany("""SELECT * FROM table1 WHERE "col1" = @a1""", ())
+            cursor.executemany(u"""SELECT * FROM table1 WHERE "col1" = @a1""", ())
 
     def test_executemany(self):
         from google.cloud.spanner_dbapi import connect
 
-        operation = """SELECT * FROM table1 WHERE "col1" = @a1"""
+        operation = u"""SELECT * FROM table1 WHERE "col1" = @a1"""
         params_seq = ((1,), (2,))
 
         with mock.patch(
-            "google.cloud.spanner_v1.instance.Instance.exists", return_value=True
+            u"google.cloud.spanner_v1.instance.Instance.exists", return_value=True
         ):
             with mock.patch(
-                "google.cloud.spanner_v1.database.Database.exists", return_value=True
+                u"google.cloud.spanner_v1.database.Database.exists", return_value=True
             ):
-                connection = connect("test-instance", "test-database")
+                connection = connect(u"test-instance", u"test-database")
 
         cursor = connection.cursor()
         with mock.patch(
-            "google.cloud.spanner_dbapi.cursor.Cursor.execute"
+            u"google.cloud.spanner_dbapi.cursor.Cursor.execute"
         ) as execute_mock:
             cursor.executemany(operation, params_seq)
 
@@ -282,14 +284,14 @@ class TestCursor(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        sys.version_info[0] < 3, "Python 2 has an outdated iterator definition"
+        sys.version_info[0] < 3, u"Python 2 has an outdated iterator definition"
     )
     def test_fetchone(self):
         connection = self._make_connection(self.INSTANCE, mock.MagicMock())
         cursor = self._make_one(connection)
         lst = [1, 2, 3]
         cursor._itr = iter(lst)
-        for i in range(len(lst)):
+        for i in xrange(len(lst)):
             self.assertEqual(cursor.fetchone(), lst[i])
         self.assertIsNone(cursor.fetchone())
 
@@ -358,13 +360,13 @@ class TestCursor(unittest.TestCase):
         cursor = self._make_one(connection)
 
         mock_snapshot.execute_sql.return_value = int(0)
-        cursor._handle_DQL("sql", params=None)
+        cursor._handle_DQL(u"sql", params=None)
         self.assertEqual(cursor._row_count, 0)
         self.assertIsNone(cursor._itr)
 
-        mock_snapshot.execute_sql.return_value = "0"
-        cursor._handle_DQL("sql", params=None)
-        self.assertEqual(cursor._result_set, "0")
+        mock_snapshot.execute_sql.return_value = u"0"
+        cursor._handle_DQL(u"sql", params=None)
+        self.assertEqual(cursor._result_set, u"0")
         self.assertIsInstance(cursor._itr, utils.PeekIterator)
         self.assertEqual(cursor._row_count, _UNSET_COUNT)
 
@@ -382,7 +384,7 @@ class TestCursor(unittest.TestCase):
         connection = self._make_connection(self.INSTANCE, self.DATABASE)
         cursor = self._make_one(connection)
         with self.assertRaises(exceptions.ProgrammingError):
-            cursor.__next__()
+            cursor.next()
 
         lst = [(1,), (2,), (3,)]
         cursor._itr = iter(lst)
@@ -409,9 +411,9 @@ class TestCursor(unittest.TestCase):
         connection = self._make_connection(self.INSTANCE, self.DATABASE)
         cursor = self._make_one(connection)
 
-        table_list = ["table1", "table2", "table3"]
+        table_list = [u"table1", u"table2", u"table3"]
         with mock.patch(
-            "google.cloud.spanner_dbapi.cursor.Cursor.run_sql_in_snapshot",
+            u"google.cloud.spanner_dbapi.cursor.Cursor.run_sql_in_snapshot",
             return_value=table_list,
         ) as mock_run_sql:
             cursor.list_tables()
@@ -426,7 +428,7 @@ class TestCursor(unittest.TestCase):
 
         results = 1, 2, 3
         mock_snapshot.execute_sql.return_value = results
-        self.assertEqual(cursor.run_sql_in_snapshot("sql"), list(results))
+        self.assertEqual(cursor.run_sql_in_snapshot(u"sql"), list(results))
 
     def test_get_table_column_schema(self):
         from google.cloud.spanner_dbapi.cursor import ColumnDetails
@@ -436,20 +438,20 @@ class TestCursor(unittest.TestCase):
         connection = self._make_connection(self.INSTANCE, self.DATABASE)
         cursor = self._make_one(connection)
 
-        column_name = "column1"
-        is_nullable = "YES"
-        spanner_type = "spanner_type"
+        column_name = u"column1"
+        is_nullable = u"YES"
+        spanner_type = u"spanner_type"
         rows = [(column_name, is_nullable, spanner_type)]
         expected = {column_name: ColumnDetails(null_ok=True, spanner_type=spanner_type)}
         with mock.patch(
-            "google.cloud.spanner_dbapi.cursor.Cursor.run_sql_in_snapshot",
+            u"google.cloud.spanner_dbapi.cursor.Cursor.run_sql_in_snapshot",
             return_value=rows,
         ) as mock_run_sql:
-            table_name = "table1"
+            table_name = u"table1"
             result = cursor.get_table_column_schema(table_name=table_name)
             mock_run_sql.assert_called_once_with(
                 sql=_helpers.SQL_GET_TABLE_COLUMN_SCHEMA,
-                params={"table_name": table_name},
-                param_types={"table_name": param_types.STRING},
+                params={u"table_name": table_name},
+                param_types={u"table_name": param_types.STRING},
             )
             self.assertEqual(result, expected)

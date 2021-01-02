@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Context manager for Cloud Spanner batched writes."""
+u"""Context manager for Cloud Spanner batched writes."""
 
+from __future__ import with_statement
+from __future__ import absolute_import
 from google.cloud.spanner_v1 import Mutation
 from google.cloud.spanner_v1 import TransactionOptions
 
@@ -27,7 +29,7 @@ from google.cloud.spanner_v1._opentelemetry_tracing import trace_call
 
 
 class _BatchBase(_SessionWrapper):
-    """Accumulate mutations for transmission during :meth:`commit`.
+    u"""Accumulate mutations for transmission during :meth:`commit`.
 
     :type session: :class:`~google.cloud.spanner_v1.session.Session`
     :param session: the session used to perform the commit
@@ -38,7 +40,7 @@ class _BatchBase(_SessionWrapper):
         self._mutations = []
 
     def _check_state(self):
-        """Helper for :meth:`commit` et al.
+        u"""Helper for :meth:`commit` et al.
 
         Subclasses must override
 
@@ -48,7 +50,7 @@ class _BatchBase(_SessionWrapper):
         raise NotImplementedError
 
     def insert(self, table, columns, values):
-        """Insert one or more new table rows.
+        u"""Insert one or more new table rows.
 
         :type table: str
         :param table: Name of the table to be modified.
@@ -62,7 +64,7 @@ class _BatchBase(_SessionWrapper):
         self._mutations.append(Mutation(insert=_make_write_pb(table, columns, values)))
 
     def update(self, table, columns, values):
-        """Update one or more existing table rows.
+        u"""Update one or more existing table rows.
 
         :type table: str
         :param table: Name of the table to be modified.
@@ -76,7 +78,7 @@ class _BatchBase(_SessionWrapper):
         self._mutations.append(Mutation(update=_make_write_pb(table, columns, values)))
 
     def insert_or_update(self, table, columns, values):
-        """Insert/update one or more table rows.
+        u"""Insert/update one or more table rows.
 
         :type table: str
         :param table: Name of the table to be modified.
@@ -92,7 +94,7 @@ class _BatchBase(_SessionWrapper):
         )
 
     def replace(self, table, columns, values):
-        """Replace one or more table rows.
+        u"""Replace one or more table rows.
 
         :type table: str
         :param table: Name of the table to be modified.
@@ -106,7 +108,7 @@ class _BatchBase(_SessionWrapper):
         self._mutations.append(Mutation(replace=_make_write_pb(table, columns, values)))
 
     def delete(self, table, keyset):
-        """Delete one or more table rows.
+        u"""Delete one or more table rows.
 
         :type table: str
         :param table: Name of the table to be modified.
@@ -119,14 +121,14 @@ class _BatchBase(_SessionWrapper):
 
 
 class Batch(_BatchBase):
-    """Accumulate mutations for transmission during :meth:`commit`.
+    u"""Accumulate mutations for transmission during :meth:`commit`.
     """
 
     committed = None
-    """Timestamp at which the batch was successfully committed."""
+    u"""Timestamp at which the batch was successfully committed."""
 
     def _check_state(self):
-        """Helper for :meth:`commit` et al.
+        u"""Helper for :meth:`commit` et al.
 
         Subclasses must override
 
@@ -134,10 +136,10 @@ class Batch(_BatchBase):
                  API requests.
         """
         if self.committed is not None:
-            raise ValueError("Batch already committed")
+            raise ValueError(u"Batch already committed")
 
     def commit(self):
-        """Commit mutations to the database.
+        u"""Commit mutations to the database.
 
         :rtype: datetime
         :returns: timestamp of the committed changes.
@@ -147,8 +149,8 @@ class Batch(_BatchBase):
         api = database.spanner_api
         metadata = _metadata_with_prefix(database.name)
         txn_options = TransactionOptions(read_write=TransactionOptions.ReadWrite())
-        trace_attributes = {"num_mutations": len(self._mutations)}
-        with trace_call("CloudSpanner.Commit", self._session, trace_attributes):
+        trace_attributes = {u"num_mutations": len(self._mutations)}
+        with trace_call(u"CloudSpanner.Commit", self._session, trace_attributes):
             response = api.commit(
                 session=self._session.name,
                 mutations=self._mutations,
@@ -159,19 +161,19 @@ class Batch(_BatchBase):
         return self.committed
 
     def __enter__(self):
-        """Begin ``with`` block."""
+        u"""Begin ``with`` block."""
         self._check_state()
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """End ``with`` block."""
+        u"""End ``with`` block."""
         if exc_type is None:
             self.commit()
 
 
 def _make_write_pb(table, columns, values):
-    """Helper for :meth:`Batch.insert` et aliae.
+    u"""Helper for :meth:`Batch.insert` et aliae.
 
     :type table: str
     :param table: Name of the table to be modified.

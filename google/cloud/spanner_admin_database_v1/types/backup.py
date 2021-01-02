@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -25,25 +26,24 @@ from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.admin.database.v1",
-    manifest={
-        "Backup",
-        "CreateBackupRequest",
-        "CreateBackupMetadata",
-        "UpdateBackupRequest",
-        "GetBackupRequest",
-        "DeleteBackupRequest",
-        "ListBackupsRequest",
-        "ListBackupsResponse",
-        "ListBackupOperationsRequest",
-        "ListBackupOperationsResponse",
-        "BackupInfo",
-    },
+    package=u"google.spanner.admin.database.v1",
+    manifest=set([
+        u"Backup",
+        u"CreateBackupRequest",
+        u"CreateBackupMetadata",
+        u"UpdateBackupRequest",
+        u"GetBackupRequest",
+        u"DeleteBackupRequest",
+        u"ListBackupsRequest",
+        u"ListBackupsResponse",
+        u"ListBackupOperationsRequest",
+        u"ListBackupOperationsResponse",
+        u"BackupInfo",]),
 )
 
 
 class Backup(proto.Message):
-    r"""A backup of a Cloud Spanner database.
+    ur"""A backup of a Cloud Spanner database.
 
     Attributes:
         database (str):
@@ -102,7 +102,7 @@ class Backup(proto.Message):
     """
 
     class State(proto.Enum):
-        r"""Indicates the current state of the backup."""
+        ur"""Indicates the current state of the backup."""
         STATE_UNSPECIFIED = 0
         CREATING = 1
         READY = 2
@@ -123,7 +123,7 @@ class Backup(proto.Message):
 
 
 class CreateBackupRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [CreateBackup][google.spanner.admin.database.v1.DatabaseAdmin.CreateBackup].
 
     Attributes:
@@ -147,11 +147,11 @@ class CreateBackupRequest(proto.Message):
 
     backup_id = proto.Field(proto.STRING, number=2)
 
-    backup = proto.Field(proto.MESSAGE, number=3, message="Backup",)
+    backup = proto.Field(proto.MESSAGE, number=3, message=u"Backup",)
 
 
 class CreateBackupMetadata(proto.Message):
-    r"""Metadata type for the operation returned by
+    ur"""Metadata type for the operation returned by
     [CreateBackup][google.spanner.admin.database.v1.DatabaseAdmin.CreateBackup].
 
     Attributes:
@@ -191,7 +191,7 @@ class CreateBackupMetadata(proto.Message):
 
 
 class UpdateBackupRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [UpdateBackup][google.spanner.admin.database.v1.DatabaseAdmin.UpdateBackup].
 
     Attributes:
@@ -211,13 +211,13 @@ class UpdateBackupRequest(proto.Message):
             accidentally by clients that do not know about them.
     """
 
-    backup = proto.Field(proto.MESSAGE, number=1, message="Backup",)
+    backup = proto.Field(proto.MESSAGE, number=1, message=u"Backup",)
 
     update_mask = proto.Field(proto.MESSAGE, number=2, message=field_mask.FieldMask,)
 
 
 class GetBackupRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [GetBackup][google.spanner.admin.database.v1.DatabaseAdmin.GetBackup].
 
     Attributes:
@@ -230,7 +230,7 @@ class GetBackupRequest(proto.Message):
 
 
 class DeleteBackupRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [DeleteBackup][google.spanner.admin.database.v1.DatabaseAdmin.DeleteBackup].
 
     Attributes:
@@ -244,7 +244,7 @@ class DeleteBackupRequest(proto.Message):
 
 
 class ListBackupsRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ListBackups][google.spanner.admin.database.v1.DatabaseAdmin.ListBackups].
 
     Attributes:
@@ -318,7 +318,7 @@ class ListBackupsRequest(proto.Message):
 
 
 class ListBackupsResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ListBackups][google.spanner.admin.database.v1.DatabaseAdmin.ListBackups].
 
     Attributes:
@@ -336,13 +336,13 @@ class ListBackupsResponse(proto.Message):
     def raw_page(self):
         return self
 
-    backups = proto.RepeatedField(proto.MESSAGE, number=1, message="Backup",)
+    backups = proto.RepeatedField(proto.MESSAGE, number=1, message=u"Backup",)
 
     next_page_token = proto.Field(proto.STRING, number=2)
 
 
 class ListBackupOperationsRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ListBackupOperations][google.spanner.admin.database.v1.DatabaseAdmin.ListBackupOperations].
 
     Attributes:
@@ -420,7 +420,7 @@ class ListBackupOperationsRequest(proto.Message):
 
 
 class ListBackupOperationsResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ListBackupOperations][google.spanner.admin.database.v1.DatabaseAdmin.ListBackupOperations].
 
     Attributes:
@@ -456,7 +456,7 @@ class ListBackupOperationsResponse(proto.Message):
 
 
 class BackupInfo(proto.Message):
-    r"""Information about a backup.
+    ur"""Information about a backup.
 
     Attributes:
         backup (str):

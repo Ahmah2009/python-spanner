@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Pools managing shared Session objects."""
+u"""Pools managing shared Session objects."""
 
+from __future__ import absolute_import
 import datetime
 
 from six.moves import queue
@@ -26,7 +27,7 @@ _NOW = datetime.datetime.utcnow  # unit tests may replace
 
 
 class AbstractSessionPool(object):
-    """Specifies required API for concrete session pool implementations.
+    u"""Specifies required API for concrete session pool implementations.
 
     :type labels: dict (str -> str) or None
     :param labels: (Optional) user-assigned labels for sessions created
@@ -42,7 +43,7 @@ class AbstractSessionPool(object):
 
     @property
     def labels(self):
-        """User-assigned labels for sesions created by the pool.
+        u"""User-assigned labels for sesions created by the pool.
 
         :rtype: dict (str -> str)
         :returns: labels assigned by the user
@@ -50,7 +51,7 @@ class AbstractSessionPool(object):
         return self._labels
 
     def bind(self, database):
-        """Associate the pool with a database.
+        u"""Associate the pool with a database.
 
         :type database: :class:`~google.cloud.spanner_v1.database.Database`
         :param database: database used by the pool:  used to create sessions
@@ -64,7 +65,7 @@ class AbstractSessionPool(object):
         raise NotImplementedError()
 
     def get(self):
-        """Check a session out from the pool.
+        u"""Check a session out from the pool.
 
         Concrete implementations of this method are allowed to raise an
         error to signal that the pool is exhausted, or to block until a
@@ -75,7 +76,7 @@ class AbstractSessionPool(object):
         raise NotImplementedError()
 
     def put(self, session):
-        """Return a session to the pool.
+        u"""Return a session to the pool.
 
         :type session: :class:`~google.cloud.spanner_v1.session.Session`
         :param session: the session being returned.
@@ -89,7 +90,7 @@ class AbstractSessionPool(object):
         raise NotImplementedError()
 
     def clear(self):
-        """Delete all sessions in the pool.
+        u"""Delete all sessions in the pool.
 
         Concrete implementations of this method are allowed to raise an
         error to signal that the pool is full, or to block until it is
@@ -100,7 +101,7 @@ class AbstractSessionPool(object):
         raise NotImplementedError()
 
     def _new_session(self):
-        """Helper for concrete methods creating session instances.
+        u"""Helper for concrete methods creating session instances.
 
         :rtype: :class:`~google.cloud.spanner_v1.session.Session`
         :returns: new session instance.
@@ -110,7 +111,7 @@ class AbstractSessionPool(object):
         return self._database.session()
 
     def session(self, **kwargs):
-        """Check out a session from the pool.
+        u"""Check out a session from the pool.
 
         :param kwargs: (optional) keyword arguments, passed through to
                        the returned checkout.
@@ -123,7 +124,7 @@ class AbstractSessionPool(object):
 
 
 class FixedSizePool(AbstractSessionPool):
-    """Concrete session pool implementation:
+    u"""Concrete session pool implementation:
 
     - Pre-allocates / creates a fixed number of sessions.
 
@@ -159,7 +160,7 @@ class FixedSizePool(AbstractSessionPool):
         self._sessions = queue.LifoQueue(size)
 
     def bind(self, database):
-        """Associate the pool with a database.
+        u"""Associate the pool with a database.
 
         :type database: :class:`~google.cloud.spanner_v1.database.Database`
         :param database: database used by the pool:  used to create sessions
@@ -177,11 +178,11 @@ class FixedSizePool(AbstractSessionPool):
             )
             for session_pb in resp.session:
                 session = self._new_session()
-                session._session_id = session_pb.name.split("/")[-1]
+                session._session_id = session_pb.name.split(u"/")[-1]
                 self._sessions.put(session)
 
     def get(self, timeout=None):  # pylint: disable=arguments-differ
-        """Check a session out from the pool.
+        u"""Check a session out from the pool.
 
         :type timeout: int
         :param timeout: seconds to block waiting for an available session
@@ -203,7 +204,7 @@ class FixedSizePool(AbstractSessionPool):
         return session
 
     def put(self, session):
-        """Return a session to the pool.
+        u"""Return a session to the pool.
 
         Never blocks:  if the pool is full, raises.
 
@@ -215,7 +216,7 @@ class FixedSizePool(AbstractSessionPool):
         self._sessions.put_nowait(session)
 
     def clear(self):
-        """Delete all sessions in the pool."""
+        u"""Delete all sessions in the pool."""
 
         while True:
             try:
@@ -227,7 +228,7 @@ class FixedSizePool(AbstractSessionPool):
 
 
 class BurstyPool(AbstractSessionPool):
-    """Concrete session pool implementation:
+    u"""Concrete session pool implementation:
 
     - "Pings" existing sessions via :meth:`session.exists` before returning
       them.
@@ -253,7 +254,7 @@ class BurstyPool(AbstractSessionPool):
         self._sessions = queue.LifoQueue(target_size)
 
     def bind(self, database):
-        """Associate the pool with a database.
+        u"""Associate the pool with a database.
 
         :type database: :class:`~google.cloud.spanner_v1.database.Database`
         :param database: database used by the pool:  used to create sessions
@@ -262,7 +263,7 @@ class BurstyPool(AbstractSessionPool):
         self._database = database
 
     def get(self):
-        """Check a session out from the pool.
+        u"""Check a session out from the pool.
 
         :rtype: :class:`~google.cloud.spanner_v1.session.Session`
         :returns: an existing session from the pool, or a newly-created
@@ -280,7 +281,7 @@ class BurstyPool(AbstractSessionPool):
         return session
 
     def put(self, session):
-        """Return a session to the pool.
+        u"""Return a session to the pool.
 
         Never blocks:  if the pool is full, the returned session is
         discarded.
@@ -297,7 +298,7 @@ class BurstyPool(AbstractSessionPool):
                 pass
 
     def clear(self):
-        """Delete all sessions in the pool."""
+        u"""Delete all sessions in the pool."""
 
         while True:
             try:
@@ -309,7 +310,7 @@ class BurstyPool(AbstractSessionPool):
 
 
 class PingingPool(AbstractSessionPool):
-    """Concrete session pool implementation:
+    u"""Concrete session pool implementation:
 
     - Pre-allocates / creates a fixed number of sessions.
 
@@ -351,7 +352,7 @@ class PingingPool(AbstractSessionPool):
         self._sessions = queue.PriorityQueue(size)
 
     def bind(self, database):
-        """Associate the pool with a database.
+        u"""Associate the pool with a database.
 
         :type database: :class:`~google.cloud.spanner_v1.database.Database`
         :param database: database used by the pool:  used to create sessions
@@ -370,12 +371,12 @@ class PingingPool(AbstractSessionPool):
             )
             for session_pb in resp.session:
                 session = self._new_session()
-                session._session_id = session_pb.name.split("/")[-1]
+                session._session_id = session_pb.name.split(u"/")[-1]
                 self.put(session)
             created_session_count += len(resp.session)
 
     def get(self, timeout=None):  # pylint: disable=arguments-differ
-        """Check a session out from the pool.
+        u"""Check a session out from the pool.
 
         :type timeout: int
         :param timeout: seconds to block waiting for an available session
@@ -401,7 +402,7 @@ class PingingPool(AbstractSessionPool):
         return session
 
     def put(self, session):
-        """Return a session to the pool.
+        u"""Return a session to the pool.
 
         Never blocks:  if the pool is full, raises.
 
@@ -413,7 +414,7 @@ class PingingPool(AbstractSessionPool):
         self._sessions.put_nowait((_NOW() + self._delta, session))
 
     def clear(self):
-        """Delete all sessions in the pool."""
+        u"""Delete all sessions in the pool."""
         while True:
             try:
                 _, session = self._sessions.get(block=False)
@@ -423,7 +424,7 @@ class PingingPool(AbstractSessionPool):
                 session.delete()
 
     def ping(self):
-        """Refresh maybe-expired sessions in the pool.
+        u"""Refresh maybe-expired sessions in the pool.
 
         This method is designed to be called from a background thread,
         or during the "idle" phase of an event loop.
@@ -447,7 +448,7 @@ class PingingPool(AbstractSessionPool):
 
 
 class TransactionPingingPool(PingingPool):
-    """Concrete session pool implementation:
+    u"""Concrete session pool implementation:
 
     In addition to the features of :class:`PingingPool`, this class
     creates and begins a transaction for each of its sessions at startup.
@@ -483,7 +484,7 @@ class TransactionPingingPool(PingingPool):
         self.begin_pending_transactions()
 
     def bind(self, database):
-        """Associate the pool with a database.
+        u"""Associate the pool with a database.
 
         :type database: :class:`~google.cloud.spanner_v1.database.Database`
         :param database: database used by the pool:  used to create sessions
@@ -493,7 +494,7 @@ class TransactionPingingPool(PingingPool):
         self.begin_pending_transactions()
 
     def put(self, session):
-        """Return a session to the pool.
+        u"""Return a session to the pool.
 
         Never blocks:  if the pool is full, raises.
 
@@ -513,7 +514,7 @@ class TransactionPingingPool(PingingPool):
             super(TransactionPingingPool, self).put(session)
 
     def begin_pending_transactions(self):
-        """Begin all transactions for sessions added to the pool."""
+        u"""Begin all transactions for sessions added to the pool."""
         while not self._pending_sessions.empty():
             session = self._pending_sessions.get()
             session._transaction.begin()
@@ -521,7 +522,7 @@ class TransactionPingingPool(PingingPool):
 
 
 class SessionCheckout(object):
-    """Context manager: hold session checked out from a pool.
+    u"""Context manager: hold session checked out from a pool.
 
     :type pool: concrete subclass of
         :class:`~google.cloud.spanner_v1.pool.AbstractSessionPool`

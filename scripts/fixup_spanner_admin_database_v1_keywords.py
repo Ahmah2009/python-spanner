@@ -15,19 +15,23 @@
 # limitations under the License.
 #
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import argparse
 import os
 import libcst as cst
 import pathlib
 import sys
 from typing import (Any, Callable, Dict, List, Sequence, Tuple)
+from itertools import izip
+from io import open
 
 
 def partition(
-    predicate: Callable[[Any], bool],
-    iterator: Sequence[Any]
-) -> Tuple[List[Any], List[Any]]:
-    """A stable, out-of-place partition."""
+    predicate,
+    iterator
+):
+    u"""A stable, out-of-place partition."""
     results = ([], [])
 
     for i in iterator:
@@ -38,29 +42,29 @@ def partition(
 
 
 class spanner_admin_databaseCallTransformer(cst.CSTTransformer):
-    CTRL_PARAMS: Tuple[str] = ('retry', 'timeout', 'metadata')
-    METHOD_TO_PARAMS: Dict[str, Tuple[str]] = {
-    'create_backup': ('parent', 'backup_id', 'backup', ),
-    'create_database': ('parent', 'create_statement', 'extra_statements', ),
-    'delete_backup': ('name', ),
-    'drop_database': ('database', ),
-    'get_backup': ('name', ),
-    'get_database': ('name', ),
-    'get_database_ddl': ('database', ),
-    'get_iam_policy': ('resource', 'options', ),
-    'list_backup_operations': ('parent', 'filter', 'page_size', 'page_token', ),
-    'list_backups': ('parent', 'filter', 'page_size', 'page_token', ),
-    'list_database_operations': ('parent', 'filter', 'page_size', 'page_token', ),
-    'list_databases': ('parent', 'page_size', 'page_token', ),
-    'restore_database': ('parent', 'database_id', 'backup', ),
-    'set_iam_policy': ('resource', 'policy', ),
-    'test_iam_permissions': ('resource', 'permissions', ),
-    'update_backup': ('backup', 'update_mask', ),
-    'update_database_ddl': ('database', 'statements', 'operation_id', ),
+    CTRL_PARAMS: Tuple[unicode] = (u'retry', u'timeout', u'metadata')
+    METHOD_TO_PARAMS: Dict[unicode, Tuple[unicode]] = {
+    u'create_backup': (u'parent', u'backup_id', u'backup', ),
+    u'create_database': (u'parent', u'create_statement', u'extra_statements', ),
+    u'delete_backup': (u'name', ),
+    u'drop_database': (u'database', ),
+    u'get_backup': (u'name', ),
+    u'get_database': (u'name', ),
+    u'get_database_ddl': (u'database', ),
+    u'get_iam_policy': (u'resource', u'options', ),
+    u'list_backup_operations': (u'parent', u'filter', u'page_size', u'page_token', ),
+    u'list_backups': (u'parent', u'filter', u'page_size', u'page_token', ),
+    u'list_database_operations': (u'parent', u'filter', u'page_size', u'page_token', ),
+    u'list_databases': (u'parent', u'page_size', u'page_token', ),
+    u'restore_database': (u'parent', u'database_id', u'backup', ),
+    u'set_iam_policy': (u'resource', u'policy', ),
+    u'test_iam_permissions': (u'resource', u'permissions', ),
+    u'update_backup': (u'backup', u'update_mask', ),
+    u'update_database_ddl': (u'database', u'statements', u'operation_id', ),
 
     }
 
-    def leave_Call(self, original: cst.Call, updated: cst.Call) -> cst.CSTNode:
+    def leave_Call(self, original, updated):
         try:
             key = original.func.attr.value
             kword_params = self.METHOD_TO_PARAMS[key]
@@ -71,7 +75,7 @@ class spanner_admin_databaseCallTransformer(cst.CSTTransformer):
         # If the existing code is valid, keyword args come after positional args.
         # Therefore, all positional args must map to the first parameters.
         args, kwargs = partition(lambda a: not bool(a.keyword), updated.args)
-        if any(k.keyword.value == "request" for k in kwargs):
+        if any(k.keyword.value == u"request" for k in kwargs):
             # We've already fixed this file, don't fix it again.
             return updated
 
@@ -82,19 +86,19 @@ class spanner_admin_databaseCallTransformer(cst.CSTTransformer):
 
         args, ctrl_args = args[:len(kword_params)], args[len(kword_params):]
         ctrl_kwargs.extend(cst.Arg(value=a.value, keyword=cst.Name(value=ctrl))
-                           for a, ctrl in zip(ctrl_args, self.CTRL_PARAMS))
+                           for a, ctrl in izip(ctrl_args, self.CTRL_PARAMS))
 
         request_arg = cst.Arg(
             value=cst.Dict([
                 cst.DictElement(
-                    cst.SimpleString("'{}'".format(name)),
+                    cst.SimpleString(u"'{}'".format(name)),
                     cst.Element(value=arg.value)
                 )
                 # Note: the args + kwargs looks silly, but keep in mind that
                 # the control parameters had to be stripped out, and that
                 # those could have been passed positionally or by keyword.
-                for name, arg in zip(kword_params, args + kwargs)]),
-            keyword=cst.Name("request")
+                for name, arg in izip(kword_params, args + kwargs)]),
+            keyword=cst.Name(u"request")
         )
 
         return updated.with_changes(
@@ -103,12 +107,12 @@ class spanner_admin_databaseCallTransformer(cst.CSTTransformer):
 
 
 def fix_files(
-    in_dir: pathlib.Path,
-    out_dir: pathlib.Path,
-    *,
-    transformer=spanner_admin_databaseCallTransformer(),
+    in_dir,
+    out_dir, **_3to2kwargs
 ):
-    """Duplicate the input dir to the output dir, fixing file method calls.
+    if 'transformer' in _3to2kwargs: transformer = _3to2kwargs['transformer']; del _3to2kwargs['transformer']
+    else: transformer = spanner_admin_databaseCallTransformer()
+    u"""Duplicate the input dir to the output dir, fixing file method calls.
 
     Preconditions:
     * in_dir is a real directory
@@ -117,11 +121,11 @@ def fix_files(
     pyfile_gen = (
         pathlib.Path(os.path.join(root, f))
         for root, _, files in os.walk(in_dir)
-        for f in files if os.path.splitext(f)[1] == ".py"
+        for f in files if os.path.splitext(f)[1] == u".py"
     )
 
     for fpath in pyfile_gen:
-        with open(fpath, 'r') as f:
+        with open(fpath, u'r') as f:
             src = f.read()
 
         # Parse the code and insert method call fixes.
@@ -133,13 +137,13 @@ def fix_files(
         updated_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Generate the updated source file at the corresponding path.
-        with open(updated_path, 'w') as f:
+        with open(updated_path, u'w') as f:
             f.write(updated.code)
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     parser = argparse.ArgumentParser(
-        description="""Fix up source that uses the spanner_admin_database client library.
+        description=u"""Fix up source that uses the spanner_admin_database client library.
 
 The existing sources are NOT overwritten but are copied to output_dir with changes made.
 
@@ -154,41 +158,32 @@ Note: This tool operates at a best-effort level at converting positional
       positives when an API method shares a name with another method.
 """)
     parser.add_argument(
-        '-d',
-        '--input-directory',
+        u'-d',
+        u'--input-directory',
         required=True,
-        dest='input_dir',
-        help='the input directory to walk for python files to fix up',
+        dest=u'input_dir',
+        help=u'the input directory to walk for python files to fix up',
     )
     parser.add_argument(
-        '-o',
-        '--output-directory',
+        u'-o',
+        u'--output-directory',
         required=True,
-        dest='output_dir',
-        help='the directory to output files fixed via un-flattening',
+        dest=u'output_dir',
+        help=u'the directory to output files fixed via un-flattening',
     )
     args = parser.parse_args()
     input_dir = pathlib.Path(args.input_dir)
     output_dir = pathlib.Path(args.output_dir)
     if not input_dir.is_dir():
-        print(
-            f"input directory '{input_dir}' does not exist or is not a directory",
-            file=sys.stderr,
-        )
+        print >>sys.stderr, f"input directory '{input_dir}' does not exist or is not a directory"
         sys.exit(-1)
 
     if not output_dir.is_dir():
-        print(
-            f"output directory '{output_dir}' does not exist or is not a directory",
-            file=sys.stderr,
-        )
+        print >>sys.stderr, f"output directory '{output_dir}' does not exist or is not a directory"
         sys.exit(-1)
 
     if os.listdir(output_dir):
-        print(
-            f"output directory '{output_dir}' is not empty",
-            file=sys.stderr,
-        )
+        print >>sys.stderr, f"output directory '{output_dir}' is not empty"
         sys.exit(-1)
 
     fix_files(input_dir, output_dir)

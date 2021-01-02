@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from __future__ import absolute_import
 from __future__ import print_function
 
 import os
@@ -37,27 +39,27 @@ import nox
 
 TEST_CONFIG = {
     # You can opt out from the test for specific Python versions.
-    'ignored_versions': ["2.7"],
+    u'ignored_versions': [u"2.7"],
 
     # An envvar key for determining the project id to use. Change it
     # to 'BUILD_SPECIFIC_GCLOUD_PROJECT' if you want to opt in using a
     # build specific Cloud project. You can also use your own string
     # to use your own Cloud project.
-    'gcloud_project_env': 'GOOGLE_CLOUD_PROJECT',
+    u'gcloud_project_env': u'GOOGLE_CLOUD_PROJECT',
     # 'gcloud_project_env': 'BUILD_SPECIFIC_GCLOUD_PROJECT',
 
     # A dictionary you want to inject into your test. Don't put any
     # secrets here. These values will override predefined values.
-    'envs': {},
+    u'envs': {},
 }
 
 
 try:
     # Ensure we can import noxfile_config in the project's directory.
-    sys.path.append('.')
+    sys.path.append(u'.')
     from noxfile_config import TEST_CONFIG_OVERRIDE
-except ImportError as e:
-    print("No user noxfile_config found: detail: {}".format(e))
+except ImportError, e:
+    print u"No user noxfile_config found: detail: {}".format(e)
     TEST_CONFIG_OVERRIDE = {}
 
 # Update the TEST_CONFIG with the user supplied values.
@@ -65,36 +67,36 @@ TEST_CONFIG.update(TEST_CONFIG_OVERRIDE)
 
 
 def get_pytest_env_vars():
-    """Returns a dict for pytest invocation."""
+    u"""Returns a dict for pytest invocation."""
     ret = {}
 
     # Override the GCLOUD_PROJECT and the alias.
-    env_key = TEST_CONFIG['gcloud_project_env']
+    env_key = TEST_CONFIG[u'gcloud_project_env']
     # This should error out if not set.
-    ret['GOOGLE_CLOUD_PROJECT'] = os.environ[env_key]
+    ret[u'GOOGLE_CLOUD_PROJECT'] = os.environ[env_key]
 
     # Apply user supplied envs.
-    ret.update(TEST_CONFIG['envs'])
+    ret.update(TEST_CONFIG[u'envs'])
     return ret
 
 
 # DO NOT EDIT - automatically generated.
 # All versions used to tested samples.
-ALL_VERSIONS = ["2.7", "3.6", "3.7", "3.8"]
+ALL_VERSIONS = [u"2.7", u"3.6", u"3.7", u"3.8"]
 
 # Any default versions that should be ignored.
-IGNORED_VERSIONS = TEST_CONFIG['ignored_versions']
+IGNORED_VERSIONS = TEST_CONFIG[u'ignored_versions']
 
 TESTED_VERSIONS = sorted([v for v in ALL_VERSIONS if v not in IGNORED_VERSIONS])
 
-INSTALL_LIBRARY_FROM_SOURCE = bool(os.environ.get("INSTALL_LIBRARY_FROM_SOURCE", False))
+INSTALL_LIBRARY_FROM_SOURCE = bool(os.environ.get(u"INSTALL_LIBRARY_FROM_SOURCE", False))
 #
 # Style Checks
 #
 
 
 def _determine_local_import_names(start_dir):
-    """Determines all import names that should be considered "local".
+    u"""Determines all import names that should be considered "local".
 
     This is used when running the linter to insure that import order is
     properly checked.
@@ -103,9 +105,9 @@ def _determine_local_import_names(start_dir):
     return [
         basename
         for basename, extension in file_ext_pairs
-        if extension == ".py"
+        if extension == u".py"
         or os.path.isdir(os.path.join(start_dir, basename))
-        and basename not in ("__pycache__")
+        and basename not in (u"__pycache__")
     ]
 
 
@@ -120,27 +122,27 @@ def _determine_local_import_names(start_dir):
 # We also need to specify the rules which are ignored by default:
 # ['E226', 'W504', 'E126', 'E123', 'W503', 'E24', 'E704', 'E121']
 FLAKE8_COMMON_ARGS = [
-    "--show-source",
-    "--builtin=gettext",
-    "--max-complexity=20",
-    "--import-order-style=google",
-    "--exclude=.nox,.cache,env,lib,generated_pb2,*_pb2.py,*_pb2_grpc.py",
-    "--ignore=E121,E123,E126,E203,E226,E24,E266,E501,E704,W503,W504,I202",
-    "--max-line-length=88",
+    u"--show-source",
+    u"--builtin=gettext",
+    u"--max-complexity=20",
+    u"--import-order-style=google",
+    u"--exclude=.nox,.cache,env,lib,generated_pb2,*_pb2.py,*_pb2_grpc.py",
+    u"--ignore=E121,E123,E126,E203,E226,E24,E266,E501,E704,W503,W504,I202",
+    u"--max-line-length=88",
 ]
 
 
 @nox.session
 def lint(session):
-    session.install("flake8", "flake8-import-order")
+    session.install(u"flake8", u"flake8-import-order")
 
-    local_names = _determine_local_import_names(".")
+    local_names = _determine_local_import_names(u".")
     args = FLAKE8_COMMON_ARGS + [
-        "--application-import-names",
-        ",".join(local_names),
-        "."
+        u"--application-import-names",
+        u",".join(local_names),
+        u"."
     ]
-    session.run("flake8", *args)
+    session.run(u"flake8", *args)
 
 
 #
@@ -148,25 +150,25 @@ def lint(session):
 #
 
 
-PYTEST_COMMON_ARGS = ["--junitxml=sponge_log.xml"]
+PYTEST_COMMON_ARGS = [u"--junitxml=sponge_log.xml"]
 
 
 def _session_tests(session, post_install=None):
-    """Runs py.test for a particular project."""
-    if os.path.exists("requirements.txt"):
-        session.install("-r", "requirements.txt")
+    u"""Runs py.test for a particular project."""
+    if os.path.exists(u"requirements.txt"):
+        session.install(u"-r", u"requirements.txt")
 
-    if os.path.exists("requirements-test.txt"):
-        session.install("-r", "requirements-test.txt")
+    if os.path.exists(u"requirements-test.txt"):
+        session.install(u"-r", u"requirements-test.txt")
 
     if INSTALL_LIBRARY_FROM_SOURCE:
-        session.install("-e", _get_repo_root())
+        session.install(u"-e", _get_repo_root())
 
     if post_install:
         post_install(session)
 
     session.run(
-        "pytest",
+        u"pytest",
         *(PYTEST_COMMON_ARGS + session.posargs),
         # Pytest will return 5 when no tests are collected. This can happen
         # on travis where slow and flaky tests are excluded.
@@ -178,11 +180,11 @@ def _session_tests(session, post_install=None):
 
 @nox.session(python=ALL_VERSIONS)
 def py(session):
-    """Runs py.test for a sample using the specified version of Python."""
+    u"""Runs py.test for a sample using the specified version of Python."""
     if session.python in TESTED_VERSIONS:
         _session_tests(session)
     else:
-        session.skip("SKIPPED: {} tests are disabled for this sample.".format(
+        session.skip(u"SKIPPED: {} tests are disabled for this sample.".format(
             session.python
         ))
 
@@ -193,37 +195,37 @@ def py(session):
 
 
 def _get_repo_root():
-    """ Returns the root folder of the project. """
+    u""" Returns the root folder of the project. """
     # Get root of this repository. Assume we don't have directories nested deeper than 10 items.
-    p = Path(os.getcwd())
-    for i in range(10):
+    p = Path(os.getcwdu())
+    for i in xrange(10):
         if p is None:
             break
-        if Path(p / ".git").exists():
-            return str(p)
+        if Path(p / u".git").exists():
+            return unicode(p)
         # .git is not available in repos cloned via Cloud Build
         # setup.py is always in the library's root, so use that instead
         # https://github.com/googleapis/synthtool/issues/792
-        if Path(p / "setup.py").exists():
-            return str(p)
+        if Path(p / u"setup.py").exists():
+            return unicode(p)
         p = p.parent
-    raise Exception("Unable to detect repository root.")
+    raise Exception(u"Unable to detect repository root.")
 
 
-GENERATED_READMES = sorted([x for x in Path(".").rglob("*.rst.in")])
+GENERATED_READMES = sorted([x for x in Path(u".").rglob(u"*.rst.in")])
 
 
 @nox.session
-@nox.parametrize("path", GENERATED_READMES)
+@nox.parametrize(u"path", GENERATED_READMES)
 def readmegen(session, path):
-    """(Re-)generates the readme for a sample."""
-    session.install("jinja2", "pyyaml")
+    u"""(Re-)generates the readme for a sample."""
+    session.install(u"jinja2", u"pyyaml")
     dir_ = os.path.dirname(path)
 
-    if os.path.exists(os.path.join(dir_, "requirements.txt")):
-        session.install("-r", os.path.join(dir_, "requirements.txt"))
+    if os.path.exists(os.path.join(dir_, u"requirements.txt")):
+        session.install(u"-r", os.path.join(dir_, u"requirements.txt"))
 
-    in_file = os.path.join(dir_, "README.rst.in")
+    in_file = os.path.join(dir_, u"README.rst.in")
     session.run(
-        "python", _get_repo_root() + "/scripts/readme-gen/readme_gen.py", in_file
+        u"python", _get_repo_root() + u"/scripts/readme-gen/readme_gen.py", in_file
     )

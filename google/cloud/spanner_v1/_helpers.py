@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helper functions for Cloud Spanner."""
+u"""Helper functions for Cloud Spanner."""
 
+from __future__ import absolute_import
 import datetime
 import decimal
 import math
@@ -28,10 +29,11 @@ from google.cloud._helpers import _date_from_iso8601_date
 from google.cloud._helpers import _datetime_to_rfc3339
 from google.cloud.spanner_v1 import TypeCode
 from google.cloud.spanner_v1 import ExecuteSqlRequest
+from itertools import izip
 
 
 def _try_to_coerce_bytes(bytestring):
-    """Try to coerce a byte string into the right thing based on Python
+    u"""Try to coerce a byte string into the right thing based on Python
     version and whether or not it is base64 encoded.
 
     Return a text string or raise ValueError.
@@ -43,14 +45,14 @@ def _try_to_coerce_bytes(bytestring):
         return bytestring
     except ValueError:
         raise ValueError(
-            "Received a bytes that is not base64 encoded. "
-            "Ensure that you either send a Unicode string or a "
-            "base64-encoded bytes."
+            u"Received a bytes that is not base64 encoded. "
+            u"Ensure that you either send a Unicode string or a "
+            u"base64-encoded bytes."
         )
 
 
 def _merge_query_options(base, merge):
-    """Merge higher precedence QueryOptions with current QueryOptions.
+    u"""Merge higher precedence QueryOptions with current QueryOptions.
 
     :type base:
         :class:`~google.cloud.spanner_v1.ExecuteSqlRequest.QueryOptions`
@@ -74,12 +76,12 @@ def _merge_query_options(base, merge):
     combined = base or ExecuteSqlRequest.QueryOptions()
     if type(combined) == dict:
         combined = ExecuteSqlRequest.QueryOptions(
-            optimizer_version=combined.get("optimizer_version", "")
+            optimizer_version=combined.get(u"optimizer_version", u"")
         )
     merge = merge or ExecuteSqlRequest.QueryOptions()
     if type(merge) == dict:
         merge = ExecuteSqlRequest.QueryOptions(
-            optimizer_version=merge.get("optimizer_version", "")
+            optimizer_version=merge.get(u"optimizer_version", u"")
         )
     type(combined).pb(combined).MergeFrom(type(merge).pb(merge))
     if not combined.optimizer_version:
@@ -89,7 +91,7 @@ def _merge_query_options(base, merge):
 
 # pylint: disable=too-many-return-statements,too-many-branches
 def _make_value_pb(value):
-    """Helper for :func:`_make_list_value_pbs`.
+    u"""Helper for :func:`_make_list_value_pbs`.
 
     :type value: scalar value
     :param value: value to convert
@@ -99,21 +101,21 @@ def _make_value_pb(value):
     :raises ValueError: if value is not of a known scalar type.
     """
     if value is None:
-        return Value(null_value="NULL_VALUE")
+        return Value(null_value=u"NULL_VALUE")
     if isinstance(value, (list, tuple)):
         return Value(list_value=_make_list_value_pb(value))
     if isinstance(value, bool):
         return Value(bool_value=value)
     if isinstance(value, six.integer_types):
-        return Value(string_value=str(value))
+        return Value(string_value=unicode(value))
     if isinstance(value, float):
         if math.isnan(value):
-            return Value(string_value="NaN")
+            return Value(string_value=u"NaN")
         if math.isinf(value):
             if value > 0:
-                return Value(string_value="Infinity")
+                return Value(string_value=u"Infinity")
             else:
-                return Value(string_value="-Infinity")
+                return Value(string_value=u"-Infinity")
         return Value(number_value=value)
     if isinstance(value, datetime_helpers.DatetimeWithNanoseconds):
         return Value(string_value=value.rfc3339())
@@ -129,15 +131,15 @@ def _make_value_pb(value):
     if isinstance(value, ListValue):
         return Value(list_value=value)
     if isinstance(value, decimal.Decimal):
-        return Value(string_value=str(value))
-    raise ValueError("Unknown type: %s" % (value,))
+        return Value(string_value=unicode(value))
+    raise ValueError(u"Unknown type: %s" % (value,))
 
 
 # pylint: enable=too-many-return-statements,too-many-branches
 
 
 def _make_list_value_pb(values):
-    """Construct of ListValue protobufs.
+    u"""Construct of ListValue protobufs.
 
     :type values: list of scalar
     :param values: Row data
@@ -149,7 +151,7 @@ def _make_list_value_pb(values):
 
 
 def _make_list_value_pbs(values):
-    """Construct a sequence of ListValue protobufs.
+    u"""Construct a sequence of ListValue protobufs.
 
     :type values: list of list of scalar
     :param values: Row data
@@ -167,13 +169,13 @@ def _parse_value(value, field_type):
     if field_type.code == TypeCode.STRING:
         result = value
     elif field_type.code == TypeCode.BYTES:
-        result = value.encode("utf8")
+        result = value.encode(u"utf8")
     elif field_type.code == TypeCode.BOOL:
         result = value
     elif field_type.code == TypeCode.INT64:
         result = int(value)
     elif field_type.code == TypeCode.FLOAT64:
-        if isinstance(value, str):
+        if isinstance(value, unicode):
             result = float(value)
         else:
             result = value
@@ -192,12 +194,12 @@ def _parse_value(value, field_type):
     elif field_type.code == TypeCode.NUMERIC:
         result = decimal.Decimal(value)
     else:
-        raise ValueError("Unknown type: %s" % (field_type,))
+        raise ValueError(u"Unknown type: %s" % (field_type,))
     return result
 
 
 def _parse_value_pb(value_pb, field_type):
-    """Convert a Value protobuf to cell data.
+    u"""Convert a Value protobuf to cell data.
 
     :type value_pb: :class:`~google.protobuf.struct_pb2.Value`
     :param value_pb: protobuf to convert
@@ -209,24 +211,24 @@ def _parse_value_pb(value_pb, field_type):
     :returns: value extracted from value_pb
     :raises ValueError: if unknown type is passed
     """
-    if value_pb.HasField("null_value"):
+    if value_pb.HasField(u"null_value"):
         return None
-    if value_pb.HasField("string_value"):
+    if value_pb.HasField(u"string_value"):
         return _parse_value(value_pb.string_value, field_type)
-    if value_pb.HasField("bool_value"):
+    if value_pb.HasField(u"bool_value"):
         return _parse_value(value_pb.bool_value, field_type)
-    if value_pb.HasField("number_value"):
+    if value_pb.HasField(u"number_value"):
         return _parse_value(value_pb.number_value, field_type)
-    if value_pb.HasField("list_value"):
+    if value_pb.HasField(u"list_value"):
         return _parse_value(value_pb.list_value, field_type)
-    raise ValueError("No value set in Value: %s" % (value_pb,))
+    raise ValueError(u"No value set in Value: %s" % (value_pb,))
 
 
 # pylint: enable=too-many-branches
 
 
 def _parse_list_value_pbs(rows, row_type):
-    """Convert a list of ListValue protobufs into a list of list of cell data.
+    u"""Convert a list of ListValue protobufs into a list of list of cell data.
 
     :type rows: list of :class:`~google.protobuf.struct_pb2.ListValue`
     :param rows: row data returned from a read/query
@@ -240,14 +242,14 @@ def _parse_list_value_pbs(rows, row_type):
     result = []
     for row in rows:
         row_data = []
-        for value_pb, field in zip(row.values, row_type.fields):
+        for value_pb, field in izip(row.values, row_type.fields):
             row_data.append(_parse_value_pb(value_pb, field.type_))
         result.append(row_data)
     return result
 
 
 class _SessionWrapper(object):
-    """Base class for objects wrapping a session.
+    u"""Base class for objects wrapping a session.
 
     :type session: :class:`~google.cloud.spanner_v1.session.Session`
     :param session: the session used to perform the commit
@@ -258,7 +260,7 @@ class _SessionWrapper(object):
 
 
 def _metadata_with_prefix(prefix, **kw):
-    """Create RPC metadata containing a prefix.
+    u"""Create RPC metadata containing a prefix.
 
     Args:
         prefix (str): appropriate resource path.
@@ -266,4 +268,4 @@ def _metadata_with_prefix(prefix, **kw):
     Returns:
         List[Tuple[str, str]]: RPC metadata with supplied prefix
     """
-    return [("google-cloud-resource-prefix", prefix)]
+    return [(u"google-cloud-resource-prefix", prefix)]

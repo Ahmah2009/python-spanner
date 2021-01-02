@@ -15,10 +15,11 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from .client import SpannerClient
 from .async_client import SpannerAsyncClient
 
 __all__ = (
-    "SpannerClient",
-    "SpannerAsyncClient",
+    u"SpannerClient",
+    u"SpannerAsyncClient",
 )

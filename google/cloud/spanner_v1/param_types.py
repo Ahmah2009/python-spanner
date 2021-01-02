@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Types exported from this package."""
+u"""Types exported from this package."""
 
+from __future__ import absolute_import
 from google.cloud.spanner_v1 import Type
 from google.cloud.spanner_v1 import TypeCode
 from google.cloud.spanner_v1 import StructType
@@ -31,7 +32,7 @@ NUMERIC = Type(code=TypeCode.NUMERIC)
 
 
 def Array(element_type):  # pylint: disable=invalid-name
-    """Construct an array parameter type description protobuf.
+    u"""Construct an array parameter type description protobuf.
 
     :type element_type: :class:`~google.cloud.spanner_v1.Type`
     :param element_type: the type of elements of the array
@@ -43,7 +44,7 @@ def Array(element_type):  # pylint: disable=invalid-name
 
 
 def StructField(name, field_type):  # pylint: disable=invalid-name
-    """Construct a field description protobuf.
+    u"""Construct a field description protobuf.
 
     :type name: str
     :param name: the name of the field
@@ -58,7 +59,7 @@ def StructField(name, field_type):  # pylint: disable=invalid-name
 
 
 def Struct(fields):  # pylint: disable=invalid-name
-    """Construct a struct parameter type description protobuf.
+    u"""Construct a struct parameter type description protobuf.
 
     :type fields: list of :class:`google.cloud.spanner_v1.StructType.Field`
     :param fields: the fields of the struct

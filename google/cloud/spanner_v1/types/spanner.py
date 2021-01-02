@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -29,35 +30,34 @@ from google.rpc import status_pb2 as gr_status  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.v1",
-    manifest={
-        "CreateSessionRequest",
-        "BatchCreateSessionsRequest",
-        "BatchCreateSessionsResponse",
-        "Session",
-        "GetSessionRequest",
-        "ListSessionsRequest",
-        "ListSessionsResponse",
-        "DeleteSessionRequest",
-        "ExecuteSqlRequest",
-        "ExecuteBatchDmlRequest",
-        "ExecuteBatchDmlResponse",
-        "PartitionOptions",
-        "PartitionQueryRequest",
-        "PartitionReadRequest",
-        "Partition",
-        "PartitionResponse",
-        "ReadRequest",
-        "BeginTransactionRequest",
-        "CommitRequest",
-        "CommitResponse",
-        "RollbackRequest",
-    },
+    package=u"google.spanner.v1",
+    manifest=set([
+        u"CreateSessionRequest",
+        u"BatchCreateSessionsRequest",
+        u"BatchCreateSessionsResponse",
+        u"Session",
+        u"GetSessionRequest",
+        u"ListSessionsRequest",
+        u"ListSessionsResponse",
+        u"DeleteSessionRequest",
+        u"ExecuteSqlRequest",
+        u"ExecuteBatchDmlRequest",
+        u"ExecuteBatchDmlResponse",
+        u"PartitionOptions",
+        u"PartitionQueryRequest",
+        u"PartitionReadRequest",
+        u"Partition",
+        u"PartitionResponse",
+        u"ReadRequest",
+        u"BeginTransactionRequest",
+        u"CommitRequest",
+        u"CommitResponse",
+        u"RollbackRequest",]),
 )
 
 
 class CreateSessionRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [CreateSession][google.spanner.v1.Spanner.CreateSession].
 
     Attributes:
@@ -70,11 +70,11 @@ class CreateSessionRequest(proto.Message):
 
     database = proto.Field(proto.STRING, number=1)
 
-    session = proto.Field(proto.MESSAGE, number=2, message="Session",)
+    session = proto.Field(proto.MESSAGE, number=2, message=u"Session",)
 
 
 class BatchCreateSessionsRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [BatchCreateSessions][google.spanner.v1.Spanner.BatchCreateSessions].
 
     Attributes:
@@ -96,13 +96,13 @@ class BatchCreateSessionsRequest(proto.Message):
 
     database = proto.Field(proto.STRING, number=1)
 
-    session_template = proto.Field(proto.MESSAGE, number=2, message="Session",)
+    session_template = proto.Field(proto.MESSAGE, number=2, message=u"Session",)
 
     session_count = proto.Field(proto.INT32, number=3)
 
 
 class BatchCreateSessionsResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [BatchCreateSessions][google.spanner.v1.Spanner.BatchCreateSessions].
 
     Attributes:
@@ -110,11 +110,11 @@ class BatchCreateSessionsResponse(proto.Message):
             The freshly created sessions.
     """
 
-    session = proto.RepeatedField(proto.MESSAGE, number=1, message="Session",)
+    session = proto.RepeatedField(proto.MESSAGE, number=1, message=u"Session",)
 
 
 class Session(proto.Message):
-    r"""A session in the Cloud Spanner API.
+    ur"""A session in the Cloud Spanner API.
 
     Attributes:
         name (str):
@@ -156,7 +156,7 @@ class Session(proto.Message):
 
 
 class GetSessionRequest(proto.Message):
-    r"""The request for [GetSession][google.spanner.v1.Spanner.GetSession].
+    ur"""The request for [GetSession][google.spanner.v1.Spanner.GetSession].
 
     Attributes:
         name (str):
@@ -168,7 +168,7 @@ class GetSessionRequest(proto.Message):
 
 
 class ListSessionsRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ListSessions][google.spanner.v1.Spanner.ListSessions].
 
     Attributes:
@@ -208,7 +208,7 @@ class ListSessionsRequest(proto.Message):
 
 
 class ListSessionsResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ListSessions][google.spanner.v1.Spanner.ListSessions].
 
     Attributes:
@@ -224,13 +224,13 @@ class ListSessionsResponse(proto.Message):
     def raw_page(self):
         return self
 
-    sessions = proto.RepeatedField(proto.MESSAGE, number=1, message="Session",)
+    sessions = proto.RepeatedField(proto.MESSAGE, number=1, message=u"Session",)
 
     next_page_token = proto.Field(proto.STRING, number=2)
 
 
 class DeleteSessionRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [DeleteSession][google.spanner.v1.Spanner.DeleteSession].
 
     Attributes:
@@ -242,7 +242,7 @@ class DeleteSessionRequest(proto.Message):
 
 
 class ExecuteSqlRequest(proto.Message):
-    r"""The request for [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql]
+    ur"""The request for [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql]
     and
     [ExecuteStreamingSql][google.spanner.v1.Spanner.ExecuteStreamingSql].
 
@@ -338,13 +338,13 @@ class ExecuteSqlRequest(proto.Message):
     """
 
     class QueryMode(proto.Enum):
-        r"""Mode in which the statement must be processed."""
+        ur"""Mode in which the statement must be processed."""
         NORMAL = 0
         PLAN = 1
         PROFILE = 2
 
     class QueryOptions(proto.Message):
-        r"""Query optimizer configuration.
+        ur"""Query optimizer configuration.
 
         Attributes:
             optimizer_version (str):
@@ -396,7 +396,7 @@ class ExecuteSqlRequest(proto.Message):
 
 
 class ExecuteBatchDmlRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ExecuteBatchDml][google.spanner.v1.Spanner.ExecuteBatchDml].
 
     Attributes:
@@ -435,7 +435,7 @@ class ExecuteBatchDmlRequest(proto.Message):
     """
 
     class Statement(proto.Message):
-        r"""A single DML statement.
+        ur"""A single DML statement.
 
         Attributes:
             sql (str):
@@ -491,7 +491,7 @@ class ExecuteBatchDmlRequest(proto.Message):
 
 
 class ExecuteBatchDmlResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ExecuteBatchDml][google.spanner.v1.Spanner.ExecuteBatchDml].
     Contains a list of [ResultSet][google.spanner.v1.ResultSet]
     messages, one for each DML statement that has successfully executed,
@@ -553,7 +553,7 @@ class ExecuteBatchDmlResponse(proto.Message):
 
 
 class PartitionOptions(proto.Message):
-    r"""Options for a PartitionQueryRequest and
+    ur"""Options for a PartitionQueryRequest and
     PartitionReadRequest.
 
     Attributes:
@@ -583,7 +583,7 @@ class PartitionOptions(proto.Message):
 
 
 class PartitionQueryRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [PartitionQuery][google.spanner.v1.Spanner.PartitionQuery]
 
     Attributes:
@@ -656,12 +656,12 @@ class PartitionQueryRequest(proto.Message):
     )
 
     partition_options = proto.Field(
-        proto.MESSAGE, number=6, message="PartitionOptions",
+        proto.MESSAGE, number=6, message=u"PartitionOptions",
     )
 
 
 class PartitionReadRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [PartitionRead][google.spanner.v1.Spanner.PartitionRead]
 
     Attributes:
@@ -724,12 +724,12 @@ class PartitionReadRequest(proto.Message):
     key_set = proto.Field(proto.MESSAGE, number=6, message=keys.KeySet,)
 
     partition_options = proto.Field(
-        proto.MESSAGE, number=9, message="PartitionOptions",
+        proto.MESSAGE, number=9, message=u"PartitionOptions",
     )
 
 
 class Partition(proto.Message):
-    r"""Information returned for each partition returned in a
+    ur"""Information returned for each partition returned in a
     PartitionResponse.
 
     Attributes:
@@ -745,7 +745,7 @@ class Partition(proto.Message):
 
 
 class PartitionResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [PartitionQuery][google.spanner.v1.Spanner.PartitionQuery] or
     [PartitionRead][google.spanner.v1.Spanner.PartitionRead]
 
@@ -756,7 +756,7 @@ class PartitionResponse(proto.Message):
             Transaction created by this request.
     """
 
-    partitions = proto.RepeatedField(proto.MESSAGE, number=1, message="Partition",)
+    partitions = proto.RepeatedField(proto.MESSAGE, number=1, message=u"Partition",)
 
     transaction = proto.Field(
         proto.MESSAGE, number=2, message=gs_transaction.Transaction,
@@ -764,7 +764,7 @@ class PartitionResponse(proto.Message):
 
 
 class ReadRequest(proto.Message):
-    r"""The request for [Read][google.spanner.v1.Spanner.Read] and
+    ur"""The request for [Read][google.spanner.v1.Spanner.Read] and
     [StreamingRead][google.spanner.v1.Spanner.StreamingRead].
 
     Attributes:
@@ -857,7 +857,7 @@ class ReadRequest(proto.Message):
 
 
 class BeginTransactionRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction].
 
     Attributes:
@@ -876,7 +876,7 @@ class BeginTransactionRequest(proto.Message):
 
 
 class CommitRequest(proto.Message):
-    r"""The request for [Commit][google.spanner.v1.Spanner.Commit].
+    ur"""The request for [Commit][google.spanner.v1.Spanner.Commit].
 
     Attributes:
         session (str):
@@ -903,12 +903,12 @@ class CommitRequest(proto.Message):
 
     session = proto.Field(proto.STRING, number=1)
 
-    transaction_id = proto.Field(proto.BYTES, number=2, oneof="transaction")
+    transaction_id = proto.Field(proto.BYTES, number=2, oneof=u"transaction")
 
     single_use_transaction = proto.Field(
         proto.MESSAGE,
         number=3,
-        oneof="transaction",
+        oneof=u"transaction",
         message=gs_transaction.TransactionOptions,
     )
 
@@ -916,7 +916,7 @@ class CommitRequest(proto.Message):
 
 
 class CommitResponse(proto.Message):
-    r"""The response for [Commit][google.spanner.v1.Spanner.Commit].
+    ur"""The response for [Commit][google.spanner.v1.Spanner.Commit].
 
     Attributes:
         commit_timestamp (~.timestamp.Timestamp):
@@ -930,7 +930,7 @@ class CommitResponse(proto.Message):
 
 
 class RollbackRequest(proto.Message):
-    r"""The request for [Rollback][google.spanner.v1.Spanner.Rollback].
+    ur"""The request for [Rollback][google.spanner.v1.Spanner.Rollback].
 
     Attributes:
         session (str):

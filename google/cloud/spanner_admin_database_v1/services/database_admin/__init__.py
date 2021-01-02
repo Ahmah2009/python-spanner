@@ -15,10 +15,11 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 from .client import DatabaseAdminClient
 from .async_client import DatabaseAdminAsyncClient
 
 __all__ = (
-    "DatabaseAdminClient",
-    "DatabaseAdminAsyncClient",
+    u"DatabaseAdminClient",
+    u"DatabaseAdminAsyncClient",
 )

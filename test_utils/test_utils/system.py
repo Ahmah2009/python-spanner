@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 from __future__ import print_function
 import os
 import sys
@@ -24,58 +25,58 @@ from google.auth.environment_vars import CREDENTIALS as TEST_CREDENTIALS
 # From shell environ. May be None.
 CREDENTIALS = os.getenv(TEST_CREDENTIALS)
 
-ENVIRON_ERROR_MSG = """\
+ENVIRON_ERROR_MSG = u"""\
 To run the system tests, you need to set some environment variables.
 Please check the CONTRIBUTING guide for instructions.
 """
 
 
 class EmulatorCreds(google.auth.credentials.Credentials):
-    """A mock credential object.
+    u"""A mock credential object.
 
     Used to avoid unnecessary token refreshing or reliance on the network
     while an emulator is running.
     """
 
     def __init__(self):  # pylint: disable=super-init-not-called
-        self.token = b'seekrit'
+        self.token = 'seekrit'
         self.expiry = None
 
     @property
     def valid(self):
-        """Would-be validity check of the credentials.
+        u"""Would-be validity check of the credentials.
 
         Always is :data:`True`.
         """
         return True
 
     def refresh(self, unused_request):  # pylint: disable=unused-argument
-        """Off-limits implementation for abstract method."""
-        raise RuntimeError('Should never be refreshed.')
+        u"""Off-limits implementation for abstract method."""
+        raise RuntimeError(u'Should never be refreshed.')
 
 
 def check_environ():
     err_msg = None
     if CREDENTIALS is None:
-        err_msg = '\nMissing variables: ' + TEST_CREDENTIALS
+        err_msg = u'\nMissing variables: ' + TEST_CREDENTIALS
     elif not os.path.isfile(CREDENTIALS):
-        err_msg = '\nThe %s path %r is not a file.' % (TEST_CREDENTIALS,
+        err_msg = u'\nThe %s path %r is not a file.' % (TEST_CREDENTIALS,
                                                        CREDENTIALS)
 
     if err_msg is not None:
         msg = ENVIRON_ERROR_MSG + err_msg
-        print(msg, file=sys.stderr)
+        print >>sys.stderr, msg
         sys.exit(1)
 
 
-def unique_resource_id(delimiter='_'):
-    """A unique identifier for a resource.
+def unique_resource_id(delimiter=u'_'):
+    u"""A unique identifier for a resource.
 
     Intended to help locate resources created in particular
     testing environments and at particular times.
     """
-    build_id = os.getenv('CIRCLE_BUILD_NUM', '')
-    if build_id == '':
-        return '%s%d' % (delimiter, 1000 * time.time())
+    build_id = os.getenv(u'CIRCLE_BUILD_NUM', u'')
+    if build_id == u'':
+        return u'%s%d' % (delimiter, 1000 * time.time())
     else:
-        return '%s%s%s%d' % (delimiter, build_id, delimiter, time.time())
+        return u'%s%s%s%d' % (delimiter, build_id, delimiter, time.time())

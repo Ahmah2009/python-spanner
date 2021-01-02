@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import unittest
 
 import mock
@@ -30,12 +32,12 @@ def _make_credentials():
 
 class TestClient(unittest.TestCase):
 
-    PROJECT = "PROJECT"
-    PATH = "projects/%s" % (PROJECT,)
-    CONFIGURATION_NAME = "config-name"
-    INSTANCE_ID = "instance-id"
-    INSTANCE_NAME = "%s/instances/%s" % (PATH, INSTANCE_ID)
-    DISPLAY_NAME = "display-name"
+    PROJECT = u"PROJECT"
+    PATH = u"projects/%s" % (PROJECT,)
+    CONFIGURATION_NAME = u"config-name"
+    INSTANCE_ID = u"instance-id"
+    INSTANCE_NAME = u"%s/instances/%s" % (PATH, INSTANCE_ID)
+    DISPLAY_NAME = u"display-name"
     NODE_COUNT = 5
     TIMEOUT_SECONDS = 80
 
@@ -63,11 +65,11 @@ class TestClient(unittest.TestCase):
         kwargs = {}
 
         if client_info is not None:
-            kwargs["client_info"] = expected_client_info = client_info
+            kwargs[u"client_info"] = expected_client_info = client_info
         else:
             expected_client_info = MUT._CLIENT_INFO
 
-        kwargs["client_options"] = client_options
+        kwargs[u"client_options"] = client_options
         if type(client_options) == dict:
             expected_client_options = google.api_core.client_options.from_dict(
                 client_options
@@ -102,16 +104,16 @@ class TestClient(unittest.TestCase):
         if expected_query_options is not None:
             self.assertEqual(client._query_options, expected_query_options)
 
-    @mock.patch("google.cloud.spanner_v1.client._get_spanner_emulator_host")
-    @mock.patch("warnings.warn")
+    @mock.patch(u"google.cloud.spanner_v1.client._get_spanner_emulator_host")
+    @mock.patch(u"warnings.warn")
     def test_constructor_emulator_host_warning(self, mock_warn, mock_em):
         from google.cloud.spanner_v1 import client as MUT
         from google.auth.credentials import AnonymousCredentials
 
         expected_scopes = None
         creds = _make_credentials()
-        mock_em.return_value = "http://emulator.host.com"
-        with mock.patch("google.cloud.spanner_v1.client.AnonymousCredentials") as patch:
+        mock_em.return_value = u"http://emulator.host.com"
+        with mock.patch(u"google.cloud.spanner_v1.client.AnonymousCredentials") as patch:
             expected_creds = patch.return_value = AnonymousCredentials()
             self._constructor_test_helper(expected_scopes, creds, expected_creds)
         mock_warn.assert_called_once_with(MUT._EMULATOR_HOST_HTTP_SCHEME)
@@ -136,7 +138,7 @@ class TestClient(unittest.TestCase):
 
         creds = _make_credentials()
 
-        patch = mock.patch("google.auth.default", return_value=(creds, None))
+        patch = mock.patch(u"google.auth.default", return_value=(creds, None))
         with patch as default:
             self._constructor_test_helper(
                 None, None, expected_creds=creds.with_scopes.return_value
@@ -158,7 +160,7 @@ class TestClient(unittest.TestCase):
         self._constructor_test_helper(
             expected_scopes,
             creds,
-            client_options=ClientOptions(api_endpoint="endpoint"),
+            client_options=ClientOptions(api_endpoint=u"endpoint"),
         )
 
     def test_constructor_custom_client_options_dict(self):
@@ -167,7 +169,7 @@ class TestClient(unittest.TestCase):
         expected_scopes = (MUT.SPANNER_ADMIN_SCOPE,)
         creds = _make_credentials()
         self._constructor_test_helper(
-            expected_scopes, creds, client_options={"api_endpoint": "endpoint"}
+            expected_scopes, creds, client_options={u"api_endpoint": u"endpoint"}
         )
 
     def test_constructor_custom_query_options_client_config(self):
@@ -179,30 +181,30 @@ class TestClient(unittest.TestCase):
         self._constructor_test_helper(
             expected_scopes,
             creds,
-            query_options=ExecuteSqlRequest.QueryOptions(optimizer_version="1"),
+            query_options=ExecuteSqlRequest.QueryOptions(optimizer_version=u"1"),
             expected_query_options=ExecuteSqlRequest.QueryOptions(
-                optimizer_version="1"
+                optimizer_version=u"1"
             ),
         )
 
-    @mock.patch("google.cloud.spanner_v1.client._get_spanner_optimizer_version")
+    @mock.patch(u"google.cloud.spanner_v1.client._get_spanner_optimizer_version")
     def test_constructor_custom_query_options_env_config(self, mock_ver):
         from google.cloud.spanner_v1 import ExecuteSqlRequest
         from google.cloud.spanner_v1 import client as MUT
 
         expected_scopes = (MUT.SPANNER_ADMIN_SCOPE,)
         creds = _make_credentials()
-        mock_ver.return_value = "2"
+        mock_ver.return_value = u"2"
         self._constructor_test_helper(
             expected_scopes,
             creds,
-            query_options=ExecuteSqlRequest.QueryOptions(optimizer_version="1"),
+            query_options=ExecuteSqlRequest.QueryOptions(optimizer_version=u"1"),
             expected_query_options=ExecuteSqlRequest.QueryOptions(
-                optimizer_version="2"
+                optimizer_version=u"2"
             ),
         )
 
-    @mock.patch("google.cloud.spanner_v1.client._get_spanner_emulator_host")
+    @mock.patch(u"google.cloud.spanner_v1.client._get_spanner_emulator_host")
     def test_instance_admin_api(self, mock_em):
         from google.cloud.spanner_v1.client import SPANNER_ADMIN_SCOPE
         from google.api_core.client_options import ClientOptions
@@ -211,7 +213,7 @@ class TestClient(unittest.TestCase):
 
         credentials = _make_credentials()
         client_info = mock.Mock()
-        client_options = ClientOptions(quota_project_id="QUOTA-PROJECT")
+        client_options = ClientOptions(quota_project_id=u"QUOTA-PROJECT")
         client = self._make_one(
             project=self.PROJECT,
             credentials=credentials,
@@ -220,7 +222,7 @@ class TestClient(unittest.TestCase):
         )
         expected_scopes = (SPANNER_ADMIN_SCOPE,)
 
-        inst_module = "google.cloud.spanner_v1.client.InstanceAdminClient"
+        inst_module = u"google.cloud.spanner_v1.client.InstanceAdminClient"
         with mock.patch(inst_module) as instance_admin_client:
             api = client.instance_admin_api
 
@@ -236,14 +238,14 @@ class TestClient(unittest.TestCase):
 
         credentials.with_scopes.assert_called_once_with(expected_scopes)
 
-    @mock.patch("google.cloud.spanner_v1.client._get_spanner_emulator_host")
+    @mock.patch(u"google.cloud.spanner_v1.client._get_spanner_emulator_host")
     def test_instance_admin_api_emulator_env(self, mock_em):
         from google.api_core.client_options import ClientOptions
 
-        mock_em.return_value = "emulator.host"
+        mock_em.return_value = u"emulator.host"
         credentials = _make_credentials()
         client_info = mock.Mock()
-        client_options = ClientOptions(api_endpoint="endpoint")
+        client_options = ClientOptions(api_endpoint=u"endpoint")
         client = self._make_one(
             project=self.PROJECT,
             credentials=credentials,
@@ -251,7 +253,7 @@ class TestClient(unittest.TestCase):
             client_options=client_options,
         )
 
-        inst_module = "google.cloud.spanner_v1.client.InstanceAdminClient"
+        inst_module = u"google.cloud.spanner_v1.client.InstanceAdminClient"
         with mock.patch(inst_module) as instance_admin_client:
             api = client.instance_admin_api
 
@@ -264,10 +266,10 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(instance_admin_client.call_args_list), 1)
         called_args, called_kw = instance_admin_client.call_args
         self.assertEqual(called_args, ())
-        self.assertEqual(called_kw["client_info"], client_info)
-        self.assertEqual(called_kw["client_options"], client_options)
-        self.assertIn("transport", called_kw)
-        self.assertNotIn("credentials", called_kw)
+        self.assertEqual(called_kw[u"client_info"], client_info)
+        self.assertEqual(called_kw[u"client_options"], client_options)
+        self.assertIn(u"transport", called_kw)
+        self.assertNotIn(u"credentials", called_kw)
 
     def test_instance_admin_api_emulator_code(self):
         from google.auth.credentials import AnonymousCredentials
@@ -275,7 +277,7 @@ class TestClient(unittest.TestCase):
 
         credentials = AnonymousCredentials()
         client_info = mock.Mock()
-        client_options = ClientOptions(api_endpoint="emulator.host")
+        client_options = ClientOptions(api_endpoint=u"emulator.host")
         client = self._make_one(
             project=self.PROJECT,
             credentials=credentials,
@@ -283,7 +285,7 @@ class TestClient(unittest.TestCase):
             client_options=client_options,
         )
 
-        inst_module = "google.cloud.spanner_v1.client.InstanceAdminClient"
+        inst_module = u"google.cloud.spanner_v1.client.InstanceAdminClient"
         with mock.patch(inst_module) as instance_admin_client:
             api = client.instance_admin_api
 
@@ -296,12 +298,12 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(instance_admin_client.call_args_list), 1)
         called_args, called_kw = instance_admin_client.call_args
         self.assertEqual(called_args, ())
-        self.assertEqual(called_kw["client_info"], client_info)
-        self.assertEqual(called_kw["client_options"], client_options)
-        self.assertIn("transport", called_kw)
-        self.assertNotIn("credentials", called_kw)
+        self.assertEqual(called_kw[u"client_info"], client_info)
+        self.assertEqual(called_kw[u"client_options"], client_options)
+        self.assertIn(u"transport", called_kw)
+        self.assertNotIn(u"credentials", called_kw)
 
-    @mock.patch("google.cloud.spanner_v1.client._get_spanner_emulator_host")
+    @mock.patch(u"google.cloud.spanner_v1.client._get_spanner_emulator_host")
     def test_database_admin_api(self, mock_em):
         from google.cloud.spanner_v1.client import SPANNER_ADMIN_SCOPE
         from google.api_core.client_options import ClientOptions
@@ -309,7 +311,7 @@ class TestClient(unittest.TestCase):
         mock_em.return_value = None
         credentials = _make_credentials()
         client_info = mock.Mock()
-        client_options = ClientOptions(quota_project_id="QUOTA-PROJECT")
+        client_options = ClientOptions(quota_project_id=u"QUOTA-PROJECT")
         client = self._make_one(
             project=self.PROJECT,
             credentials=credentials,
@@ -318,7 +320,7 @@ class TestClient(unittest.TestCase):
         )
         expected_scopes = (SPANNER_ADMIN_SCOPE,)
 
-        db_module = "google.cloud.spanner_v1.client.DatabaseAdminClient"
+        db_module = u"google.cloud.spanner_v1.client.DatabaseAdminClient"
         with mock.patch(db_module) as database_admin_client:
             api = client.database_admin_api
 
@@ -334,14 +336,14 @@ class TestClient(unittest.TestCase):
 
         credentials.with_scopes.assert_called_once_with(expected_scopes)
 
-    @mock.patch("google.cloud.spanner_v1.client._get_spanner_emulator_host")
+    @mock.patch(u"google.cloud.spanner_v1.client._get_spanner_emulator_host")
     def test_database_admin_api_emulator_env(self, mock_em):
         from google.api_core.client_options import ClientOptions
 
-        mock_em.return_value = "host:port"
+        mock_em.return_value = u"host:port"
         credentials = _make_credentials()
         client_info = mock.Mock()
-        client_options = ClientOptions(api_endpoint="endpoint")
+        client_options = ClientOptions(api_endpoint=u"endpoint")
         client = self._make_one(
             project=self.PROJECT,
             credentials=credentials,
@@ -349,7 +351,7 @@ class TestClient(unittest.TestCase):
             client_options=client_options,
         )
 
-        db_module = "google.cloud.spanner_v1.client.DatabaseAdminClient"
+        db_module = u"google.cloud.spanner_v1.client.DatabaseAdminClient"
         with mock.patch(db_module) as database_admin_client:
             api = client.database_admin_api
 
@@ -362,10 +364,10 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(database_admin_client.call_args_list), 1)
         called_args, called_kw = database_admin_client.call_args
         self.assertEqual(called_args, ())
-        self.assertEqual(called_kw["client_info"], client_info)
-        self.assertEqual(called_kw["client_options"], client_options)
-        self.assertIn("transport", called_kw)
-        self.assertNotIn("credentials", called_kw)
+        self.assertEqual(called_kw[u"client_info"], client_info)
+        self.assertEqual(called_kw[u"client_options"], client_options)
+        self.assertIn(u"transport", called_kw)
+        self.assertNotIn(u"credentials", called_kw)
 
     def test_database_admin_api_emulator_code(self):
         from google.auth.credentials import AnonymousCredentials
@@ -373,7 +375,7 @@ class TestClient(unittest.TestCase):
 
         credentials = AnonymousCredentials()
         client_info = mock.Mock()
-        client_options = ClientOptions(api_endpoint="emulator.host")
+        client_options = ClientOptions(api_endpoint=u"emulator.host")
         client = self._make_one(
             project=self.PROJECT,
             credentials=credentials,
@@ -381,7 +383,7 @@ class TestClient(unittest.TestCase):
             client_options=client_options,
         )
 
-        db_module = "google.cloud.spanner_v1.client.DatabaseAdminClient"
+        db_module = u"google.cloud.spanner_v1.client.DatabaseAdminClient"
         with mock.patch(db_module) as database_admin_client:
             api = client.database_admin_api
 
@@ -394,10 +396,10 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(database_admin_client.call_args_list), 1)
         called_args, called_kw = database_admin_client.call_args
         self.assertEqual(called_args, ())
-        self.assertEqual(called_kw["client_info"], client_info)
-        self.assertEqual(called_kw["client_options"], client_options)
-        self.assertIn("transport", called_kw)
-        self.assertNotIn("credentials", called_kw)
+        self.assertEqual(called_kw[u"client_info"], client_info)
+        self.assertEqual(called_kw[u"client_options"], client_options)
+        self.assertIn(u"transport", called_kw)
+        self.assertNotIn(u"credentials", called_kw)
 
     def test_copy(self):
         credentials = _make_credentials()
@@ -418,7 +420,7 @@ class TestClient(unittest.TestCase):
     def test_project_name_property(self):
         credentials = _make_credentials()
         client = self._make_one(project=self.PROJECT, credentials=credentials)
-        project_name = "projects/" + self.PROJECT
+        project_name = u"projects/" + self.PROJECT
         self.assertEqual(client.project_name, project_name)
 
     def test_list_instance_configs(self):
@@ -455,8 +457,8 @@ class TestClient(unittest.TestCase):
         self.assertEqual(instance_config.display_name, self.DISPLAY_NAME)
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", client.project_name),
-            ("x-goog-request-params", "parent={}".format(client.project_name)),
+            (u"google-cloud-resource-prefix", client.project_name),
+            (u"x-goog-request-params", u"parent={}".format(client.project_name)),
         )
         lic_api.assert_called_once_with(
             ListInstanceConfigsRequest(parent=self.PATH),
@@ -494,8 +496,8 @@ class TestClient(unittest.TestCase):
         list(client.list_instance_configs(page_size=42))
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", client.project_name),
-            ("x-goog-request-params", "parent={}".format(client.project_name)),
+            (u"google-cloud-resource-prefix", client.project_name),
+            (u"x-goog-request-params", u"parent={}".format(client.project_name)),
         )
         lic_api.assert_called_once_with(
             ListInstanceConfigsRequest(parent=self.PATH, page_size=page_size),
@@ -577,8 +579,8 @@ class TestClient(unittest.TestCase):
         self.assertEqual(instance.node_count, self.NODE_COUNT)
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", client.project_name),
-            ("x-goog-request-params", "parent={}".format(client.project_name)),
+            (u"google-cloud-resource-prefix", client.project_name),
+            (u"x-goog-request-params", u"parent={}".format(client.project_name)),
         )
         li_api.assert_called_once_with(
             ListInstancesRequest(parent=self.PATH),
@@ -604,12 +606,12 @@ class TestClient(unittest.TestCase):
         ] = mock.Mock(return_value=instance_pbs)
 
         page_size = 42
-        filter_ = "name:instance"
+        filter_ = u"name:instance"
         list(client.list_instances(filter_=filter_, page_size=42))
 
         expected_metadata = (
-            ("google-cloud-resource-prefix", client.project_name),
-            ("x-goog-request-params", "parent={}".format(client.project_name)),
+            (u"google-cloud-resource-prefix", client.project_name),
+            (u"x-goog-request-params", u"parent={}".format(client.project_name)),
         )
         li_api.assert_called_once_with(
             ListInstancesRequest(parent=self.PATH, filter=filter_, page_size=page_size),

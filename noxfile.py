@@ -23,31 +23,31 @@ import shutil
 import nox
 
 
-BLACK_VERSION = "black==19.10b0"
-BLACK_PATHS = ["docs", "google", "tests", "noxfile.py", "setup.py"]
+BLACK_VERSION = u"black==19.10b0"
+BLACK_PATHS = [u"docs", u"google", u"tests", u"noxfile.py", u"setup.py"]
 
-DEFAULT_PYTHON_VERSION = "3.8"
-SYSTEM_TEST_PYTHON_VERSIONS = ["3.8"]
-UNIT_TEST_PYTHON_VERSIONS = ["3.6", "3.7", "3.8"]
+DEFAULT_PYTHON_VERSION = u"3.8"
+SYSTEM_TEST_PYTHON_VERSIONS = [u"3.8"]
+UNIT_TEST_PYTHON_VERSIONS = [u"3.6", u"3.7", u"3.8"]
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def lint(session):
-    """Run linters.
+    u"""Run linters.
 
     Returns a failure if the linters find linting errors or sufficiently
     serious code quality issues.
     """
-    session.install("flake8", BLACK_VERSION)
+    session.install(u"flake8", BLACK_VERSION)
     session.run(
-        "black", "--check", *BLACK_PATHS,
+        u"black", u"--check", *BLACK_PATHS,
     )
-    session.run("flake8", "google", "tests")
+    session.run(u"flake8", u"google", u"tests")
 
 
-@nox.session(python="3.6")
+@nox.session(python=u"3.6")
 def blacken(session):
-    """Run black.
+    u"""Run black.
 
     Format code to uniform standard.
 
@@ -57,168 +57,168 @@ def blacken(session):
     """
     session.install(BLACK_VERSION)
     session.run(
-        "black", *BLACK_PATHS,
+        u"black", *BLACK_PATHS,
     )
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def lint_setup_py(session):
-    """Verify that setup.py is valid (including RST check)."""
-    session.install("docutils", "pygments")
-    session.run("python", "setup.py", "check", "--restructuredtext", "--strict")
+    u"""Verify that setup.py is valid (including RST check)."""
+    session.install(u"docutils", u"pygments")
+    session.run(u"python", u"setup.py", u"check", u"--restructuredtext", u"--strict")
 
 
 def default(session):
     # Install all test dependencies, then install this package in-place.
-    session.install("asyncmock", "pytest-asyncio")
+    session.install(u"asyncmock", u"pytest-asyncio")
 
-    session.install("mock", "pytest", "pytest-cov", "sqlparse")
-    session.install("-e", ".")
+    session.install(u"mock", u"pytest", u"pytest-cov", u"sqlparse")
+    session.install(u"-e", u".")
 
     # Run py.test against the unit tests.
     session.run(
-        "py.test",
-        "--quiet",
-        "--cov=google.cloud.spanner",
-        "--cov=google.cloud",
-        "--cov=tests.unit",
-        "--cov-append",
-        "--cov-config=.coveragerc",
-        "--cov-report=",
-        "--cov-fail-under=0",
-        os.path.join("tests", "unit"),
+        u"py.test",
+        u"--quiet",
+        u"--cov=google.cloud.spanner",
+        u"--cov=google.cloud",
+        u"--cov=tests.unit",
+        u"--cov-append",
+        u"--cov-config=.coveragerc",
+        u"--cov-report=",
+        u"--cov-fail-under=0",
+        os.path.join(u"tests", u"unit"),
         *session.posargs,
     )
 
-    session.install("-e", ".[tracing]")
+    session.install(u"-e", u".[tracing]")
 
     # Run py.test against the unit tests with OpenTelemetry.
     session.run(
-        "py.test",
-        "--quiet",
-        "--cov=google.cloud.spanner",
-        "--cov=google.cloud",
-        "--cov=tests.unit",
-        "--cov-append",
-        "--cov-config=.coveragerc",
-        "--cov-report=",
-        "--cov-fail-under=0",
-        os.path.join("tests", "unit"),
+        u"py.test",
+        u"--quiet",
+        u"--cov=google.cloud.spanner",
+        u"--cov=google.cloud",
+        u"--cov=tests.unit",
+        u"--cov-append",
+        u"--cov-config=.coveragerc",
+        u"--cov-report=",
+        u"--cov-fail-under=0",
+        os.path.join(u"tests", u"unit"),
         *session.posargs,
     )
 
 
 @nox.session(python=UNIT_TEST_PYTHON_VERSIONS)
 def unit(session):
-    """Run the unit test suite."""
+    u"""Run the unit test suite."""
     default(session)
 
 
 @nox.session(python=SYSTEM_TEST_PYTHON_VERSIONS)
 def system(session):
-    """Run the system test suite."""
-    system_test_path = os.path.join("tests", "system.py")
-    system_test_folder_path = os.path.join("tests", "system")
+    u"""Run the system test suite."""
+    system_test_path = os.path.join(u"tests", u"system.py")
+    system_test_folder_path = os.path.join(u"tests", u"system")
 
     # Check the value of `RUN_SYSTEM_TESTS` env var. It defaults to true.
-    if os.environ.get("RUN_SYSTEM_TESTS", "true") == "false":
-        session.skip("RUN_SYSTEM_TESTS is set to false, skipping")
+    if os.environ.get(u"RUN_SYSTEM_TESTS", u"true") == u"false":
+        session.skip(u"RUN_SYSTEM_TESTS is set to false, skipping")
     # Sanity check: Only run tests if the environment variable is set.
-    if not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "") and not os.environ.get(
-        "SPANNER_EMULATOR_HOST", ""
+    if not os.environ.get(u"GOOGLE_APPLICATION_CREDENTIALS", u"") and not os.environ.get(
+        u"SPANNER_EMULATOR_HOST", u""
     ):
         session.skip(
-            "Credentials or emulator host must be set via environment variable"
+            u"Credentials or emulator host must be set via environment variable"
         )
 
     system_test_exists = os.path.exists(system_test_path)
     system_test_folder_exists = os.path.exists(system_test_folder_path)
     # Sanity check: only run tests if found.
     if not system_test_exists and not system_test_folder_exists:
-        session.skip("System tests were not found")
+        session.skip(u"System tests were not found")
 
     # Use pre-release gRPC for system tests.
-    session.install("--pre", "grpcio")
+    session.install(u"--pre", u"grpcio")
 
     # Install all test dependencies, then install this package into the
     # virtualenv's dist-packages.
     session.install(
-        "mock", "pytest", "google-cloud-testutils",
+        u"mock", u"pytest", u"google-cloud-testutils",
     )
-    session.install("-e", ".[tracing]")
+    session.install(u"-e", u".[tracing]")
 
     # Run py.test against the system tests.
     if system_test_exists:
-        session.run("py.test", "--quiet", system_test_path, *session.posargs)
+        session.run(u"py.test", u"--quiet", system_test_path, *session.posargs)
     if system_test_folder_exists:
-        session.run("py.test", "--quiet", system_test_folder_path, *session.posargs)
+        session.run(u"py.test", u"--quiet", system_test_folder_path, *session.posargs)
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def cover(session):
-    """Run the final coverage report.
+    u"""Run the final coverage report.
 
     This outputs the coverage report aggregating coverage from the unit
     test runs (not system test runs), and then erases coverage data.
     """
-    session.install("coverage", "pytest-cov")
-    session.run("coverage", "report", "--show-missing", "--fail-under=99")
+    session.install(u"coverage", u"pytest-cov")
+    session.run(u"coverage", u"report", u"--show-missing", u"--fail-under=99")
 
-    session.run("coverage", "erase")
+    session.run(u"coverage", u"erase")
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def docs(session):
-    """Build the docs for this library."""
+    u"""Build the docs for this library."""
 
-    session.install("-e", ".[tracing]")
-    session.install("sphinx", "alabaster", "recommonmark")
+    session.install(u"-e", u".[tracing]")
+    session.install(u"sphinx", u"alabaster", u"recommonmark")
 
-    shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
+    shutil.rmtree(os.path.join(u"docs", u"_build"), ignore_errors=True)
     session.run(
-        "sphinx-build",
-        "-W",  # warnings as errors
-        "-T",  # show full traceback on exception
-        "-N",  # no colors
-        "-b",
-        "html",
-        "-d",
-        os.path.join("docs", "_build", "doctrees", ""),
-        os.path.join("docs", ""),
-        os.path.join("docs", "_build", "html", ""),
+        u"sphinx-build",
+        u"-W",  # warnings as errors
+        u"-T",  # show full traceback on exception
+        u"-N",  # no colors
+        u"-b",
+        u"html",
+        u"-d",
+        os.path.join(u"docs", u"_build", u"doctrees", u""),
+        os.path.join(u"docs", u""),
+        os.path.join(u"docs", u"_build", u"html", u""),
     )
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def docfx(session):
-    """Build the docfx yaml files for this library."""
+    u"""Build the docfx yaml files for this library."""
 
-    session.install("-e", ".[tracing]")
+    session.install(u"-e", u".[tracing]")
     # sphinx-docfx-yaml supports up to sphinx version 1.5.5.
     # https://github.com/docascode/sphinx-docfx-yaml/issues/97
-    session.install("sphinx==1.5.5", "alabaster", "recommonmark", "sphinx-docfx-yaml")
+    session.install(u"sphinx==1.5.5", u"alabaster", u"recommonmark", u"sphinx-docfx-yaml")
 
-    shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
+    shutil.rmtree(os.path.join(u"docs", u"_build"), ignore_errors=True)
     session.run(
-        "sphinx-build",
-        "-T",  # show full traceback on exception
-        "-N",  # no colors
-        "-D",
+        u"sphinx-build",
+        u"-T",  # show full traceback on exception
+        u"-N",  # no colors
+        u"-D",
         (
-            "extensions=sphinx.ext.autodoc,"
-            "sphinx.ext.autosummary,"
-            "docfx_yaml.extension,"
-            "sphinx.ext.intersphinx,"
-            "sphinx.ext.coverage,"
-            "sphinx.ext.napoleon,"
-            "sphinx.ext.todo,"
-            "sphinx.ext.viewcode,"
-            "recommonmark"
+            u"extensions=sphinx.ext.autodoc,"
+            u"sphinx.ext.autosummary,"
+            u"docfx_yaml.extension,"
+            u"sphinx.ext.intersphinx,"
+            u"sphinx.ext.coverage,"
+            u"sphinx.ext.napoleon,"
+            u"sphinx.ext.todo,"
+            u"sphinx.ext.viewcode,"
+            u"recommonmark"
         ),
-        "-b",
-        "html",
-        "-d",
-        os.path.join("docs", "_build", "doctrees", ""),
-        os.path.join("docs", ""),
-        os.path.join("docs", "_build", "html", ""),
+        u"-b",
+        u"html",
+        u"-d",
+        os.path.join(u"docs", u"_build", u"doctrees", u""),
+        os.path.join(u"docs", u""),
+        os.path.join(u"docs", u"_build", u"html", u""),
     )

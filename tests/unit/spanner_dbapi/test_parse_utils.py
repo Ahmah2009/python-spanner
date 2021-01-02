@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import sys
 import unittest
 
@@ -21,7 +23,7 @@ from google.cloud.spanner_v1 import param_types
 class TestParseUtils(unittest.TestCase):
 
     skip_condition = sys.version_info[0] < 3
-    skip_message = "Subtests are not supported in Python 2"
+    skip_message = u"Subtests are not supported in Python 2"
 
     def test_classify_stmt(self):
         from google.cloud.spanner_dbapi.parse_utils import STMT_DDL
@@ -31,29 +33,29 @@ class TestParseUtils(unittest.TestCase):
         from google.cloud.spanner_dbapi.parse_utils import classify_stmt
 
         cases = (
-            ("SELECT 1", STMT_NON_UPDATING),
-            ("SELECT s.SongName FROM Songs AS s", STMT_NON_UPDATING),
+            (u"SELECT 1", STMT_NON_UPDATING),
+            (u"SELECT s.SongName FROM Songs AS s", STMT_NON_UPDATING),
             (
-                "WITH sq AS (SELECT SchoolID FROM Roster) SELECT * from sq",
+                u"WITH sq AS (SELECT SchoolID FROM Roster) SELECT * from sq",
                 STMT_NON_UPDATING,
             ),
             (
-                "CREATE TABLE django_content_type (id STRING(64) NOT NULL, name STRING(100) "
-                "NOT NULL, app_label STRING(100) NOT NULL, model STRING(100) NOT NULL) PRIMARY KEY(id)",
+                u"CREATE TABLE django_content_type (id STRING(64) NOT NULL, name STRING(100) "
+                u"NOT NULL, app_label STRING(100) NOT NULL, model STRING(100) NOT NULL) PRIMARY KEY(id)",
                 STMT_DDL,
             ),
             (
-                "CREATE INDEX SongsBySingerAlbumSongNameDesc ON "
-                "Songs(SingerId, AlbumId, SongName DESC), INTERLEAVE IN Albums",
+                u"CREATE INDEX SongsBySingerAlbumSongNameDesc ON "
+                u"Songs(SingerId, AlbumId, SongName DESC), INTERLEAVE IN Albums",
                 STMT_DDL,
             ),
-            ("CREATE INDEX SongsBySongName ON Songs(SongName)", STMT_DDL),
+            (u"CREATE INDEX SongsBySongName ON Songs(SongName)", STMT_DDL),
             (
-                "CREATE INDEX AlbumsByAlbumTitle2 ON Albums(AlbumTitle) STORING (MarketingBudget)",
+                u"CREATE INDEX AlbumsByAlbumTitle2 ON Albums(AlbumTitle) STORING (MarketingBudget)",
                 STMT_DDL,
             ),
-            ("INSERT INTO table (col1) VALUES (1)", STMT_INSERT),
-            ("UPDATE table SET col1 = 1 WHERE col1 = NULL", STMT_UPDATING),
+            (u"INSERT INTO table (col1) VALUES (1)", STMT_INSERT),
+            (u"UPDATE table SET col1 = 1 WHERE col1 = NULL", STMT_UPDATING),
         )
 
         for query, want_class in cases:
@@ -65,109 +67,109 @@ class TestParseUtils(unittest.TestCase):
         from google.cloud.spanner_dbapi.exceptions import ProgrammingError
 
         with self.assertRaises(ProgrammingError):
-            parse_insert("bad-sql", None)
+            parse_insert(u"bad-sql", None)
 
         cases = [
             (
-                "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
+                u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
                 [1, 2, 3, 4, 5, 6],
                 {
-                    "sql_params_list": [
+                    u"sql_params_list": [
                         (
-                            "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
+                            u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
                             (1, 2, 3),
                         ),
                         (
-                            "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
+                            u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
                             (4, 5, 6),
                         ),
                     ]
                 },
             ),
             (
-                "INSERT INTO django_migrations(app, name, applied) VALUES (%s, %s, %s)",
+                u"INSERT INTO django_migrations(app, name, applied) VALUES (%s, %s, %s)",
                 [1, 2, 3, 4, 5, 6],
                 {
-                    "sql_params_list": [
+                    u"sql_params_list": [
                         (
-                            "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
+                            u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
                             (1, 2, 3),
                         ),
                         (
-                            "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
+                            u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)",
                             (4, 5, 6),
                         ),
                     ]
                 },
             ),
             (
-                "INSERT INTO sales.addresses (street, city, state, zip_code) "
-                "SELECT street, city, state, zip_code FROM sales.customers"
-                "ORDER BY first_name, last_name",
+                u"INSERT INTO sales.addresses (street, city, state, zip_code) "
+                u"SELECT street, city, state, zip_code FROM sales.customers"
+                u"ORDER BY first_name, last_name",
                 None,
                 {
-                    "sql_params_list": [
+                    u"sql_params_list": [
                         (
-                            "INSERT INTO sales.addresses (street, city, state, zip_code) "
-                            "SELECT street, city, state, zip_code FROM sales.customers"
-                            "ORDER BY first_name, last_name",
+                            u"INSERT INTO sales.addresses (street, city, state, zip_code) "
+                            u"SELECT street, city, state, zip_code FROM sales.customers"
+                            u"ORDER BY first_name, last_name",
                             None,
                         )
                     ]
                 },
             ),
             (
-                "INSERT INTO ap (n, ct, cn) "
-                "VALUES (%s, %s, %s), (%s, %s, %s), (%s, %s, %s),(%s,      %s, %s)",
+                u"INSERT INTO ap (n, ct, cn) "
+                u"VALUES (%s, %s, %s), (%s, %s, %s), (%s, %s, %s),(%s,      %s, %s)",
                 (1, 2, 3, 4, 5, 6, 7, 8, 9),
                 {
-                    "sql_params_list": [
-                        ("INSERT INTO ap (n, ct, cn) VALUES (%s, %s, %s)", (1, 2, 3)),
-                        ("INSERT INTO ap (n, ct, cn) VALUES (%s, %s, %s)", (4, 5, 6)),
-                        ("INSERT INTO ap (n, ct, cn) VALUES (%s, %s, %s)", (7, 8, 9)),
+                    u"sql_params_list": [
+                        (u"INSERT INTO ap (n, ct, cn) VALUES (%s, %s, %s)", (1, 2, 3)),
+                        (u"INSERT INTO ap (n, ct, cn) VALUES (%s, %s, %s)", (4, 5, 6)),
+                        (u"INSERT INTO ap (n, ct, cn) VALUES (%s, %s, %s)", (7, 8, 9)),
                     ]
                 },
             ),
             (
-                "INSERT INTO `no` (`yes`) VALUES (%s)",
+                u"INSERT INTO `no` (`yes`) VALUES (%s)",
                 (1, 4, 5),
                 {
-                    "sql_params_list": [
-                        ("INSERT INTO `no` (`yes`) VALUES (%s)", (1,)),
-                        ("INSERT INTO `no` (`yes`) VALUES (%s)", (4,)),
-                        ("INSERT INTO `no` (`yes`) VALUES (%s)", (5,)),
+                    u"sql_params_list": [
+                        (u"INSERT INTO `no` (`yes`) VALUES (%s)", (1,)),
+                        (u"INSERT INTO `no` (`yes`) VALUES (%s)", (4,)),
+                        (u"INSERT INTO `no` (`yes`) VALUES (%s)", (5,)),
                     ]
                 },
             ),
             (
-                "INSERT INTO T (f1, f2) VALUES (1, 2)",
+                u"INSERT INTO T (f1, f2) VALUES (1, 2)",
                 None,
-                {"sql_params_list": [("INSERT INTO T (f1, f2) VALUES (1, 2)", None)]},
+                {u"sql_params_list": [(u"INSERT INTO T (f1, f2) VALUES (1, 2)", None)]},
             ),
             (
-                "INSERT INTO `no` (`yes`, tiff) VALUES (%s, LOWER(%s)), (%s, %s), (%s, %s)",
-                (1, "FOO", 5, 10, 11, 29),
+                u"INSERT INTO `no` (`yes`, tiff) VALUES (%s, LOWER(%s)), (%s, %s), (%s, %s)",
+                (1, u"FOO", 5, 10, 11, 29),
                 {
-                    "sql_params_list": [
+                    u"sql_params_list": [
                         (
-                            "INSERT INTO `no` (`yes`, tiff)  VALUES(%s, LOWER(%s))",
-                            (1, "FOO"),
+                            u"INSERT INTO `no` (`yes`, tiff)  VALUES(%s, LOWER(%s))",
+                            (1, u"FOO"),
                         ),
-                        ("INSERT INTO `no` (`yes`, tiff)  VALUES(%s, %s)", (5, 10)),
-                        ("INSERT INTO `no` (`yes`, tiff)  VALUES(%s, %s)", (11, 29)),
+                        (u"INSERT INTO `no` (`yes`, tiff)  VALUES(%s, %s)", (5, 10)),
+                        (u"INSERT INTO `no` (`yes`, tiff)  VALUES(%s, %s)", (11, 29)),
                     ]
                 },
             ),
         ]
 
-        sql = "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)"
+        sql = u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s)"
         with self.assertRaises(ProgrammingError):
             parse_insert(sql, None)
 
         for sql, params, want in cases:
             with self.subTest(sql=sql):
                 got = parse_insert(sql, params)
-                self.assertEqual(got, want, "Mismatch with parse_insert of `%s`" % sql)
+                self.assertEqual(got, want, u"Mismatch with parse_insert of `%s`" % sql)
 
     @unittest.skipIf(skip_condition, skip_message)
     def test_parse_insert_invalid(self):
@@ -176,19 +178,19 @@ class TestParseUtils(unittest.TestCase):
 
         cases = [
             (
-                "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s), (%s, %s, %s)",
+                u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s), (%s, %s, %s)",
                 [1, 2, 3, 4, 5, 6, 7],
-                "len\\(params\\)=7 MUST be a multiple of len\\(pyformat_args\\)=3",
+                u"len\\(params\\)=7 MUST be a multiple of len\\(pyformat_args\\)=3",
             ),
             (
-                "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s), (%s, %s, LOWER(%s))",
+                u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s), (%s, %s, LOWER(%s))",
                 [1, 2, 3, 4, 5, 6, 7],
-                "Invalid length: VALUES\\(...\\) len: 6 != len\\(params\\): 7",
+                u"Invalid length: VALUES\\(...\\) len: 6 != len\\(params\\): 7",
             ),
             (
-                "INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s), (%s, %s, LOWER(%s)))",
+                u"INSERT INTO django_migrations (app, name, applied) VALUES (%s, %s, %s), (%s, %s, LOWER(%s)))",
                 [1, 2, 3, 4, 5, 6],
-                "VALUES: expected `,` got \\) in \\)",
+                u"VALUES: expected `,` got \\) in \\)",
             ),
         ]
 
@@ -209,42 +211,42 @@ class TestParseUtils(unittest.TestCase):
             rows_for_insert_or_update([0], [[]])
 
         with self.assertRaises(Error):
-            rows_for_insert_or_update([0], None, ["0", "%s"])
+            rows_for_insert_or_update([0], None, [u"0", u"%s"])
 
         cases = [
             (
-                ["id", "app", "name"],
-                [(5, "ap", "n"), (6, "bp", "m")],
+                [u"id", u"app", u"name"],
+                [(5, u"ap", u"n"), (6, u"bp", u"m")],
                 None,
-                [(5, "ap", "n"), (6, "bp", "m")],
+                [(5, u"ap", u"n"), (6, u"bp", u"m")],
             ),
             (
-                ["app", "name"],
-                [("ap", "n"), ("bp", "m")],
+                [u"app", u"name"],
+                [(u"ap", u"n"), (u"bp", u"m")],
                 None,
-                [("ap", "n"), ("bp", "m")],
+                [(u"ap", u"n"), (u"bp", u"m")],
             ),
             (
-                ["app", "name", "fn"],
-                ["ap", "n", "f1", "bp", "m", "f2", "cp", "o", "f3"],
-                ["(%s, %s, %s)", "(%s, %s, %s)", "(%s, %s, %s)"],
-                [("ap", "n", "f1"), ("bp", "m", "f2"), ("cp", "o", "f3")],
+                [u"app", u"name", u"fn"],
+                [u"ap", u"n", u"f1", u"bp", u"m", u"f2", u"cp", u"o", u"f3"],
+                [u"(%s, %s, %s)", u"(%s, %s, %s)", u"(%s, %s, %s)"],
+                [(u"ap", u"n", u"f1"), (u"bp", u"m", u"f2"), (u"cp", u"o", u"f3")],
             ),
             (
-                ["app", "name", "fn", "ln"],
+                [u"app", u"name", u"fn", u"ln"],
                 [
-                    ("ap", "n", (45, "nested"), "ll"),
-                    ("bp", "m", "f2", "mt"),
-                    ("fp", "cp", "o", "f3"),
+                    (u"ap", u"n", (45, u"nested"), u"ll"),
+                    (u"bp", u"m", u"f2", u"mt"),
+                    (u"fp", u"cp", u"o", u"f3"),
                 ],
                 None,
                 [
-                    ("ap", "n", (45, "nested"), "ll"),
-                    ("bp", "m", "f2", "mt"),
-                    ("fp", "cp", "o", "f3"),
+                    (u"ap", u"n", (45, u"nested"), u"ll"),
+                    (u"bp", u"m", u"f2", u"mt"),
+                    (u"fp", u"cp", u"o", u"f3"),
                 ],
             ),
-            (["app", "name", "fn"], ["ap", "n", "f1"], None, [("ap", "n", "f1")]),
+            ([u"app", u"name", u"fn"], [u"ap", u"n", u"f1"], None, [(u"ap", u"n", u"f1")]),
         ]
 
         for i, (columns, params, pyformat_args, want) in enumerate(cases):
@@ -261,53 +263,53 @@ class TestParseUtils(unittest.TestCase):
         cases = [
             (
                 (
-                    "SELECT * from t WHERE f1=%s, f2 = %s, f3=%s",
-                    (10, "abc", "y**$22l3f"),
+                    u"SELECT * from t WHERE f1=%s, f2 = %s, f3=%s",
+                    (10, u"abc", u"y**$22l3f"),
                 ),
                 (
-                    "SELECT * from t WHERE f1=@a0, f2 = @a1, f3=@a2",
-                    {"a0": 10, "a1": "abc", "a2": "y**$22l3f"},
-                ),
-            ),
-            (
-                (
-                    "INSERT INTO t (f1, f2, f2) VALUES (%s, %s, %s)",
-                    ("app", "name", "applied"),
-                ),
-                (
-                    "INSERT INTO t (f1, f2, f2) VALUES (@a0, @a1, @a2)",
-                    {"a0": "app", "a1": "name", "a2": "applied"},
+                    u"SELECT * from t WHERE f1=@a0, f2 = @a1, f3=@a2",
+                    {u"a0": 10, u"a1": u"abc", u"a2": u"y**$22l3f"},
                 ),
             ),
             (
                 (
-                    "INSERT INTO t (f1, f2, f2) VALUES (%(f1)s, %(f2)s, %(f3)s)",
-                    {"f1": "app", "f2": "name", "f3": "applied"},
+                    u"INSERT INTO t (f1, f2, f2) VALUES (%s, %s, %s)",
+                    (u"app", u"name", u"applied"),
                 ),
                 (
-                    "INSERT INTO t (f1, f2, f2) VALUES (@a0, @a1, @a2)",
-                    {"a0": "app", "a1": "name", "a2": "applied"},
+                    u"INSERT INTO t (f1, f2, f2) VALUES (@a0, @a1, @a2)",
+                    {u"a0": u"app", u"a1": u"name", u"a2": u"applied"},
+                ),
+            ),
+            (
+                (
+                    u"INSERT INTO t (f1, f2, f2) VALUES (%(f1)s, %(f2)s, %(f3)s)",
+                    {u"f1": u"app", u"f2": u"name", u"f3": u"applied"},
+                ),
+                (
+                    u"INSERT INTO t (f1, f2, f2) VALUES (@a0, @a1, @a2)",
+                    {u"a0": u"app", u"a1": u"name", u"a2": u"applied"},
                 ),
             ),
             (
                 # Intentionally using a dict with more keys than will be resolved.
-                ("SELECT * from t WHERE f1=%(f1)s", {"f1": "app", "f2": "name"}),
-                ("SELECT * from t WHERE f1=@a0", {"a0": "app"}),
+                (u"SELECT * from t WHERE f1=%(f1)s", {u"f1": u"app", u"f2": u"name"}),
+                (u"SELECT * from t WHERE f1=@a0", {u"a0": u"app"}),
             ),
             (
                 # No args to replace, we MUST return the original params dict
                 # since it might be useful to pass to the next user.
-                ("SELECT * from t WHERE id=10", {"f1": "app", "f2": "name"}),
-                ("SELECT * from t WHERE id=10", {"f1": "app", "f2": "name"}),
+                (u"SELECT * from t WHERE id=10", {u"f1": u"app", u"f2": u"name"}),
+                (u"SELECT * from t WHERE id=10", {u"f1": u"app", u"f2": u"name"}),
             ),
             (
                 (
-                    "SELECT (an.p + %s) AS np FROM an WHERE (an.p + %s) = %s",
-                    (1, 1.0, decimal.Decimal("31")),
+                    u"SELECT (an.p + %s) AS np FROM an WHERE (an.p + %s) = %s",
+                    (1, 1.0, decimal.Decimal(u"31")),
                 ),
                 (
-                    "SELECT (an.p + @a0) AS np FROM an WHERE (an.p + @a1) = @a2",
-                    {"a0": 1, "a1": 1.0, "a2": str(31)},
+                    u"SELECT (an.p + @a0) AS np FROM an WHERE (an.p + @a1) = @a2",
+                    {u"a0": 1, u"a1": 1.0, u"a2": unicode(31)},
                 ),
             ),
         ]
@@ -315,9 +317,9 @@ class TestParseUtils(unittest.TestCase):
             with self.subTest(sql=sql_in):
                 got_sql, got_named_args = sql_pyformat_args_to_spanner(sql_in, params)
                 want_sql, want_named_args = sql_want
-                self.assertEqual(got_sql, want_sql, "SQL does not match")
+                self.assertEqual(got_sql, want_sql, u"SQL does not match")
                 self.assertEqual(
-                    got_named_args, want_named_args, "Named args do not match"
+                    got_named_args, want_named_args, u"Named args do not match"
                 )
 
     @unittest.skipIf(skip_condition, skip_message)
@@ -327,15 +329,15 @@ class TestParseUtils(unittest.TestCase):
 
         cases = [
             (
-                "SELECT * from t WHERE f1=%s, f2 = %s, f3=%s, extra=%s",
-                (10, "abc", "y**$22l3f"),
+                u"SELECT * from t WHERE f1=%s, f2 = %s, f3=%s, extra=%s",
+                (10, u"abc", u"y**$22l3f"),
             )
         ]
         for sql, params in cases:
             with self.subTest(sql=sql):
                 self.assertRaisesRegex(
                     exceptions.Error,
-                    "pyformat_args mismatch",
+                    u"pyformat_args mismatch",
                     lambda: sql_pyformat_args_to_spanner(sql, params),
                 )
 
@@ -346,9 +348,9 @@ class TestParseUtils(unittest.TestCase):
 
         dec = 3
         value = decimal.Decimal(dec)
-        self.assertEqual(cast_for_spanner(value), str(dec))
+        self.assertEqual(cast_for_spanner(value), unicode(dec))
         self.assertEqual(cast_for_spanner(5), 5)
-        self.assertEqual(cast_for_spanner("string"), "string")
+        self.assertEqual(cast_for_spanner(u"string"), u"string")
 
     @unittest.skipIf(skip_condition, skip_message)
     def test_get_param_types(self):
@@ -359,27 +361,27 @@ class TestParseUtils(unittest.TestCase):
         from google.cloud.spanner_dbapi.parse_utils import get_param_types
 
         params = {
-            "a1": 10,
-            "b1": "string",
-            "c1": 10.39,
-            "d1": TimestampStr("2005-08-30T01:01:01.000001Z"),
-            "e1": DateStr("2019-12-05"),
-            "f1": True,
-            "g1": datetime.datetime(2011, 9, 1, 13, 20, 30),
-            "h1": datetime.date(2011, 9, 1),
-            "i1": b"bytes",
-            "j1": None,
+            u"a1": 10,
+            u"b1": u"string",
+            u"c1": 10.39,
+            u"d1": TimestampStr(u"2005-08-30T01:01:01.000001Z"),
+            u"e1": DateStr(u"2019-12-05"),
+            u"f1": True,
+            u"g1": datetime.datetime(2011, 9, 1, 13, 20, 30),
+            u"h1": datetime.date(2011, 9, 1),
+            u"i1": "bytes",
+            u"j1": None,
         }
         want_types = {
-            "a1": param_types.INT64,
-            "b1": param_types.STRING,
-            "c1": param_types.FLOAT64,
-            "d1": param_types.TIMESTAMP,
-            "e1": param_types.DATE,
-            "f1": param_types.BOOL,
-            "g1": param_types.TIMESTAMP,
-            "h1": param_types.DATE,
-            "i1": param_types.BYTES,
+            u"a1": param_types.INT64,
+            u"b1": param_types.STRING,
+            u"c1": param_types.FLOAT64,
+            u"d1": param_types.TIMESTAMP,
+            u"e1": param_types.DATE,
+            u"f1": param_types.BOOL,
+            u"g1": param_types.TIMESTAMP,
+            u"h1": param_types.DATE,
+            u"i1": param_types.BYTES,
         }
         got_types = get_param_types(params)
         self.assertEqual(got_types, want_types)
@@ -395,26 +397,26 @@ class TestParseUtils(unittest.TestCase):
 
         cases = [
             (
-                "UPDATE a SET a.b=10 FROM articles a JOIN d c ON a.ai = c.ai WHERE c.ci = 1",
-                "UPDATE a SET a.b=10 FROM articles a JOIN d c ON a.ai = c.ai WHERE c.ci = 1",
+                u"UPDATE a SET a.b=10 FROM articles a JOIN d c ON a.ai = c.ai WHERE c.ci = 1",
+                u"UPDATE a SET a.b=10 FROM articles a JOIN d c ON a.ai = c.ai WHERE c.ci = 1",
             ),
             (
-                "UPDATE (SELECT * FROM A JOIN c ON ai.id = c.id WHERE cl.ci = 1) SET d=5",
-                "UPDATE (SELECT * FROM A JOIN c ON ai.id = c.id WHERE cl.ci = 1) SET d=5 WHERE 1=1",
+                u"UPDATE (SELECT * FROM A JOIN c ON ai.id = c.id WHERE cl.ci = 1) SET d=5",
+                u"UPDATE (SELECT * FROM A JOIN c ON ai.id = c.id WHERE cl.ci = 1) SET d=5 WHERE 1=1",
             ),
             (
-                "UPDATE T SET A = 1 WHERE C1 = 1 AND C2 = 2",
-                "UPDATE T SET A = 1 WHERE C1 = 1 AND C2 = 2",
+                u"UPDATE T SET A = 1 WHERE C1 = 1 AND C2 = 2",
+                u"UPDATE T SET A = 1 WHERE C1 = 1 AND C2 = 2",
             ),
             (
-                "UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
-                "UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
+                u"UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
+                u"UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
             ),
             (
-                "UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
-                "UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
+                u"UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
+                u"UPDATE T SET r=r*0.9 WHERE id IN (SELECT id FROM items WHERE r / w >= 1.3 AND q > 100)",
             ),
-            ("DELETE * FROM TABLE", "DELETE * FROM TABLE WHERE 1=1"),
+            (u"DELETE * FROM TABLE", u"DELETE * FROM TABLE WHERE 1=1"),
         ]
 
         for sql, want in cases:
@@ -427,11 +429,11 @@ class TestParseUtils(unittest.TestCase):
         from google.cloud.spanner_dbapi.parse_utils import escape_name
 
         cases = (
-            ("SELECT", "`SELECT`"),
-            ("dashed-value", "`dashed-value`"),
-            ("with space", "`with space`"),
-            ("name", "name"),
-            ("", ""),
+            (u"SELECT", u"`SELECT`"),
+            (u"dashed-value", u"`dashed-value`"),
+            (u"with space", u"`with space`"),
+            (u"name", u"name"),
+            (u"", u""),
         )
         for name, want in cases:
             with self.subTest(name=name):

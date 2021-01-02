@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -23,28 +24,27 @@ from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.admin.instance.v1",
-    manifest={
-        "ReplicaInfo",
-        "InstanceConfig",
-        "Instance",
-        "ListInstanceConfigsRequest",
-        "ListInstanceConfigsResponse",
-        "GetInstanceConfigRequest",
-        "GetInstanceRequest",
-        "CreateInstanceRequest",
-        "ListInstancesRequest",
-        "ListInstancesResponse",
-        "UpdateInstanceRequest",
-        "DeleteInstanceRequest",
-        "CreateInstanceMetadata",
-        "UpdateInstanceMetadata",
-    },
+    package=u"google.spanner.admin.instance.v1",
+    manifest=set([
+        u"ReplicaInfo",
+        u"InstanceConfig",
+        u"Instance",
+        u"ListInstanceConfigsRequest",
+        u"ListInstanceConfigsResponse",
+        u"GetInstanceConfigRequest",
+        u"GetInstanceRequest",
+        u"CreateInstanceRequest",
+        u"ListInstancesRequest",
+        u"ListInstancesResponse",
+        u"UpdateInstanceRequest",
+        u"DeleteInstanceRequest",
+        u"CreateInstanceMetadata",
+        u"UpdateInstanceMetadata",]),
 )
 
 
 class ReplicaInfo(proto.Message):
-    r"""
+    ur"""
 
     Attributes:
         location (str):
@@ -61,7 +61,7 @@ class ReplicaInfo(proto.Message):
     """
 
     class ReplicaType(proto.Enum):
-        r"""Indicates the type of replica. See the `replica types
+        ur"""Indicates the type of replica. See the `replica types
         documentation <https://cloud.google.com/spanner/docs/replication#replica_types>`__
         for more details.
         """
@@ -78,7 +78,7 @@ class ReplicaInfo(proto.Message):
 
 
 class InstanceConfig(proto.Message):
-    r"""A possible configuration for a Cloud Spanner instance.
+    ur"""A possible configuration for a Cloud Spanner instance.
     Configurations define the geographic placement of nodes and
     their replication.
 
@@ -100,11 +100,11 @@ class InstanceConfig(proto.Message):
 
     display_name = proto.Field(proto.STRING, number=2)
 
-    replicas = proto.RepeatedField(proto.MESSAGE, number=3, message="ReplicaInfo",)
+    replicas = proto.RepeatedField(proto.MESSAGE, number=3, message=u"ReplicaInfo",)
 
 
 class Instance(proto.Message):
-    r"""An isolated set of Cloud Spanner resources on which databases
+    ur"""An isolated set of Cloud Spanner resources on which databases
     can be hosted.
 
     Attributes:
@@ -176,7 +176,7 @@ class Instance(proto.Message):
     """
 
     class State(proto.Enum):
-        r"""Indicates the current state of the instance."""
+        ur"""Indicates the current state of the instance."""
         STATE_UNSPECIFIED = 0
         CREATING = 1
         READY = 2
@@ -197,7 +197,7 @@ class Instance(proto.Message):
 
 
 class ListInstanceConfigsRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ListInstanceConfigs][google.spanner.admin.instance.v1.InstanceAdmin.ListInstanceConfigs].
 
     Attributes:
@@ -224,7 +224,7 @@ class ListInstanceConfigsRequest(proto.Message):
 
 
 class ListInstanceConfigsResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ListInstanceConfigs][google.spanner.admin.instance.v1.InstanceAdmin.ListInstanceConfigs].
 
     Attributes:
@@ -242,14 +242,14 @@ class ListInstanceConfigsResponse(proto.Message):
         return self
 
     instance_configs = proto.RepeatedField(
-        proto.MESSAGE, number=1, message="InstanceConfig",
+        proto.MESSAGE, number=1, message=u"InstanceConfig",
     )
 
     next_page_token = proto.Field(proto.STRING, number=2)
 
 
 class GetInstanceConfigRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [GetInstanceConfigRequest][google.spanner.admin.instance.v1.InstanceAdmin.GetInstanceConfig].
 
     Attributes:
@@ -263,7 +263,7 @@ class GetInstanceConfigRequest(proto.Message):
 
 
 class GetInstanceRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [GetInstance][google.spanner.admin.instance.v1.InstanceAdmin.GetInstance].
 
     Attributes:
@@ -284,7 +284,7 @@ class GetInstanceRequest(proto.Message):
 
 
 class CreateInstanceRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [CreateInstance][google.spanner.admin.instance.v1.InstanceAdmin.CreateInstance].
 
     Attributes:
@@ -305,11 +305,11 @@ class CreateInstanceRequest(proto.Message):
 
     instance_id = proto.Field(proto.STRING, number=2)
 
-    instance = proto.Field(proto.MESSAGE, number=3, message="Instance",)
+    instance = proto.Field(proto.MESSAGE, number=3, message=u"Instance",)
 
 
 class ListInstancesRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ListInstances][google.spanner.admin.instance.v1.InstanceAdmin.ListInstances].
 
     Attributes:
@@ -360,7 +360,7 @@ class ListInstancesRequest(proto.Message):
 
 
 class ListInstancesResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ListInstances][google.spanner.admin.instance.v1.InstanceAdmin.ListInstances].
 
     Attributes:
@@ -376,13 +376,13 @@ class ListInstancesResponse(proto.Message):
     def raw_page(self):
         return self
 
-    instances = proto.RepeatedField(proto.MESSAGE, number=1, message="Instance",)
+    instances = proto.RepeatedField(proto.MESSAGE, number=1, message=u"Instance",)
 
     next_page_token = proto.Field(proto.STRING, number=2)
 
 
 class UpdateInstanceRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance].
 
     Attributes:
@@ -401,13 +401,13 @@ class UpdateInstanceRequest(proto.Message):
             them.
     """
 
-    instance = proto.Field(proto.MESSAGE, number=1, message="Instance",)
+    instance = proto.Field(proto.MESSAGE, number=1, message=u"Instance",)
 
     field_mask = proto.Field(proto.MESSAGE, number=2, message=gp_field_mask.FieldMask,)
 
 
 class DeleteInstanceRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [DeleteInstance][google.spanner.admin.instance.v1.InstanceAdmin.DeleteInstance].
 
     Attributes:
@@ -420,7 +420,7 @@ class DeleteInstanceRequest(proto.Message):
 
 
 class CreateInstanceMetadata(proto.Message):
-    r"""Metadata type for the operation returned by
+    ur"""Metadata type for the operation returned by
     [CreateInstance][google.spanner.admin.instance.v1.InstanceAdmin.CreateInstance].
 
     Attributes:
@@ -440,7 +440,7 @@ class CreateInstanceMetadata(proto.Message):
             was completed successfully.
     """
 
-    instance = proto.Field(proto.MESSAGE, number=1, message="Instance",)
+    instance = proto.Field(proto.MESSAGE, number=1, message=u"Instance",)
 
     start_time = proto.Field(proto.MESSAGE, number=2, message=timestamp.Timestamp,)
 
@@ -450,7 +450,7 @@ class CreateInstanceMetadata(proto.Message):
 
 
 class UpdateInstanceMetadata(proto.Message):
-    r"""Metadata type for the operation returned by
+    ur"""Metadata type for the operation returned by
     [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance].
 
     Attributes:
@@ -470,7 +470,7 @@ class UpdateInstanceMetadata(proto.Message):
             was completed successfully.
     """
 
-    instance = proto.Field(proto.MESSAGE, number=1, message="Instance",)
+    instance = proto.Field(proto.MESSAGE, number=1, message=u"Instance",)
 
     start_time = proto.Field(proto.MESSAGE, number=2, message=timestamp.Timestamp,)
 

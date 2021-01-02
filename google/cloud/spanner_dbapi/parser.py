@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
+u"""
 Grammar for parsing VALUES:
     VALUES      := `VALUES(` + ARGS + `)`
     ARGS        := [EXPR,]*EXPR
@@ -33,12 +33,13 @@ thus given:
                 |- (TERMINAL)
 """
 
+from __future__ import absolute_import
 from .exceptions import ProgrammingError
 
-ARGS = "ARGS"
-EXPR = "EXPR"
-FUNC = "FUNC"
-VALUES = "VALUES"
+ARGS = u"ARGS"
+EXPR = u"EXPR"
+FUNC = u"FUNC"
+VALUES = u"VALUES"
 
 
 class func(object):
@@ -47,7 +48,7 @@ class func(object):
         self.args = args
 
     def __str__(self):
-        return "%s%s" % (self.name, self.args)
+        return u"%s%s" % (self.name, self.args)
 
     def __repr__(self):
         return self.__str__()
@@ -67,8 +68,8 @@ class func(object):
         return len(self.args)
 
 
-class terminal(str):
-    """
+class terminal(unicode):
+    u"""
     terminal represents the unit symbol that can be part of a SQL values clause.
     """
 
@@ -80,7 +81,7 @@ class a_args(object):
         self.argv = argv
 
     def __str__(self):
-        return "(" + ", ".join([str(arg) for arg in self.argv]) + ")"
+        return u"(" + u", ".join([unicode(arg) for arg in self.argv]) + u")"
 
     def __repr__(self):
         return self.__str__()
@@ -108,7 +109,7 @@ class a_args(object):
         return self.argv[index]
 
     def homogenous(self):
-        """
+        u"""
         Return True if all the arguments are pyformat
         args and have the same number of arguments.
         """
@@ -126,7 +127,7 @@ class a_args(object):
         return True
 
     def _is_equal_length(self):
-        """
+        u"""
         Return False if all the arguments have the same length.
         """
         if len(self) == 0:
@@ -142,22 +143,22 @@ class a_args(object):
 
 class values(a_args):
     def __str__(self):
-        return "VALUES%s" % super().__str__()
+        return u"VALUES%s" % super(values, self).__str__()
 
 
 def parse_values(stmt):
     return expect(stmt, VALUES)
 
 
-pyfmt_str = terminal("%s")
+pyfmt_str = terminal(u"%s")
 
 
 def expect(word, token):
     word = word.strip()
     if token == VALUES:
-        if not word.startswith("VALUES"):
-            raise ProgrammingError("VALUES: `%s` does not start with VALUES" % word)
-        word = word[len("VALUES") :].lstrip()
+        if not word.startswith(u"VALUES"):
+            raise ProgrammingError(u"VALUES: `%s` does not start with VALUES" % word)
+        word = word[len(u"VALUES") :].lstrip()
 
         all_args = []
         while word:
@@ -167,24 +168,24 @@ def expect(word, token):
             all_args.append(arg)
             word = word.strip()
 
-            if word and not word.startswith(","):
+            if word and not word.startswith(u","):
                 raise ProgrammingError(
-                    "VALUES: expected `,` got %s in %s" % (word[0], word)
+                    u"VALUES: expected `,` got %s in %s" % (word[0], word)
                 )
             word = word[1:]
-        return "", values(all_args)
+        return u"", values(all_args)
 
     elif token == FUNC:
-        begins_with_letter = word and (word[0].isalpha() or word[0] == "_")
+        begins_with_letter = word and (word[0].isalpha() or word[0] == u"_")
         if not begins_with_letter:
             raise ProgrammingError(
-                "FUNC: `%s` does not begin with `a-zA-z` nor a `_`" % word
+                u"FUNC: `%s` does not begin with `a-zA-z` nor a `_`" % word
             )
 
         rest = word[1:]
         end = 0
         for ch in rest:
-            if ch.isalnum() or ch == "_":
+            if ch.isalnum() or ch == u"_":
                 end += 1
             else:
                 break
@@ -200,45 +201,45 @@ def expect(word, token):
         #   (%s, %s...)
         #   (FUNC, %s...)
         #   (%s, %s...)
-        if not (word and word.startswith("(")):
-            raise ProgrammingError("ARGS: supposed to begin with `(` in `%s`" % word)
+        if not (word and word.startswith(u"(")):
+            raise ProgrammingError(u"ARGS: supposed to begin with `(` in `%s`" % word)
 
         word = word[1:]
 
         terms = []
         while True:
             word = word.strip()
-            if not word or word.startswith(")"):
+            if not word or word.startswith(u")"):
                 break
 
-            if word == "%s":
+            if word == u"%s":
                 terms.append(pyfmt_str)
-                word = ""
-            elif not word.startswith("%s"):
+                word = u""
+            elif not word.startswith(u"%s"):
                 word, parsed = expect(word, FUNC)
                 terms.append(parsed)
             else:
                 terms.append(pyfmt_str)
                 word = word[2:].strip()
 
-            if word.startswith(","):
+            if word.startswith(u","):
                 word = word[1:]
 
-        if not (word and word.startswith(")")):
-            raise ProgrammingError("ARGS: supposed to end with `)` in `%s`" % word)
+        if not (word and word.startswith(u")")):
+            raise ProgrammingError(u"ARGS: supposed to end with `)` in `%s`" % word)
 
         word = word[1:]
         return word, a_args(terms)
 
     elif token == EXPR:
-        if word == "%s":
+        if word == u"%s":
             # Terminal symbol.
-            return "", pyfmt_str
+            return u"", pyfmt_str
 
         # Otherwise we expect a function.
         return expect(word, FUNC)
 
-    raise ProgrammingError("Unknown token `%s`" % token)
+    raise ProgrammingError(u"Unknown token `%s`" % token)
 
 
 def as_values(values_stmt):

@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from __future__ import absolute_import
 import proto  # type: ignore
 
 
@@ -25,38 +26,37 @@ from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
 
 
 __protobuf__ = proto.module(
-    package="google.spanner.admin.database.v1",
-    manifest={
-        "RestoreSourceType",
-        "RestoreInfo",
-        "Database",
-        "ListDatabasesRequest",
-        "ListDatabasesResponse",
-        "CreateDatabaseRequest",
-        "CreateDatabaseMetadata",
-        "GetDatabaseRequest",
-        "UpdateDatabaseDdlRequest",
-        "UpdateDatabaseDdlMetadata",
-        "DropDatabaseRequest",
-        "GetDatabaseDdlRequest",
-        "GetDatabaseDdlResponse",
-        "ListDatabaseOperationsRequest",
-        "ListDatabaseOperationsResponse",
-        "RestoreDatabaseRequest",
-        "RestoreDatabaseMetadata",
-        "OptimizeRestoredDatabaseMetadata",
-    },
+    package=u"google.spanner.admin.database.v1",
+    manifest=set([
+        u"RestoreSourceType",
+        u"RestoreInfo",
+        u"Database",
+        u"ListDatabasesRequest",
+        u"ListDatabasesResponse",
+        u"CreateDatabaseRequest",
+        u"CreateDatabaseMetadata",
+        u"GetDatabaseRequest",
+        u"UpdateDatabaseDdlRequest",
+        u"UpdateDatabaseDdlMetadata",
+        u"DropDatabaseRequest",
+        u"GetDatabaseDdlRequest",
+        u"GetDatabaseDdlResponse",
+        u"ListDatabaseOperationsRequest",
+        u"ListDatabaseOperationsResponse",
+        u"RestoreDatabaseRequest",
+        u"RestoreDatabaseMetadata",
+        u"OptimizeRestoredDatabaseMetadata",]),
 )
 
 
 class RestoreSourceType(proto.Enum):
-    r"""Indicates the type of the restore source."""
+    ur"""Indicates the type of the restore source."""
     TYPE_UNSPECIFIED = 0
     BACKUP = 1
 
 
 class RestoreInfo(proto.Message):
-    r"""Information about the database restore.
+    ur"""Information about the database restore.
 
     Attributes:
         source_type (~.spanner_database_admin.RestoreSourceType):
@@ -66,15 +66,15 @@ class RestoreInfo(proto.Message):
             the database. The backup may no longer exist.
     """
 
-    source_type = proto.Field(proto.ENUM, number=1, enum="RestoreSourceType",)
+    source_type = proto.Field(proto.ENUM, number=1, enum=u"RestoreSourceType",)
 
     backup_info = proto.Field(
-        proto.MESSAGE, number=2, oneof="source_info", message=gsad_backup.BackupInfo,
+        proto.MESSAGE, number=2, oneof=u"source_info", message=gsad_backup.BackupInfo,
     )
 
 
 class Database(proto.Message):
-    r"""A Cloud Spanner database.
+    ur"""A Cloud Spanner database.
 
     Attributes:
         name (str):
@@ -95,7 +95,7 @@ class Database(proto.Message):
     """
 
     class State(proto.Enum):
-        r"""Indicates the current state of the database."""
+        ur"""Indicates the current state of the database."""
         STATE_UNSPECIFIED = 0
         CREATING = 1
         READY = 2
@@ -107,11 +107,11 @@ class Database(proto.Message):
 
     create_time = proto.Field(proto.MESSAGE, number=3, message=timestamp.Timestamp,)
 
-    restore_info = proto.Field(proto.MESSAGE, number=4, message="RestoreInfo",)
+    restore_info = proto.Field(proto.MESSAGE, number=4, message=u"RestoreInfo",)
 
 
 class ListDatabasesRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ListDatabases][google.spanner.admin.database.v1.DatabaseAdmin.ListDatabases].
 
     Attributes:
@@ -138,7 +138,7 @@ class ListDatabasesRequest(proto.Message):
 
 
 class ListDatabasesResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ListDatabases][google.spanner.admin.database.v1.DatabaseAdmin.ListDatabases].
 
     Attributes:
@@ -154,13 +154,13 @@ class ListDatabasesResponse(proto.Message):
     def raw_page(self):
         return self
 
-    databases = proto.RepeatedField(proto.MESSAGE, number=1, message="Database",)
+    databases = proto.RepeatedField(proto.MESSAGE, number=1, message=u"Database",)
 
     next_page_token = proto.Field(proto.STRING, number=2)
 
 
 class CreateDatabaseRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [CreateDatabase][google.spanner.admin.database.v1.DatabaseAdmin.CreateDatabase].
 
     Attributes:
@@ -192,7 +192,7 @@ class CreateDatabaseRequest(proto.Message):
 
 
 class CreateDatabaseMetadata(proto.Message):
-    r"""Metadata type for the operation returned by
+    ur"""Metadata type for the operation returned by
     [CreateDatabase][google.spanner.admin.database.v1.DatabaseAdmin.CreateDatabase].
 
     Attributes:
@@ -204,7 +204,7 @@ class CreateDatabaseMetadata(proto.Message):
 
 
 class GetDatabaseRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [GetDatabase][google.spanner.admin.database.v1.DatabaseAdmin.GetDatabase].
 
     Attributes:
@@ -218,7 +218,7 @@ class GetDatabaseRequest(proto.Message):
 
 
 class UpdateDatabaseDdlRequest(proto.Message):
-    r"""Enqueues the given DDL statements to be applied, in order but not
+    ur"""Enqueues the given DDL statements to be applied, in order but not
     necessarily all at once, to the database schema at some point (or
     points) in the future. The server checks that the statements are
     executable (syntactically valid, name tables that exist, etc.)
@@ -273,7 +273,7 @@ class UpdateDatabaseDdlRequest(proto.Message):
 
 
 class UpdateDatabaseDdlMetadata(proto.Message):
-    r"""Metadata type for the operation returned by
+    ur"""Metadata type for the operation returned by
     [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl].
 
     Attributes:
@@ -299,7 +299,7 @@ class UpdateDatabaseDdlMetadata(proto.Message):
 
 
 class DropDatabaseRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [DropDatabase][google.spanner.admin.database.v1.DatabaseAdmin.DropDatabase].
 
     Attributes:
@@ -311,7 +311,7 @@ class DropDatabaseRequest(proto.Message):
 
 
 class GetDatabaseDdlRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [GetDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.GetDatabaseDdl].
 
     Attributes:
@@ -324,7 +324,7 @@ class GetDatabaseDdlRequest(proto.Message):
 
 
 class GetDatabaseDdlResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [GetDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.GetDatabaseDdl].
 
     Attributes:
@@ -338,7 +338,7 @@ class GetDatabaseDdlResponse(proto.Message):
 
 
 class ListDatabaseOperationsRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [ListDatabaseOperations][google.spanner.admin.database.v1.DatabaseAdmin.ListDatabaseOperations].
 
     Attributes:
@@ -417,7 +417,7 @@ class ListDatabaseOperationsRequest(proto.Message):
 
 
 class ListDatabaseOperationsResponse(proto.Message):
-    r"""The response for
+    ur"""The response for
     [ListDatabaseOperations][google.spanner.admin.database.v1.DatabaseAdmin.ListDatabaseOperations].
 
     Attributes:
@@ -446,7 +446,7 @@ class ListDatabaseOperationsResponse(proto.Message):
 
 
 class RestoreDatabaseRequest(proto.Message):
-    r"""The request for
+    ur"""The request for
     [RestoreDatabase][google.spanner.admin.database.v1.DatabaseAdmin.RestoreDatabase].
 
     Attributes:
@@ -472,11 +472,11 @@ class RestoreDatabaseRequest(proto.Message):
 
     database_id = proto.Field(proto.STRING, number=2)
 
-    backup = proto.Field(proto.STRING, number=3, oneof="source")
+    backup = proto.Field(proto.STRING, number=3, oneof=u"source")
 
 
 class RestoreDatabaseMetadata(proto.Message):
-    r"""Metadata type for the long-running operation returned by
+    ur"""Metadata type for the long-running operation returned by
     [RestoreDatabase][google.spanner.admin.database.v1.DatabaseAdmin.RestoreDatabase].
 
     Attributes:
@@ -525,10 +525,10 @@ class RestoreDatabaseMetadata(proto.Message):
 
     name = proto.Field(proto.STRING, number=1)
 
-    source_type = proto.Field(proto.ENUM, number=2, enum="RestoreSourceType",)
+    source_type = proto.Field(proto.ENUM, number=2, enum=u"RestoreSourceType",)
 
     backup_info = proto.Field(
-        proto.MESSAGE, number=3, oneof="source_info", message=gsad_backup.BackupInfo,
+        proto.MESSAGE, number=3, oneof=u"source_info", message=gsad_backup.BackupInfo,
     )
 
     progress = proto.Field(proto.MESSAGE, number=4, message=common.OperationProgress,)
@@ -539,7 +539,7 @@ class RestoreDatabaseMetadata(proto.Message):
 
 
 class OptimizeRestoredDatabaseMetadata(proto.Message):
-    r"""Metadata type for the long-running operation used to track
+    ur"""Metadata type for the long-running operation used to track
     the progress of optimizations performed on a newly restored
     database. This long-running operation is automatically created
     by the system after the successful completion of a database

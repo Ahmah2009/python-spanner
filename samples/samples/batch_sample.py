@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This application demonstrates how to do batch operations using Cloud
+u"""This application demonstrates how to do batch operations using Cloud
 Spanner.
 
 For more information, see the README.rst under /spanner.
 """
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import argparse
 import concurrent.futures
 import time
@@ -27,7 +29,7 @@ from google.cloud import spanner
 
 # [START spanner_batch_client]
 def run_batch_query(instance_id, database_id):
-    """Runs an example batch query."""
+    u"""Runs an example batch query."""
 
     # Expected Table Format:
     # CREATE TABLE Singers (
@@ -44,8 +46,8 @@ def run_batch_query(instance_id, database_id):
     # Create the batch transaction and generate partitions
     snapshot = database.batch_snapshot()
     partitions = snapshot.generate_read_batches(
-        table="Singers",
-        columns=("SingerId", "FirstName", "LastName"),
+        table=u"Singers",
+        columns=(u"SingerId", u"FirstName", u"LastName"),
         keyset=spanner.KeySet(all_=True),
     )
 
@@ -57,18 +59,18 @@ def run_batch_query(instance_id, database_id):
         for future in concurrent.futures.as_completed(futures, timeout=3600):
             finish, row_ct = future.result()
             elapsed = finish - start
-            print(u"Completed {} rows in {} seconds".format(row_ct, elapsed))
+            print u"Completed {} rows in {} seconds".format(row_ct, elapsed)
 
     # Clean up
     snapshot.close()
 
 
 def process(snapshot, partition):
-    """Processes the requests of a query in an separate process."""
-    print("Started processing partition.")
+    u"""Processes the requests of a query in an separate process."""
+    print u"Started processing partition."
     row_ct = 0
     for row in snapshot.process_read_batch(partition):
-        print(u"SingerId: {}, AlbumId: {}, AlbumTitle: {}".format(*row))
+        print u"SingerId: {}, AlbumId: {}, AlbumTitle: {}".format(*row)
         row_ct += 1
     return time.time(), row_ct
 
@@ -76,13 +78,13 @@ def process(snapshot, partition):
 # [END spanner_batch_client]
 
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("instance_id", help="Your Cloud Spanner instance ID.")
+    parser.add_argument(u"instance_id", help=u"Your Cloud Spanner instance ID.")
     parser.add_argument(
-        "database_id", help="Your Cloud Spanner database ID.", default="example_db"
+        u"database_id", help=u"Your Cloud Spanner database ID.", default=u"example_db"
     )
 
     args = parser.parse_args()
